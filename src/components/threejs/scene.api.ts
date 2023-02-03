@@ -1,5 +1,7 @@
 import { THREE } from '@/components/threejs/three';
 import { Scene } from './scene';
+import { Material } from 'three/src/materials/Material';
+import { BufferGeometry } from 'three/src/core/BufferGeometry';
 
 /**
  * three scene 操作 api
@@ -23,10 +25,10 @@ export class SceneApi {
     let webGlCoordinate = this.getWebGlCoordinate(container, event);
     this.scene.pointer.set(webGlCoordinate.x, webGlCoordinate.y);
 
-    let raycaster = this.create3dRay(event, container);
+    let raycaster = this.create2dRay(event, container);
+    this.scene.renderer.setPixelRatio(window.devicePixelRatio);
     raycaster.setFromCamera(this.scene.pointer, this.scene.camera);
     const intersects = raycaster.intersectObjects(objects, true);
-
     if (intersects.length > 0) {
       const intersect: any = intersects[0];
       if (intersect) {
@@ -38,17 +40,9 @@ export class SceneApi {
           .floor()
           .multiplyScalar(25)
           .addScalar(12.5);
-        if (intersect.object !== this.scene.plane) {
-          console.log(this.scene.mouseMesh.position.y);
-          console.log(intersect.object.position.y);
-          this.scene.mouseMesh.position.y = 0;
-        } else {
-          this.scene.mouseMesh.position.y = 0;
-        }
+        this.scene.render();
       }
     }
-
-    this.scene.render();
   }
 
   /**
@@ -63,12 +57,64 @@ export class SceneApi {
     ) {
       selectedObjects.forEach((obj: any) => {
         obj.intersect.object.position.set(
-          obj.intersect.object.position.x + this.scene.mouseMesh.position.x,
-          this.scene.mouseMesh.position.y + 50,
-          obj.intersect.object.position.z + this.scene.mouseMesh.position.z
+          obj.intersect.object.position.x,
+          this.scene.mouseMesh.position.y,
+          obj.intersect.object.position.z
         );
       });
     }
+  }
+
+  create3dMouseDefault() {
+    this.clearModelWithName([], ['mouseCtrl']);
+    let cubeSize = this.scene.size / this.scene.divisions;
+    const rollOverGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    let rollOverMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      opacity: 0.5,
+      transparent: true,
+    });
+    let rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
+    rollOverMesh.name = 'mouseCtrl';
+    rollOverGeo.name = 'mouseCtrl';
+    rollOverMaterial.name = 'mouseCtrl';
+    this.scene.mouseMesh = rollOverMesh;
+    this.scene.scene.add(rollOverMesh);
+  }
+
+  create3dMouseByModel(
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material,
+    mesh: THREE.Mesh
+  ) {
+    this.clearModelWithName([], ['mouseCtrl']);
+    mesh.name = 'mouseCtrl';
+    geometry.name = 'mouseCtrl';
+    material.name = 'mouseCtrl';
+    this.scene.mouseMesh = mesh;
+    this.scene.scene.add(mesh);
+  }
+
+  create2dMouse() {
+    this.clearModelWithName([], ['mouseCtrl']);
+    let cubeSize = this.scene.size / this.scene.divisions;
+    // 鼠标几何（场景大小/场景分割份数）
+    let rollOverGeo = new THREE.PlaneGeometry(cubeSize, cubeSize);
+    // 鼠标材质
+    rollOverGeo.name = 'mouseCtrl';
+    let rollOverMaterial = new THREE.MeshLambertMaterial({
+      color: 0xff0000,
+      opacity: 0.5,
+      transparent: true,
+    });
+    rollOverMaterial.name = 'mouseCtrl';
+    // 鼠标方块平面
+    let rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
+    rollOverMesh.name = 'mouseCtrl';
+    // 旋转
+    rollOverMesh.rotateX(-Math.PI / 2);
+    this.scene.mouseMesh = rollOverMesh;
+    this.scene.scene.add(rollOverMesh);
   }
 
   /**
@@ -81,14 +127,39 @@ export class SceneApi {
       new THREE.MeshBasicMaterial({ color: 0xff0000 })
     );
     cube.name = 'myCube';
+    console.log(this.scene.mouseMesh);
     cube.position.set(
       this.scene.mouseMesh.position.x,
-      this.scene.mouseMesh.position.y + 50,
+      this.scene.mouseMesh.position.y +
+        50 -
+        this.scene.mouseMesh.geometry.parameters.height / 2,
       this.scene.mouseMesh.position.z
     );
     this.scene.scene.add(cube);
     this.scene.render();
     return cube;
+  }
+
+  /**
+   * raycaster射线扫描位置生成鼠标模型（测试用）
+   * @param intersect   raycaster射线扫描出来的模型区域
+   */
+  mouseClickCreateByMouse(intersect: any): THREE.Mesh {
+    let mesh = new THREE.Mesh(
+      this.scene.mouseMesh.geometry,
+      this.scene.mouseMesh.material
+    );
+    mesh.name = 'myCube';
+    mesh.position.set(
+      this.scene.mouseMesh.position.x,
+      this.scene.mouseMesh.position.y +
+        50 -
+        this.scene.mouseMesh.geometry.parameters.height / 2,
+      this.scene.mouseMesh.position.z
+    );
+    this.scene.scene.add(mesh);
+    this.scene.render();
+    return mesh;
   }
 
   /**
@@ -262,6 +333,14 @@ export class SceneApi {
     return new THREE.Raycaster(this.scene.camera.position, ray);
   }
 
+  create2dRay(event: any, container: HTMLElement): THREE.Raycaster {
+    let coordinate = this.getWebGlCoordinate(container, event);
+    this.scene.pointer.set(coordinate.x, coordinate.y);
+    let raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(this.scene.pointer, this.scene.camera);
+    return raycaster;
+  }
+
   /**
    * 选择一个模型
    * @param event             事件
@@ -274,13 +353,24 @@ export class SceneApi {
     selectedObjects: Array<any>
   ): any {
     // 获取三维射线
-    let rayCaster = this.create3dRay(event, container);
+    let rayCaster = this.create2dRay(event, container);
     const intersects = rayCaster.intersectObjects(
       this.scene.scene.children,
       true
     );
-
     if (intersects.length > 0) {
+      for (let i = intersects.length - 1; i >= 0; i -= 1) {
+        if (
+          intersects[i].object &&
+          intersects[i].object.name &&
+          (intersects[i].object.name === 'mouseCtrl' ||
+            intersects[i].object.name === 'axesHelper' ||
+            intersects[i].object instanceof THREE.BoxHelper)
+        ) {
+          intersects.splice(i, 1);
+        }
+      }
+
       const intersect: any = intersects[0];
 
       // 反选
@@ -295,12 +385,13 @@ export class SceneApi {
       }
 
       if (
-        !(intersect.object instanceof THREE.BoxHelper) &&
+        intersect.object &&
         intersect.object !== this.scene.plane &&
         intersect.object !== this.scene.mouseMesh &&
         intersect.object !== this.scene.axesHelper
       ) {
         let helper = new THREE.BoxHelper(intersect.object, 'blue');
+        helper.name = 'boxHelper';
         this.scene.scene.add(helper);
         selectedObjects.push({
           key: intersect.object.uuid,

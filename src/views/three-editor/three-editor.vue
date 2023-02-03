@@ -6,13 +6,15 @@
           <ChildComponent v-model:name="selectedName">
             {{ name }}
           </ChildComponent>
-          <button @click="parse3d"> 3d </button>
+          <button @click="parse3d"> 3d鼠标 </button>
 
-          <button @click="parse2d"> 2d </button>
+          <button @click="parse2d"> 2d鼠标 </button>
 
-          <button @click="onLineClick"> 画线 </button>
+          <button @click="cylinder"> 圆柱体鼠标 </button>
 
-          <button> 生成 </button>
+          <button @click="onLineClick"> 鼠标跟随 </button>
+
+          <button @click="createMouse"> 生成鼠标模型 </button>
 
           <button> 背景 </button>
 
@@ -21,6 +23,8 @@
           <button> 贴图 </button>
 
           <button> 光照 </button>
+
+          <button> 摄像头 </button>
 
           <button @click="undo"> 撤回 </button>
 
@@ -33,6 +37,8 @@
           <button> 导出gltf </button>
 
           <button> 保存为素材 </button>
+
+          <button> 打开新视图 </button>
 
           <button @click="clearChoose"> 清除选中 </button>
 
@@ -153,6 +159,13 @@
           case 18:
             holdAlt = true;
             break;
+          case 32:
+            scene.container.removeEventListener(
+              'pointermove',
+              this.onPointerMove,
+              false
+            );
+            break;
           default:
             break;
         }
@@ -171,6 +184,13 @@
           case 18:
             holdAlt = false;
             break;
+          case 32:
+            scene.container.addEventListener(
+              'pointermove',
+              this.onPointerMove,
+              false
+            );
+            break;
           default:
             break;
         }
@@ -179,13 +199,25 @@
       parse3d() {
         if (model === '2d') {
           model = '3d';
+          sceneApi.create3dMouseDefault();
         }
       },
 
       parse2d() {
         if (model === '3d') {
           model = '2d';
+          sceneApi.create2dMouse();
         }
+      },
+
+      cylinder() {
+        let geo = new THREE.CylinderGeometry(25, 25, 25, 25, 25, false);
+        let material = new THREE.MeshBasicMaterial({
+          color: 0xff0000,
+          wireframe: true,
+        });
+        let mesh = new THREE.Mesh(geo, material);
+        sceneApi.create3dMouseByModel(geo, material, mesh);
       },
 
       onLineClick() {
@@ -203,6 +235,16 @@
 
           // 关闭场景移动
           scene.controls.enabled = false;
+        }
+      },
+
+      createMouse() {
+        // 2d
+        let raycaster = sceneApi.create2dRay(event, container);
+        const intersects = raycaster.intersectObjects(objects);
+        if (intersects.length > 0) {
+          const intersect: any = intersects[0];
+          objects.push(sceneApi.mouseClickCreateByMouse(intersect));
         }
       },
 
@@ -225,11 +267,7 @@
 
       onPointerClick(event: any) {
         // 2d
-        let coordinate = sceneApi.getWebGlCoordinate(container, event);
-
-        scene.pointer.set(coordinate.x, coordinate.y);
-        let raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(scene.pointer, scene.camera);
+        let raycaster = sceneApi.create2dRay(event, container);
         const intersects = raycaster.intersectObjects(objects);
 
         // 移除模型控制
@@ -237,9 +275,9 @@
         if (intersects.length > 0) {
           const intersect: any = intersects[0];
           /*
-        左键 event.button = 0
-        中键 event.button = 1
-        右键 event.button = 2
+            左键 event.button = 0
+            中键 event.button = 1
+            右键 event.button = 2
          */
           if (event.button === 0) {
             if (holdAlt) {
