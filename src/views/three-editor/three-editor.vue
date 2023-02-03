@@ -20,6 +20,8 @@
 
           <button> 贴图 </button>
 
+          <button> 光照 </button>
+
           <button @click="undo"> 撤回 </button>
 
           <button @click="redo"> 恢复 </button>
@@ -32,7 +34,9 @@
 
           <button> 保存为素材 </button>
 
-          <button @click="clearModel"> 清空 </button>
+          <button @click="clearChoose"> 清除选中 </button>
+
+          <button @click="clearModel"> 清空模型 </button>
         </template>
       </a-page-header>
     </div>
@@ -52,6 +56,7 @@
 <script lang="ts">
   import { ref, reactive, toRefs, computed } from 'vue';
   import { Scene } from '@/components/threejs/scene';
+  import { SceneApi } from '@/components/threejs/scene.api';
   import {
     THREE,
     TransformControls,
@@ -61,6 +66,8 @@
   import gltf from '@/static/scene.gltf';
 
   let scene: Scene;
+
+  let sceneApi: SceneApi;
 
   let renders: any;
 
@@ -72,11 +79,11 @@
 
   let holdCtrl = false;
 
+  let holdAlt = false;
+
   let isEditor = false;
 
   let model = '2d';
-
-  let mousePoint = new Array<THREE.Vector3>();
 
   const objects: any = [];
 
@@ -102,6 +109,8 @@
       scene.renderer.domElement.style.outline = 'none';
       scene.container.appendChild(scene.renderer.domElement);
 
+      sceneApi = new SceneApi(scene);
+
       // 屏幕适应监听
       window.addEventListener('resize', that.onWindowResize, false);
       // shift down
@@ -126,7 +135,6 @@
 
     methods: {
       onWindowResize() {
-        console.log(container.clientWidth);
         scene.camera.aspect = container.clientWidth / container.clientHeight;
         scene.camera.updateProjectionMatrix();
         scene.renderer.setSize(container.clientWidth, container.clientHeight);
@@ -141,6 +149,9 @@
           case 17:
             holdCtrl = true;
             scene.controls.enabled = false;
+            break;
+          case 18:
+            holdAlt = true;
             break;
           default:
             break;
@@ -157,61 +168,24 @@
             holdCtrl = false;
             scene.controls.enabled = false;
             break;
+          case 18:
+            holdAlt = false;
+            break;
           default:
             break;
         }
       },
 
-      parse3d(event: any) {
+      parse3d() {
         if (model === '2d') {
           model = '3d';
         }
       },
 
-      parse2d(event: any) {
+      parse2d() {
         if (model === '3d') {
           model = '2d';
         }
-      },
-
-      onMouseDown(event: any) {
-        mousePoint = [];
-        let getBoundingClientRect = container.getBoundingClientRect();
-        let offsetWidth =
-          ((event.clientX - getBoundingClientRect.left) /
-            container.offsetWidth) *
-            2 -
-          1;
-        let offsetHeight =
-          -(
-            (event.clientY - getBoundingClientRect.top) /
-            container.offsetHeight
-          ) *
-            2 +
-          1;
-        console.log(offsetWidth);
-        console.log(offsetHeight);
-        mousePoint.push(Scene.parseLine(offsetWidth, 0, offsetHeight));
-      },
-
-      onMouseUp(event: any) {
-        let getBoundingClientRect = container.getBoundingClientRect();
-        let offsetWidth =
-          ((event.clientX - getBoundingClientRect.left) /
-            container.offsetWidth) *
-            2 -
-          1;
-        let offsetHeight =
-          -(
-            (event.clientY - getBoundingClientRect.top) /
-            container.offsetHeight
-          ) *
-            2 +
-          1;
-        console.log(offsetWidth);
-        console.log(offsetHeight);
-        mousePoint.push(Scene.parseLine(offsetWidth, 0, offsetHeight));
-        scene.drawLine(mousePoint);
       },
 
       onLineClick() {
@@ -234,83 +208,26 @@
 
       // 选择模型
       chooseModel(event: any) {
-        // ray因为屏幕有侧边栏，位置偏移问题
-        let getBoundingClientRect = scene.container.getBoundingClientRect();
-        // 2d
-        let x =
-          ((event.clientX - getBoundingClientRect.left) /
-            container.offsetWidth) *
-            2 -
-          1;
-        let y =
-          -(
-            (event.clientY - getBoundingClientRect.top) /
-            container.offsetHeight
-          ) *
-            2 +
-          1;
-
-        // 标准设备坐标
-        let standardVector = new THREE.Vector3(x, y, 0.5);
-        let worldVector = standardVector.unproject(scene.camera);
-        let ray = worldVector.sub(scene.camera.position).normalize();
-        let rayCaster = new THREE.Raycaster(scene.camera.position, ray);
-        const intersects = rayCaster.intersectObjects(
-          scene.scene.children,
-          true
+        let hasSelect = sceneApi.chooseOneModel(
+          event,
+          container,
+          selectedObjects
         );
-
-        if (intersects.length > 0) {
-          const intersect: any = intersects[0];
-
-          // 反选
-          for (let i = selectedObjects.length - 1; i >= 0; i -= 1) {
-            if (selectedObjects[i].key === intersect.object.uuid) {
-              selectedObjects[i].helper.dispose();
-              selectedObjects[i].helper.remove();
-              scene.scene.remove(selectedObjects[i].helper);
-              selectedObjects.splice(i, 1);
-              return;
-            }
-          }
-
-          if (
-            !(intersect.object instanceof THREE.BoxHelper) &&
-            intersect.object !== scene.plane &&
-            intersect.object !== scene.mouseMesh &&
-            intersect.object !== scene.axesHelper
-          ) {
-            let helper = new THREE.BoxHelper(intersect.object, 'blue');
-            scene.scene.add(helper);
-            selectedObjects.push({
-              key: intersect.object.uuid,
-              helper,
-            });
-            currentSelect = intersect.object;
-            selectedName = intersect.object.name;
-            scene.render();
-          }
+        if (hasSelect) {
+          currentSelect = hasSelect;
         }
       },
 
-      onPointerClick(event: any) {
-        // ray因为屏幕有侧边栏，位置偏移问题
-        let getBoundingClientRect = scene.container.getBoundingClientRect();
-        // 2d
-        let x =
-          ((event.clientX - getBoundingClientRect.left) /
-            container.offsetWidth) *
-            2 -
-          1;
-        let y =
-          -(
-            (event.clientY - getBoundingClientRect.top) /
-            container.offsetHeight
-          ) *
-            2 +
-          1;
+      // 清空选择
+      clearChoose() {
+        sceneApi.clearChooseModels(selectedObjects);
+      },
 
-        scene.pointer.set(x, y);
+      onPointerClick(event: any) {
+        // 2d
+        let coordinate = sceneApi.getWebGlCoordinate(container, event);
+
+        scene.pointer.set(coordinate.x, coordinate.y);
         let raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(scene.pointer, scene.camera);
         const intersects = raycaster.intersectObjects(objects);
@@ -319,13 +236,16 @@
         this.transformControlsRemove();
         if (intersects.length > 0) {
           const intersect: any = intersects[0];
-          console.log(intersect);
           /*
         左键 event.button = 0
         中键 event.button = 1
         右键 event.button = 2
          */
           if (event.button === 0) {
+            if (holdAlt) {
+              sceneApi.moveObjectWithMouse(selectedObjects);
+              return;
+            }
             if (holdCtrl) {
               this.chooseModel(event);
               return;
@@ -336,98 +256,28 @@
                 intersect.object !== scene.plane &&
                 intersect.object !== scene.mouseMesh
               ) {
-                scene.scene.remove(intersect.object);
+                sceneApi.removeOne(intersect);
                 objects.splice(objects.indexOf(intersect.object), 1);
               }
             } else {
-              // 鼠标点击位置 添加模型
-              let cube = new THREE.Mesh(
-                new THREE.BoxGeometry(100, 100, 100),
-                new THREE.MeshBasicMaterial({
-                  color: 0xff0000,
-                })
-              );
-              cube.name = 'myCube';
-              cube.position.set(
-                intersect.point.x,
-                intersect.point.y,
-                intersect.point.z
-              );
-              scene.scene.add(cube);
-              scene.render();
+              objects.push(sceneApi.mouseClickCreateCube(intersect));
             }
           }
         }
       },
 
       onPointerMove(event: any) {
-        // ray因为屏幕有侧边栏，位置偏移问题
-        let getBoundingClientRect = container.getBoundingClientRect();
-        // 二维坐标
-        let x =
-          ((event.clientX - getBoundingClientRect.left) /
-            container.offsetWidth) *
-            2 -
-          1;
-        let y =
-          -(
-            (event.clientY - getBoundingClientRect.top) /
-            container.offsetHeight
-          ) *
-            2 +
-          1;
-        scene.pointer.set(x, y);
-
-        let raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(scene.pointer, scene.camera);
-        const intersects = raycaster.intersectObjects(objects);
-
-        if (intersects.length > 0) {
-          const intersect: any = intersects[0];
-          if (intersect) {
-            scene.mouseMesh.position
-              .copy(intersect.point)
-              .add(intersect.face.normal);
-            scene.mouseMesh.position
-              .divideScalar(25)
-              .floor()
-              .multiplyScalar(25)
-              .addScalar(12.5);
-            scene.mouseMesh.position.y = 0;
-          }
-        }
-
-        scene.render();
+        sceneApi.mouseMoveWithRedMesh(event, container, objects);
       },
 
       // 撤回
-      undo(event: any) {
-        if (objects.length > 1) {
-          let undo = objects[objects.length - 1];
-          undoObjects.push(undo);
-
-          if (undo.dispose) {
-            undo.dispose();
-          }
-
-          if (undo.remove) {
-            undo.remove();
-          }
-          scene.scene.remove(undo);
-          objects.length -= 1;
-          scene.render();
-        }
+      undo() {
+        sceneApi.undoWithCacheArray(objects, undoObjects);
       },
 
       // 恢复
-      redo(event: any) {
-        if (undoObjects.length > 0) {
-          let redo = undoObjects[undoObjects.length - 1];
-          scene.scene.add(redo);
-          objects.push(redo);
-          scene.render();
-          undoObjects.length -= 1;
-        }
+      redo() {
+        sceneApi.redoWithCacheArray(objects, undoObjects);
       },
 
       loadGltf() {
@@ -465,27 +315,12 @@
       },
 
       clearModel() {
-        let allChildren = scene.scene.children;
-        for (let i = allChildren.length - 1; i >= 0; i -= 1) {
-          // 清空线
-          if (
-            allChildren[i] instanceof THREE.Line &&
-            allChildren[i].name === Scene.LINE_NAME
-          ) {
-            scene.scene.remove(allChildren[i]);
-          }
-        }
-
+        // 删除模型
+        sceneApi.clearModelWithName(
+          ['Plane', 'axesHelper', 'mouseCtrl', 'gridHelper', 'pointLight'],
+          []
+        );
         objects.splice(1);
-
-        // 重置相机位置
-        scene.camera.position.set(0, 1100, 0);
-        scene.camera.lookAt(0, 0, 0);
-
-        // 回中
-        scene.mouseMesh.position.x = 0;
-        scene.mouseMesh.position.y = 0;
-        scene.mouseMesh.position.z = 0;
 
         // 移除事件
         scene.container.removeEventListener(
@@ -506,10 +341,7 @@
       initDispose() {
         let that = this as any;
         if (scene.scene) {
-          let allChildren = scene.scene.children.filter((x) => x);
-          allChildren.forEach((a) => {
-            that.dispose(scene.scene, a);
-          });
+          sceneApi.clearModelWithName([], []);
           scene.scene.remove();
           scene.renderer.dispose();
           scene.renderer.forceContextLoss();
@@ -517,33 +349,6 @@
         }
       },
 
-      dispose(parent: any, child: any) {
-        if (child.children.length) {
-          let arr = child.children.filter((x: any) => x);
-          arr.forEach((obj: any) => {
-            this.dispose(child, obj);
-          });
-        }
-        if (child.type === 'Mesh' || child.type === 'Line') {
-          if (child.material.map) {
-            if (child.material.map.dispose) {
-              child.material.map.dispose();
-            }
-          }
-          if (child.material.dispose) {
-            child.material.dispose();
-          }
-          if (child.geometry.dispose) {
-            child.geometry.dispose();
-          }
-        } else if (child.material) {
-          if (child.material.dispose) {
-            child.material.dispose();
-          }
-        }
-        child.remove();
-        parent.remove(child);
-      },
       destroyed() {
         this.initDispose();
       },
