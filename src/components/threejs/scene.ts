@@ -2,6 +2,7 @@ import { THREE, OrbitControls, GLTFLoader, DRACOLoader } from './three';
 
 /**
  * 场景model
+ * 封装 场景Scene，渲染器Renderer，摄像头Camera，光照Light，控制器controls，鼠标指针提示方块mouseMesh，地面plane，模型加载器xxxLoader，三维辅助线axesHelper
  * @author jhf
  */
 export class Scene {
@@ -73,16 +74,20 @@ export class Scene {
     // 三维辅助线
     this.axesHelper = new THREE.AxesHelper(this.size);
 
-    // 鼠标指示器
+    // 鼠标几何（场景大小/场景分割份数）
     let rollOverGeo = new THREE.PlaneGeometry(
       this.size / this.divisions,
       this.size / this.divisions
     );
+    // 鼠标材质
+    rollOverGeo.name = 'mouseCtrl';
     let rollOverMaterial = new THREE.MeshLambertMaterial({
       color: 0xff0000,
       opacity: 0.5,
       transparent: true,
     });
+    rollOverMaterial.name = 'mouseCtrl';
+    // 鼠标方块平面
     this.mouseMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
 
     // 初始化地面
@@ -149,6 +154,7 @@ export class Scene {
 
   // 初始化灯光
   initLight() {
+    this.light.name = 'pointLight';
     this.light.position.set(0, 100, 0);
     this.light.castShadow = true;
     this.scene.add(this.light);
@@ -171,12 +177,14 @@ export class Scene {
   // 画辅助线（线框）
   drawGridHelper() {
     let gridHelper = new THREE.GridHelper(this.size, this.divisions);
+    gridHelper.name = 'gridHelper';
     this.scene.add(gridHelper);
   }
 
   // 初始化中心方块
   drawCenter() {
     // 红色方块
+    // Math.PI = Π =  360°
     this.mouseMesh.rotateX(-Math.PI / 2);
     this.mouseMesh.name = 'mouseCtrl';
     this.scene.add(this.mouseMesh);

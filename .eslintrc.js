@@ -36,6 +36,7 @@ module.exports = {
     },
   },
   rules: {
+    'no-continue': 0,
     'class-methods-use-this': 0,
     '@typescript-eslint/no-unused-vars': 0,
     'prefer-const': 0,
