@@ -1,23 +1,23 @@
-var DracoEncoderModule = function (DracoEncoderModule) {
+let DracoEncoderModule = function (DracoEncoderModule) {
   DracoEncoderModule = DracoEncoderModule || {};
 
-  var Module =
+  let Module =
     typeof DracoEncoderModule !== 'undefined' ? DracoEncoderModule : {};
-  var isRuntimeInitialized = false;
-  var isModuleParsed = false;
-  Module['onRuntimeInitialized'] = function () {
+  let isRuntimeInitialized = false;
+  let isModuleParsed = false;
+  Module.onRuntimeInitialized = function () {
     isRuntimeInitialized = true;
     if (isModuleParsed) {
-      if (typeof Module['onModuleLoaded'] === 'function') {
-        Module['onModuleLoaded'](Module);
+      if (typeof Module.onModuleLoaded === 'function') {
+        Module.onModuleLoaded(Module);
       }
     }
   };
-  Module['onModuleParsed'] = function () {
+  Module.onModuleParsed = function () {
     isModuleParsed = true;
     if (isRuntimeInitialized) {
-      if (typeof Module['onModuleLoaded'] === 'function') {
-        Module['onModuleLoaded'](Module);
+      if (typeof Module.onModuleLoaded === 'function') {
+        Module.onModuleLoaded(Module);
       }
     }
   };
@@ -29,33 +29,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     if (version[0] != 0 || version[1] > 10) return false;
     return true;
   }
-  Module['isVersionSupported'] = isVersionSupported;
-  var moduleOverrides = {};
-  var key;
+  Module.isVersionSupported = isVersionSupported;
+  let moduleOverrides = {};
+  let key;
   for (key in Module) {
     if (Module.hasOwnProperty(key)) {
       moduleOverrides[key] = Module[key];
     }
   }
-  Module['arguments'] = [];
-  Module['thisProgram'] = './this.program';
-  Module['quit'] = function (status, toThrow) {
+  Module.arguments = [];
+  Module.thisProgram = './this.program';
+  Module.quit = function (status, toThrow) {
     throw toThrow;
   };
-  Module['preRun'] = [];
-  Module['postRun'] = [];
-  var ENVIRONMENT_IS_WEB = false;
-  var ENVIRONMENT_IS_WORKER = false;
-  var ENVIRONMENT_IS_NODE = false;
-  var ENVIRONMENT_IS_SHELL = false;
-  if (Module['ENVIRONMENT']) {
-    if (Module['ENVIRONMENT'] === 'WEB') {
+  Module.preRun = [];
+  Module.postRun = [];
+  let ENVIRONMENT_IS_WEB = false;
+  let ENVIRONMENT_IS_WORKER = false;
+  let ENVIRONMENT_IS_NODE = false;
+  let ENVIRONMENT_IS_SHELL = false;
+  if (Module.ENVIRONMENT) {
+    if (Module.ENVIRONMENT === 'WEB') {
       ENVIRONMENT_IS_WEB = true;
-    } else if (Module['ENVIRONMENT'] === 'WORKER') {
+    } else if (Module.ENVIRONMENT === 'WORKER') {
       ENVIRONMENT_IS_WORKER = true;
-    } else if (Module['ENVIRONMENT'] === 'NODE') {
+    } else if (Module.ENVIRONMENT === 'NODE') {
       ENVIRONMENT_IS_NODE = true;
-    } else if (Module['ENVIRONMENT'] === 'SHELL') {
+    } else if (Module.ENVIRONMENT === 'SHELL') {
       ENVIRONMENT_IS_SHELL = true;
     } else {
       throw new Error(
@@ -74,54 +74,54 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
   }
   if (ENVIRONMENT_IS_NODE) {
-    var nodeFS;
-    var nodePath;
-    Module['read'] = function shell_read(filename, binary) {
-      var ret;
+    let nodeFS;
+    let nodePath;
+    Module.read = function shell_read(filename, binary) {
+      let ret;
       ret = tryParseAsDataURI(filename);
       if (!ret) {
         if (!nodeFS) nodeFS = require('fs');
         if (!nodePath) nodePath = require('path');
-        filename = nodePath['normalize'](filename);
-        ret = nodeFS['readFileSync'](filename);
+        filename = nodePath.normalize(filename);
+        ret = nodeFS.readFileSync(filename);
       }
       return binary ? ret : ret.toString();
     };
-    Module['readBinary'] = function readBinary(filename) {
-      var ret = Module['read'](filename, true);
+    Module.readBinary = function readBinary(filename) {
+      let ret = Module.read(filename, true);
       if (!ret.buffer) {
         ret = new Uint8Array(ret);
       }
       assert(ret.buffer);
       return ret;
     };
-    if (process['argv'].length > 1) {
-      Module['thisProgram'] = process['argv'][1].replace(/\\/g, '/');
+    if (process.argv.length > 1) {
+      Module.thisProgram = process.argv[1].replace(/\\/g, '/');
     }
-    Module['arguments'] = process['argv'].slice(2);
-    process['on']('uncaughtException', function (ex) {
+    Module.arguments = process.argv.slice(2);
+    process.on('uncaughtException', function (ex) {
       if (!(ex instanceof ExitStatus)) {
         throw ex;
       }
     });
-    process['on']('unhandledRejection', function (reason, p) {
-      process['exit'](1);
+    process.on('unhandledRejection', function (reason, p) {
+      process.exit(1);
     });
-    Module['inspect'] = function () {
+    Module.inspect = function () {
       return '[Emscripten Module object]';
     };
   } else if (ENVIRONMENT_IS_SHELL) {
-    if (typeof read != 'undefined') {
-      Module['read'] = function shell_read(f) {
-        var data = tryParseAsDataURI(f);
+    if (typeof read !== 'undefined') {
+      Module.read = function shell_read(f) {
+        let data = tryParseAsDataURI(f);
         if (data) {
           return intArrayToString(data);
         }
         return read(f);
       };
     }
-    Module['readBinary'] = function readBinary(f) {
-      var data;
+    Module.readBinary = function readBinary(f) {
+      let data;
       data = tryParseAsDataURI(f);
       if (data) {
         return data;
@@ -133,25 +133,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       assert(typeof data === 'object');
       return data;
     };
-    if (typeof scriptArgs != 'undefined') {
-      Module['arguments'] = scriptArgs;
-    } else if (typeof arguments != 'undefined') {
-      Module['arguments'] = arguments;
+    if (typeof scriptArgs !== 'undefined') {
+      Module.arguments = scriptArgs;
+    } else if (typeof arguments !== 'undefined') {
+      Module.arguments = arguments;
     }
     if (typeof quit === 'function') {
-      Module['quit'] = function (status, toThrow) {
+      Module.quit = function (status, toThrow) {
         quit(status);
       };
     }
   } else if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
-    Module['read'] = function shell_read(url) {
+    Module.read = function shell_read(url) {
       try {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
         xhr.send(null);
         return xhr.responseText;
       } catch (err) {
-        var data = tryParseAsDataURI(url);
+        let data = tryParseAsDataURI(url);
         if (data) {
           return intArrayToString(data);
         }
@@ -159,15 +159,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
     };
     if (ENVIRONMENT_IS_WORKER) {
-      Module['readBinary'] = function readBinary(url) {
+      Module.readBinary = function readBinary(url) {
         try {
-          var xhr = new XMLHttpRequest();
+          let xhr = new XMLHttpRequest();
           xhr.open('GET', url, false);
           xhr.responseType = 'arraybuffer';
           xhr.send(null);
           return new Uint8Array(xhr.response);
         } catch (err) {
-          var data = tryParseAsDataURI(url);
+          let data = tryParseAsDataURI(url);
           if (data) {
             return data;
           }
@@ -175,8 +175,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       };
     }
-    Module['readAsync'] = function readAsync(url, onload, onerror) {
-      var xhr = new XMLHttpRequest();
+    Module.readAsync = function readAsync(url, onload, onerror) {
+      let xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
       xhr.responseType = 'arraybuffer';
       xhr.onload = function xhr_onload() {
@@ -184,7 +184,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           onload(xhr.response);
           return;
         }
-        var data = tryParseAsDataURI(url);
+        let data = tryParseAsDataURI(url);
         if (data) {
           onload(data.buffer);
           return;
@@ -194,43 +194,43 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       xhr.onerror = onerror;
       xhr.send(null);
     };
-    Module['setWindowTitle'] = function (title) {
+    Module.setWindowTitle = function (title) {
       document.title = title;
     };
   }
-  Module['print'] =
+  Module.print =
     typeof console !== 'undefined'
       ? console.log.bind(console)
       : typeof print !== 'undefined'
       ? print
       : null;
-  Module['printErr'] =
+  Module.printErr =
     typeof printErr !== 'undefined'
       ? printErr
       : (typeof console !== 'undefined' && console.warn.bind(console)) ||
-        Module['print'];
-  Module.print = Module['print'];
-  Module.printErr = Module['printErr'];
+        Module.print;
+  Module.print = Module.print;
+  Module.printErr = Module.printErr;
   for (key in moduleOverrides) {
     if (moduleOverrides.hasOwnProperty(key)) {
       Module[key] = moduleOverrides[key];
     }
   }
   moduleOverrides = undefined;
-  var STACK_ALIGN = 16;
+  let STACK_ALIGN = 16;
   function staticAlloc(size) {
     assert(!staticSealed);
-    var ret = STATICTOP;
+    let ret = STATICTOP;
     STATICTOP = (STATICTOP + size + 15) & -16;
     return ret;
   }
   function dynamicAlloc(size) {
     assert(DYNAMICTOP_PTR);
-    var ret = HEAP32[DYNAMICTOP_PTR >> 2];
-    var end = (ret + size + 15) & -16;
+    let ret = HEAP32[DYNAMICTOP_PTR >> 2];
+    let end = (ret + size + 15) & -16;
     HEAP32[DYNAMICTOP_PTR >> 2] = end;
     if (end >= TOTAL_MEMORY) {
-      var success = enlargeMemory();
+      let success = enlargeMemory();
       if (!success) {
         HEAP32[DYNAMICTOP_PTR >> 2] = ret;
         return 0;
@@ -240,7 +240,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function alignMemory(size, factor) {
     if (!factor) factor = STACK_ALIGN;
-    var ret = (size = Math.ceil(size / factor) * factor);
+    let ret = (size = Math.ceil(size / factor) * factor);
     return ret;
   }
   function getNativeTypeSize(type) {
@@ -261,13 +261,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       default: {
         if (type[type.length - 1] === '*') {
           return 4;
-        } else if (type[0] === 'i') {
-          var bits = parseInt(type.substr(1));
+        } if (type[0] === 'i') {
+          let bits = parseInt(type.substr(1));
           assert(bits % 8 === 0);
           return bits / 8;
-        } else {
+        } 
           return 0;
-        }
+        
       }
     }
   }
@@ -278,62 +278,62 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Module.printErr(text);
     }
   }
-  var jsCallStartIndex = 1;
-  var functionPointers = new Array(0);
-  var funcWrappers = {};
+  let jsCallStartIndex = 1;
+  let functionPointers = new Array(0);
+  let funcWrappers = {};
   function dynCall(sig, ptr, args) {
     if (args && args.length) {
-      return Module['dynCall_' + sig].apply(null, [ptr].concat(args));
-    } else {
-      return Module['dynCall_' + sig].call(null, ptr);
-    }
+      return Module[`dynCall_${  sig}`].apply(null, [ptr].concat(args));
+    } 
+      return Module[`dynCall_${  sig}`].call(null, ptr);
+    
   }
-  var GLOBAL_BASE = 8;
-  var ABORT = 0;
-  var EXITSTATUS = 0;
+  let GLOBAL_BASE = 8;
+  let ABORT = 0;
+  let EXITSTATUS = 0;
   function assert(condition, text) {
     if (!condition) {
-      abort('Assertion failed: ' + text);
+      abort(`Assertion failed: ${  text}`);
     }
   }
   function getCFunc(ident) {
-    var func = Module['_' + ident];
+    let func = Module[`_${  ident}`];
     assert(
       func,
-      'Cannot call unknown function ' + ident + ', make sure it is exported'
+      `Cannot call unknown function ${  ident  }, make sure it is exported`
     );
     return func;
   }
-  var JSfuncs = {
-    stackSave: function () {
+  let JSfuncs = {
+    stackSave () {
       stackSave();
     },
-    stackRestore: function () {
+    stackRestore () {
       stackRestore();
     },
-    arrayToC: function (arr) {
-      var ret = stackAlloc(arr.length);
+    arrayToC (arr) {
+      let ret = stackAlloc(arr.length);
       writeArrayToMemory(arr, ret);
       return ret;
     },
-    stringToC: function (str) {
-      var ret = 0;
+    stringToC (str) {
+      let ret = 0;
       if (str !== null && str !== undefined && str !== 0) {
-        var len = (str.length << 2) + 1;
+        let len = (str.length << 2) + 1;
         ret = stackAlloc(len);
         stringToUTF8(str, ret, len);
       }
       return ret;
     },
   };
-  var toC = { string: JSfuncs['stringToC'], array: JSfuncs['arrayToC'] };
+  let toC = { string: JSfuncs.stringToC, array: JSfuncs.arrayToC };
   function ccall(ident, returnType, argTypes, args, opts) {
-    var func = getCFunc(ident);
-    var cArgs = [];
-    var stack = 0;
+    let func = getCFunc(ident);
+    let cArgs = [];
+    let stack = 0;
     if (args) {
-      for (var i = 0; i < args.length; i++) {
-        var converter = toC[argTypes[i]];
+      for (let i = 0; i < args.length; i++) {
+        let converter = toC[argTypes[i]];
         if (converter) {
           if (stack === 0) stack = stackSave();
           cArgs[i] = converter(args[i]);
@@ -342,7 +342,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       }
     }
-    var ret = func.apply(null, cArgs);
+    let ret = func.apply(null, cArgs);
     if (returnType === 'string') ret = Pointer_stringify(ret);
     if (returnType === 'boolean') ret = Boolean(ret);
     if (stack !== 0) {
@@ -390,13 +390,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         HEAPF64[ptr >> 3] = value;
         break;
       default:
-        abort('invalid type for setValue: ' + type);
+        abort(`invalid type for setValue: ${  type}`);
     }
   }
-  var ALLOC_STATIC = 2;
-  var ALLOC_NONE = 4;
+  let ALLOC_STATIC = 2;
+  let ALLOC_NONE = 4;
   function allocate(slab, types, allocator, ptr) {
-    var zeroinit, size;
+    let zeroinit; let size;
     if (typeof slab === 'number') {
       zeroinit = true;
       size = slab;
@@ -404,8 +404,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       zeroinit = false;
       size = slab.length;
     }
-    var singleType = typeof types === 'string' ? types : null;
-    var ret;
+    let singleType = typeof types === 'string' ? types : null;
+    let ret;
     if (allocator == ALLOC_NONE) {
       ret = ptr;
     } else {
@@ -419,7 +419,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     if (zeroinit) {
-      var stop;
+      let stop;
       ptr = ret;
       assert((ret & 3) == 0);
       stop = ret + (size & ~3);
@@ -440,12 +440,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       return ret;
     }
-    var i = 0,
-      type,
-      typeSize,
-      previousType;
+    let i = 0;
+      let type;
+      let typeSize;
+      let previousType;
     while (i < size) {
-      var curr = slab[i];
+      let curr = slab[i];
       type = singleType || types[i];
       if (type === 0) {
         i++;
@@ -463,9 +463,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function Pointer_stringify(ptr, length) {
     if (length === 0 || !ptr) return '';
-    var hasUtf = 0;
-    var t;
-    var i = 0;
+    let hasUtf = 0;
+    let t;
+    let i = 0;
     while (1) {
       t = HEAPU8[(ptr + i) >> 0];
       hasUtf |= t;
@@ -474,10 +474,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (length && i == length) break;
     }
     if (!length) length = i;
-    var ret = '';
+    let ret = '';
     if (hasUtf < 128) {
-      var MAX_CHUNK = 1024;
-      var curr;
+      let MAX_CHUNK = 1024;
+      let curr;
       while (length > 0) {
         curr = String.fromCharCode.apply(
           String,
@@ -491,16 +491,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     return UTF8ToString(ptr);
   }
-  var UTF8Decoder =
+  let UTF8Decoder =
     typeof TextDecoder !== 'undefined' ? new TextDecoder('utf8') : undefined;
   function UTF8ArrayToString(u8Array, idx) {
-    var endPtr = idx;
+    let endPtr = idx;
     while (u8Array[endPtr]) ++endPtr;
     if (endPtr - idx > 16 && u8Array.subarray && UTF8Decoder) {
       return UTF8Decoder.decode(u8Array.subarray(idx, endPtr));
-    } else {
-      var u0, u1, u2, u3, u4, u5;
-      var str = '';
+    } 
+      let u0; let u1; let u2; let u3; let u4; let u5;
+      let str = '';
       while (1) {
         u0 = u8Array[idx++];
         if (!u0) return str;
@@ -539,21 +539,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if (u0 < 65536) {
           str += String.fromCharCode(u0);
         } else {
-          var ch = u0 - 65536;
+          let ch = u0 - 65536;
           str += String.fromCharCode(55296 | (ch >> 10), 56320 | (ch & 1023));
         }
       }
-    }
+    
   }
   function UTF8ToString(ptr) {
     return UTF8ArrayToString(HEAPU8, ptr);
   }
   function stringToUTF8Array(str, outU8Array, outIdx, maxBytesToWrite) {
     if (!(maxBytesToWrite > 0)) return 0;
-    var startIdx = outIdx;
-    var endIdx = outIdx + maxBytesToWrite - 1;
-    for (var i = 0; i < str.length; ++i) {
-      var u = str.charCodeAt(i);
+    let startIdx = outIdx;
+    let endIdx = outIdx + maxBytesToWrite - 1;
+    for (let i = 0; i < str.length; ++i) {
+      let u = str.charCodeAt(i);
       if (u >= 55296 && u <= 57343)
         u = (65536 + ((u & 1023) << 10)) | (str.charCodeAt(++i) & 1023);
       if (u <= 127) {
@@ -598,9 +598,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     return stringToUTF8Array(str, HEAPU8, outPtr, maxBytesToWrite);
   }
   function lengthBytesUTF8(str) {
-    var len = 0;
-    for (var i = 0; i < str.length; ++i) {
-      var u = str.charCodeAt(i);
+    let len = 0;
+    for (let i = 0; i < str.length; ++i) {
+      let u = str.charCodeAt(i);
       if (u >= 55296 && u <= 57343)
         u = (65536 + ((u & 1023) << 10)) | (str.charCodeAt(++i) & 1023);
       if (u <= 127) {
@@ -619,7 +619,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     return len;
   }
-  var UTF16Decoder =
+  let UTF16Decoder =
     typeof TextDecoder !== 'undefined'
       ? new TextDecoder('utf-16le')
       : undefined;
@@ -627,14 +627,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     return func;
   }
   function demangleAll(text) {
-    var regex = /__Z[\w\d_]+/g;
+    let regex = /__Z[\w\d_]+/g;
     return text.replace(regex, function (x) {
-      var y = demangle(x);
-      return x === y ? x : x + ' [' + y + ']';
+      let y = demangle(x);
+      return x === y ? x : `${x  } [${  y  }]`;
     });
   }
   function jsStackTrace() {
-    var err = new Error();
+    let err = new Error();
     if (!err.stack) {
       try {
         throw new Error(0);
@@ -647,32 +647,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     return err.stack.toString();
   }
-  var WASM_PAGE_SIZE = 65536;
-  var ASMJS_PAGE_SIZE = 16777216;
-  var MIN_TOTAL_MEMORY = 16777216;
+  let WASM_PAGE_SIZE = 65536;
+  let ASMJS_PAGE_SIZE = 16777216;
+  let MIN_TOTAL_MEMORY = 16777216;
   function alignUp(x, multiple) {
     if (x % multiple > 0) {
       x += multiple - (x % multiple);
     }
     return x;
   }
-  var buffer, HEAP8, HEAPU8, HEAP16, HEAPU16, HEAP32, HEAPU32, HEAPF32, HEAPF64;
+  let buffer; let HEAP8; let HEAPU8; let HEAP16; let HEAPU16; let HEAP32; let HEAPU32; let HEAPF32; let HEAPF64;
   function updateGlobalBuffer(buf) {
-    Module['buffer'] = buffer = buf;
+    Module.buffer = buffer = buf;
   }
   function updateGlobalBufferViews() {
-    Module['HEAP8'] = HEAP8 = new Int8Array(buffer);
-    Module['HEAP16'] = HEAP16 = new Int16Array(buffer);
-    Module['HEAP32'] = HEAP32 = new Int32Array(buffer);
-    Module['HEAPU8'] = HEAPU8 = new Uint8Array(buffer);
-    Module['HEAPU16'] = HEAPU16 = new Uint16Array(buffer);
-    Module['HEAPU32'] = HEAPU32 = new Uint32Array(buffer);
-    Module['HEAPF32'] = HEAPF32 = new Float32Array(buffer);
-    Module['HEAPF64'] = HEAPF64 = new Float64Array(buffer);
+    Module.HEAP8 = HEAP8 = new Int8Array(buffer);
+    Module.HEAP16 = HEAP16 = new Int16Array(buffer);
+    Module.HEAP32 = HEAP32 = new Int32Array(buffer);
+    Module.HEAPU8 = HEAPU8 = new Uint8Array(buffer);
+    Module.HEAPU16 = HEAPU16 = new Uint16Array(buffer);
+    Module.HEAPU32 = HEAPU32 = new Uint32Array(buffer);
+    Module.HEAPF32 = HEAPF32 = new Float32Array(buffer);
+    Module.HEAPF64 = HEAPF64 = new Float64Array(buffer);
   }
-  var STATIC_BASE, STATICTOP, staticSealed;
-  var STACK_BASE, STACKTOP, STACK_MAX;
-  var DYNAMIC_BASE, DYNAMICTOP_PTR;
+  let STATIC_BASE; let STATICTOP; let staticSealed;
+  let STACK_BASE; let STACKTOP; let STACK_MAX;
+  let DYNAMIC_BASE; let DYNAMICTOP_PTR;
   STATIC_BASE =
     STATICTOP =
     STACK_BASE =
@@ -684,37 +684,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   staticSealed = false;
   function abortOnCannotGrowMemory() {
     abort(
-      'Cannot enlarge memory arrays. Either (1) compile with  -s TOTAL_MEMORY=X  with X higher than the current value ' +
-        TOTAL_MEMORY +
-        ', (2) compile with  -s ALLOW_MEMORY_GROWTH=1  which allows increasing the size at runtime but prevents some optimizations, (3) set Module.TOTAL_MEMORY to a higher value before the program runs, or (4) if you want malloc to return NULL (0) instead of this abort, compile with  -s ABORTING_MALLOC=0 '
+      `Cannot enlarge memory arrays. Either (1) compile with  -s TOTAL_MEMORY=X  with X higher than the current value ${ 
+        TOTAL_MEMORY 
+        }, (2) compile with  -s ALLOW_MEMORY_GROWTH=1  which allows increasing the size at runtime but prevents some optimizations, (3) set Module.TOTAL_MEMORY to a higher value before the program runs, or (4) if you want malloc to return NULL (0) instead of this abort, compile with  -s ABORTING_MALLOC=0 `
     );
   }
-  if (!Module['reallocBuffer'])
-    Module['reallocBuffer'] = function (size) {
-      var ret;
+  if (!Module.reallocBuffer)
+    Module.reallocBuffer = function (size) {
+      let ret;
       try {
         if (ArrayBuffer.transfer) {
           ret = ArrayBuffer.transfer(buffer, size);
         } else {
-          var oldHEAP8 = HEAP8;
+          let oldHEAP8 = HEAP8;
           ret = new ArrayBuffer(size);
-          var temp = new Int8Array(ret);
+          let temp = new Int8Array(ret);
           temp.set(oldHEAP8);
         }
       } catch (e) {
         return false;
       }
-      var success = _emscripten_replace_memory(ret);
+      let success = _emscripten_replace_memory(ret);
       if (!success) return false;
       return ret;
     };
   function enlargeMemory() {
-    var PAGE_MULTIPLE = Module['usingWasm'] ? WASM_PAGE_SIZE : ASMJS_PAGE_SIZE;
-    var LIMIT = 2147483648 - PAGE_MULTIPLE;
+    let PAGE_MULTIPLE = Module.usingWasm ? WASM_PAGE_SIZE : ASMJS_PAGE_SIZE;
+    let LIMIT = 2147483648 - PAGE_MULTIPLE;
     if (HEAP32[DYNAMICTOP_PTR >> 2] > LIMIT) {
       return false;
     }
-    var OLD_TOTAL_MEMORY = TOTAL_MEMORY;
+    let OLD_TOTAL_MEMORY = TOTAL_MEMORY;
     TOTAL_MEMORY = Math.max(TOTAL_MEMORY, MIN_TOTAL_MEMORY);
     while (TOTAL_MEMORY < HEAP32[DYNAMICTOP_PTR >> 2]) {
       if (TOTAL_MEMORY <= 536870912) {
@@ -726,7 +726,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         );
       }
     }
-    var replacement = Module['reallocBuffer'](TOTAL_MEMORY);
+    let replacement = Module.reallocBuffer(TOTAL_MEMORY);
     if (!replacement || replacement.byteLength != TOTAL_MEMORY) {
       TOTAL_MEMORY = OLD_TOTAL_MEMORY;
       return false;
@@ -735,7 +735,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     updateGlobalBufferViews();
     return true;
   }
-  var byteLength;
+  let byteLength;
   try {
     byteLength = Function.prototype.call.bind(
       Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, 'byteLength').get
@@ -746,23 +746,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return buffer.byteLength;
     };
   }
-  var TOTAL_STACK = Module['TOTAL_STACK'] || 5242880;
-  var TOTAL_MEMORY = Module['TOTAL_MEMORY'] || 16777216;
+  let TOTAL_STACK = Module.TOTAL_STACK || 5242880;
+  var TOTAL_MEMORY = Module.TOTAL_MEMORY || 16777216;
   if (TOTAL_MEMORY < TOTAL_STACK)
     Module.printErr(
-      'TOTAL_MEMORY should be larger than TOTAL_STACK, was ' +
-        TOTAL_MEMORY +
-        '! (TOTAL_STACK=' +
-        TOTAL_STACK +
-        ')'
+      `TOTAL_MEMORY should be larger than TOTAL_STACK, was ${ 
+        TOTAL_MEMORY 
+        }! (TOTAL_STACK=${ 
+        TOTAL_STACK 
+        })`
     );
-  if (Module['buffer']) {
-    buffer = Module['buffer'];
+  if (Module.buffer) {
+    buffer = Module.buffer;
   } else {
     {
       buffer = new ArrayBuffer(TOTAL_MEMORY);
     }
-    Module['buffer'] = buffer;
+    Module.buffer = buffer;
   }
   updateGlobalBufferViews();
   function getTotalMemory() {
@@ -774,36 +774,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     throw 'Runtime error: expected the system to be little-endian!';
   function callRuntimeCallbacks(callbacks) {
     while (callbacks.length > 0) {
-      var callback = callbacks.shift();
-      if (typeof callback == 'function') {
+      let callback = callbacks.shift();
+      if (typeof callback === 'function') {
         callback();
         continue;
       }
-      var func = callback.func;
+      let {func} = callback;
       if (typeof func === 'number') {
         if (callback.arg === undefined) {
-          Module['dynCall_v'](func);
+          Module.dynCall_v(func);
         } else {
-          Module['dynCall_vi'](func, callback.arg);
+          Module.dynCall_vi(func, callback.arg);
         }
       } else {
         func(callback.arg === undefined ? null : callback.arg);
       }
     }
   }
-  var __ATPRERUN__ = [];
-  var __ATINIT__ = [];
-  var __ATMAIN__ = [];
-  var __ATEXIT__ = [];
-  var __ATPOSTRUN__ = [];
-  var runtimeInitialized = false;
-  var runtimeExited = false;
+  let __ATPRERUN__ = [];
+  let __ATINIT__ = [];
+  let __ATMAIN__ = [];
+  let __ATEXIT__ = [];
+  let __ATPOSTRUN__ = [];
+  let runtimeInitialized = false;
+  let runtimeExited = false;
   function preRun() {
-    if (Module['preRun']) {
-      if (typeof Module['preRun'] == 'function')
-        Module['preRun'] = [Module['preRun']];
-      while (Module['preRun'].length) {
-        addOnPreRun(Module['preRun'].shift());
+    if (Module.preRun) {
+      if (typeof Module.preRun === 'function')
+        Module.preRun = [Module.preRun];
+      while (Module.preRun.length) {
+        addOnPreRun(Module.preRun.shift());
       }
     }
     callRuntimeCallbacks(__ATPRERUN__);
@@ -821,11 +821,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     runtimeExited = true;
   }
   function postRun() {
-    if (Module['postRun']) {
-      if (typeof Module['postRun'] == 'function')
-        Module['postRun'] = [Module['postRun']];
-      while (Module['postRun'].length) {
-        addOnPostRun(Module['postRun'].shift());
+    if (Module.postRun) {
+      if (typeof Module.postRun === 'function')
+        Module.postRun = [Module.postRun];
+      while (Module.postRun.length) {
+        addOnPostRun(Module.postRun.shift());
       }
     }
     callRuntimeCallbacks(__ATPOSTRUN__);
@@ -843,45 +843,45 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     HEAP8.set(array, buffer);
   }
   function writeAsciiToMemory(str, buffer, dontAddNull) {
-    for (var i = 0; i < str.length; ++i) {
+    for (let i = 0; i < str.length; ++i) {
       HEAP8[buffer++ >> 0] = str.charCodeAt(i);
     }
     if (!dontAddNull) HEAP8[buffer >> 0] = 0;
   }
   var Math_abs = Math.abs;
-  var Math_cos = Math.cos;
-  var Math_sin = Math.sin;
-  var Math_tan = Math.tan;
-  var Math_acos = Math.acos;
-  var Math_asin = Math.asin;
-  var Math_atan = Math.atan;
-  var Math_atan2 = Math.atan2;
-  var Math_exp = Math.exp;
-  var Math_log = Math.log;
-  var Math_sqrt = Math.sqrt;
+  let Math_cos = Math.cos;
+  let Math_sin = Math.sin;
+  let Math_tan = Math.tan;
+  let Math_acos = Math.acos;
+  let Math_asin = Math.asin;
+  let Math_atan = Math.atan;
+  let Math_atan2 = Math.atan2;
+  let Math_exp = Math.exp;
+  let Math_log = Math.log;
+  let Math_sqrt = Math.sqrt;
   var Math_ceil = Math.ceil;
   var Math_floor = Math.floor;
-  var Math_pow = Math.pow;
-  var Math_imul = Math.imul;
-  var Math_fround = Math.fround;
-  var Math_round = Math.round;
+  let Math_pow = Math.pow;
+  let Math_imul = Math.imul;
+  let Math_fround = Math.fround;
+  let Math_round = Math.round;
   var Math_min = Math.min;
-  var Math_max = Math.max;
-  var Math_clz32 = Math.clz32;
-  var Math_trunc = Math.trunc;
-  var runDependencies = 0;
-  var runDependencyWatcher = null;
-  var dependenciesFulfilled = null;
+  let Math_max = Math.max;
+  let Math_clz32 = Math.clz32;
+  let Math_trunc = Math.trunc;
+  let runDependencies = 0;
+  let runDependencyWatcher = null;
+  let dependenciesFulfilled = null;
   function addRunDependency(id) {
     runDependencies++;
-    if (Module['monitorRunDependencies']) {
-      Module['monitorRunDependencies'](runDependencies);
+    if (Module.monitorRunDependencies) {
+      Module.monitorRunDependencies(runDependencies);
     }
   }
   function removeRunDependency(id) {
     runDependencies--;
-    if (Module['monitorRunDependencies']) {
-      Module['monitorRunDependencies'](runDependencies);
+    if (Module.monitorRunDependencies) {
+      Module.monitorRunDependencies(runDependencies);
     }
     if (runDependencies == 0) {
       if (runDependencyWatcher !== null) {
@@ -889,16 +889,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         runDependencyWatcher = null;
       }
       if (dependenciesFulfilled) {
-        var callback = dependenciesFulfilled;
+        let callback = dependenciesFulfilled;
         dependenciesFulfilled = null;
         callback();
       }
     }
   }
-  Module['preloadedImages'] = {};
-  Module['preloadedAudios'] = {};
-  var memoryInitializer = null;
-  var dataURIPrefix = 'data:application/octet-stream;base64,';
+  Module.preloadedImages = {};
+  Module.preloadedAudios = {};
+  let memoryInitializer = null;
+  let dataURIPrefix = 'data:application/octet-stream;base64,';
   function isDataURI(filename) {
     return String.prototype.startsWith
       ? filename.startsWith(dataURIPrefix)
@@ -909,7 +909,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   __ATINIT__.push();
   memoryInitializer =
     'data:application/octet-stream;base64,vBoAACwbAADkGgAAehsAACAAAAAAAAAAvBoAAKEbAADkGgAAvhsAACAAAAAAAAAAvBoAAOcbAADkGgAAAxwAADgAAAAAAAAAvBoAACUcAADkGgAAShwAADgAAAAAAAAA5BoAAI4mAABQAAAAAAAAAOQaAAB6HAAAiAAAAAAAAADkGgAA0xwAAJgAAAAAAAAA5BoAACcdAACoAAAAAAAAAOQaAABbHQAAuAAAAAAAAAC8GgAAhh0AAOQaAACqHQAA0AAAAAAAAAC8GgAASB4AAOQaAADmHgAA6AAAAAAAAADkGgAAfh8AAIgAAAAAAAAA5BoAAAcgAADoAAAAAAAAAOQaAAChIAAA6AAAAAAAAADkGgAARyEAAOgAAAAAAAAA5BoAAN0hAAA4AQAAAAAAALwaAACIIgAA5BoAADMjAABQAQAAAAAAAOQaAADYIwAAiAAAAAAAAADkGgAAbiQAAFABAAAAAAAA5BoAABUlAABQAQAAAAAAAOQaAADIJQAAUAEAAAAAAADkGgAAqDEAAGgAAAAAAAAA5BoAALomAACwAQAAAAAAAOQaAAArJwAAmAAAAAAAAADkGgAAlycAANABAAAAAAAAvBoAAE0oAADkGgAAAykAAOgBAAAAAAAA5BoAALMpAACwAQAAAAAAAOQaAABUKgAA6AEAAAAAAADkGgAABisAAOgBAAAAAAAA5BoAAMQrAADoAQAAAAAAAOQaAAByLAAAOAIAAAAAAAC8GgAANS0AAOQaAAD4LQAAUAIAAAAAAADkGgAAtS4AALABAAAAAAAA5BoAAGMvAABQAgAAAAAAAOQaAAAiMAAAUAIAAAAAAADkGgAA7TAAAFACAAAAAAAA5BoAANMxAABoAAAAAAAAAOQaAABJMgAACAAAAAAAAAC8GgAAFjIAAOQaAABcMgAAsAIAAAAAAADkGgAAbDMAAHgDAAAAAAAA5BoAAOE3AABgAwAAAAAAALwaAAAsNAAA5BoAAJM0AADoAgAAAAAAAOQaAAAANQAAEAMAAAAAAAC8GgAAizUAALwaAAClNQAA5BoAAP81AAAYAwAAAAAAAOQaAABfNgAAEAMAAAAAAADkGgAA3TYAABgDAAAAAAAA5BoAAEY3AAAQAwAAAAAAALwaAAAtOAAA5BoAAFs4AABgAwAAAAAAAOQaAADMOAAAqAMAAAAAAADkGgAAEjkAAHgDAAAAAAAA5BoAAPg4AAAQAwAAAAAAALwaAAAyOQAA5BoAAAc6AACoAwAAAAAAAOQaAAApOgAAqAMAAAAAAADkGgAATzoAAOADAAAAAAAAvBoAAKE6AAC8GgAA0EQAAOQaAAAwRQAAAAQAAAAAAADkGgAA3UQAABAEAAAAAAAAvBoAAP5EAADkGgAAC0UAAPADAAAAAAAA5BoAABJGAADoAwAAAAAAAOQaAAAiRgAAKAQAAAAAAADkGgAAV0YAAAAEAAAAAAAA5BoAADNGAABIBAAAAAAAAAAAAAAIAAAAAQAAAAIAAAAAAAAAEAAAAAMAAAAEAAAAAQAAAAEAAAABAAAAAAAAACgAAAAFAAAABgAAAAIAAAACAAAAAgAAAP//////////AAAAADgAAAAHAAAACAAAAAEAAAADAAAAAQAAAAQAAAAFAAAAAgAAAAYAAAAHAAAAAwAAAAEAAAAIAAAAAAAAAEAAAAAJAAAACgAAAAEAAAADAAAABAAAAAQAAAAFAAAAAgAAAAYAAAAHAAAABQAAAAkAAAAKAAAAAAAAAFAAAAALAAAADAAAAAMAAAALAAAADAAAAAQAAAANAAAABgAAAAcAAAAOAAAADwAAAAUAAAAAAAAAWAAAAA0AAAAOAAAABgAAABAAAAAIAAAAEQAAABIAAAAHAAAAEwAAABQAAAAJAAAAFQAAABYAAAAKAAAAAQAAAAAAAABoAAAADwAAABAAAAAIAAAACwAAABcAAAAEAAAADQAAAAYAAAALAAAADgAAAA8AAAAJAAAAAgAAAAoAAAD/////AAAAAIgAAAARAAAAEgAAAAEAAAAMAAAAAQAAAA0AAAAYAAAAGQAAAA4AAAAPAAAAGgAAAAEAAAAAAAAAeAAAABEAAAATAAAAEAAAAAwAAAARAAAADQAAABgAAAAZAAAADgAAAA8AAAAaAAAAAQAAAAAAAAAYAQAAEQAAABQAAAASAAAADAAAABMAAAANAAAAGAAAABkAAAAOAAAADwAAABoAAAACAAAAAAAAAPgAAAAVAAAAFgAAABQAAAAMAAAAFQAAABYAAAAbAAAAHAAAAA4AAAAPAAAAHQAAAAMAAAAAAAAA2AAAABcAAAAYAAAAFwAAAAwAAAAYAAAAGQAAAB4AAAAfAAAADgAAAA8AAAAgAAAABAAAAAAAAADAAAAAGQAAABoAAAAhAAAAGgAAAAMAAAAAAAAA6AAAABEAAAAbAAAAAQAAAAwAAAABAAAADQAAABgAAAAZAAAADgAAAA8AAAAaAAAAAQAAAAAAAAAIAQAAHAAAAB0AAAAbAAAADAAAABwAAAANAAAAGAAAABkAAAAOAAAADwAAACIAAAAFAAAAAAAAAIABAAARAAAAHgAAAB0AAAAMAAAAHgAAAA0AAAAYAAAAGQAAAA4AAAAPAAAAGgAAAAYAAAAAAAAAYAEAAB8AAAAgAAAAHwAAAAwAAAAgAAAAIQAAACMAAAAkAAAADgAAAA8AAAAlAAAABwAAAAAAAABAAQAAIQAAACIAAAAiAAAADAAAACMAAAAkAAAAJgAAACcAAAAOAAAADwAAACgAAAAIAAAAAAAAACgBAAAjAAAAJAAAACkAAAAlAAAABAAAAAAAAABQAQAAEQAAACUAAAABAAAADAAAAAEAAAANAAAAGAAAABkAAAAOAAAADwAAABoAAAABAAAAAAAAAHABAAAmAAAAJwAAACYAAAAMAAAAJwAAAA0AAAAYAAAAGQAAAA4AAAAPAAAAKgAAAAkAAAAAAAAAkAEAACgAAAApAAAACwAAAAsAAAAXAAAABAAAACsAAAAoAAAAKQAAAA4AAAAPAAAACQAAAAUAAAAMAAAAAAAAAKABAAAqAAAAKwAAACoAAAArAAAALAAAAC0AAAAsAAAALQAAAC4AAAAvAAAALgAAAAoAAAAAAAAAGAIAACoAAAAsAAAAMAAAACsAAAAxAAAALQAAACwAAAAtAAAALgAAAC8AAAAuAAAACwAAAAAAAAAIAgAALQAAAC4AAAAyAAAAKwAAADMAAAAtAAAALAAAAC0AAAAuAAAALwAAAC8AAAAMAAAAAAAAAPgBAAAvAAAAMAAAADQAAAArAAAANQAAADYAAAAwAAAAMQAAAC4AAAAvAAAAMgAAAA0AAAAAAAAA2AEAADEAAAAyAAAANwAAACsAAAA4AAAAOQAAADMAAAA0AAAALgAAAC8AAAA1AAAADgAAAAAAAADAAQAAMwAAADQAAAA2AAAAOgAAAAYAAAAAAAAAgAIAACoAAAA1AAAAOwAAACsAAAA8AAAALQAAACwAAAAtAAAALgAAAC8AAAAuAAAADwAAAAAAAABwAgAANgAAADcAAAA9AAAAKwAAAD4AAAAtAAAALAAAAC0AAAAuAAAALwAAADcAAAAQAAAAAAAAAGACAAA4AAAAOQAAAD8AAAArAAAAQAAAAEEAAAA4AAAAOQAAAC4AAAAvAAAAOgAAABEAAAAAAAAAQAIAADoAAAA7AAAAQgAAACsAAABDAAAARAAAADsAAAA8AAAALgAAAC8AAAA9AAAAEgAAAAAAAAAoAgAAPAAAAD0AAAA+AAAARQAAAAcAAAAAAAAAkAIAAD4AAAA/AAAADQAAAAsAAAAXAAAABAAAAD8AAABGAAAARwAAAA4AAAAPAAAACQAAAAIAAAAOAAAAAAAAAKACAAABAAAAQAAAAAEAAAACAAAAAAAAALACAABBAAAAQgAAAAAAAAC4AgAAQQAAAEMAAAAAAAAAyAIAAEQAAABFAAAASAAAAEkAAABKAAAASwAAAAMAAABMAAAATQAAAEAAAABBAAAATgAAAEYAAABPAAAAQgAAAEMAAAAEAAAARwAAAAAAAADYAgAASAAAAEkAAABEAAAARQAAAEYAAABHAAAASAAAAAUAAABQAAAASQAAAFEAAAABAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAAwAASgAAAEsAAABKAAAAUgAAAAAAAADwAgAATAAAAE0AAAAIAAAAAAAAAOgCAABOAAAATwAAAAgAAAD/////AAAAADADAABQAAAAUQAAAEsAAABTAAAAAAAAACADAABSAAAAUwAAAAkAAAAAAAAAGAMAAFQAAABVAAAACQAAAAAAAABQAwAAVgAAAFcAAABMAAAAVAAAAAAAAABAAwAAWAAAAFkAAAAJAAAAAAAAAGgDAABaAAAAWwAAAE0AAABOAAAATwAAAFAAAABRAAAABgAAAFUAAABSAAAAVgAAAAAAAAABAAAABQAAAAIAAAAFAAAAAwAAAAUAAAAEAAAAAAAAAHgDAABcAAAAXQAAAEgAAAABAAAAVwAAAEsAAAADAAAATAAAAE0AAAABAAAAUwAAAE4AAAABAAAAWAAAAFQAAABVAAAAAQAAAAEAAAAAAAAAiAMAAFwAAABeAAAASAAAAFkAAABXAAAASwAAAAMAAABMAAAATQAAAFYAAABTAAAATgAAAF8AAABYAAAAVAAAAFUAAAAHAAAAYAAAAAAAAACYAwAAYQAAAGIAAABXAAAAWgAAAAAAAACoAwAAXAAAAGMAAABbAAAAAQAAAFcAAABLAAAACAAAAEwAAABNAAAAAQAAAFMAAABOAAAAAQAAAAAAAACwAwAAXAAAAGQAAABbAAAAXAAAAFcAAABLAAAACQAAAEwAAABNAAAAWAAAAFMAAABOAAAAZQAAAAAAAADAAwAAXAAAAGYAAABbAAAAXQAAAFcAAABLAAAACgAAAEwAAABNAAAAWQAAAFMAAABOAAAAZwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAFZVVVUCAAAAAAAAAAIAAACamZmZAwAAAFZVVVUDAAAAJUmSJAMAAAAAAAAAAwAAAMhxHMcEAAAAmpmZmQQAAABGF110BAAAAFZVVVUEAAAAPLETOwQAAAAlSZIkBAAAABIREREEAAAAAAAAAAQAAADi4eHhBQAAAMhxHMcFAAAAy2sorwUAAACamZmZBQAAAIdhGIYFAAAARhdddAUAAACRhSxkBQAAAFZVVVUFAAAAexSuRwUAAAA8sRM7BQAAANtLaC8FAAAAJUmSJAUAAAASlnsaBQAAABIREREFAAAAhRBCCAUAAAAAAAAABQAAAAgffPAGAAAA4uHh4QYAAADVQR3UBgAAAMhxHMcGAAAATZHPugYAAADLayivBgAAAKVBGqQGAAAAmpmZmQYAAAD6GJyPBgAAAIdhGIYGAAAAGPQFfQYAAABGF110BgAAAG3BFmwGAAAAkYUsZAYAAAC6gphcBgAAAFZVVVUGAAAAcwpeTgYAAAB7FK5HBgAAAEJBQUEGAAAAPLETOwYAAACzzyE1BgAAANtLaC8GAAAAnxLkKQYAAAAlSZIkBgAAAN1HcB8GAAAAEpZ7GgYAAAD45bEVBgAAABIREREGAAAA/BSXDAYAAACFEEIIBgAAAAVBEAQGAAAAAAAAAAYAAAD5gR/4BwAAAAgffPAHAAAAwBoT6QcAAADi4eHhBwAAAGwH5toHAAAA1UEd1AcAAACRaIXNBwAAAMhxHMcHAAAAOXDgwAcAAABNkc+6BwAAAE8b6LQHAAAAy2sorwcAAAAH9o6pBwAAAKVBGqQHAAAAUunIngcAAACamZmZBwAAAM4Pi5QHAAAA+hicjwcAAAD3kMuKBwAAAIdhGIYHAAAAgoGBgQcAAAAY9AV9BwAAABjIpHgHAAAARhdddAcAAADBBS5wBwAAAG3BFmwHAAAAaYEWaAcAAACRhSxkBwAAAAYWWGAHAAAAuoKYXAcAAAAJI+1YBwAAAFZVVVUHAAAAr37QUQcAAABzCl5OBwAAAAZq/UoHAAAAexSuRwcAAABXhm9EBwAAAEJBQUEHAAAAz8siPgcAAAA8sRM7BwAAADmBEzgHAAAAs88hNQcAAACjND4yBwAAANtLaC8HAAAA2bSfLAcAAACfEuQpBwAAAIkLNScHAAAAJUmSJAcAAAATePshBwAAAN1HcB8HAAAA22rwHAcAAAASlnsaBwAAABmBERgHAAAA+OWxFQcAAAAUgVwTBwAAABIREREHAAAAv1bPDgcAAAD8FJcMBwAAAKcQaAoHAAAAhRBCCAcAAAAw3SQGBwAAAAVBEAQHAAAAEQgEAgcAAAAAAAAABwAAACDwB/wIAAAA+YEf+AgAAADlWUb0CAAAAAgffPAIAAAAMXvA7AgAAADAGhPpCAAAAJGsc+UIAAAA4uHh4QgAAABAbl3eCAAAAGwH5toIAAAATGV71wgAAADVQR3UCAAAAPdYy9AIAAAAkWiFzQgAAABWMEvKCAAAAMhxHMcIAAAAHfD4wwgAAAA5cODACAAAAJq40r0IAAAATZHPuggAAADew9a3CAAAAE8b6LQIAAAAB2QDsggAAADLayivCAAAAK0BV6wIAAAAB/aOqQgAAABuGtCmCAAAAKVBGqQIAAAAmD9toQgAAABS6cieCAAAAO8ULZwIAAAAmpmZmQgAAACBTw6XCAAAAM4Pi5QIAAAAnrQPkggAAAD6GJyPCAAAANQYMI0IAAAA95DLiggAAAALX26ICAAAAIdhGIYIAAAArHfJgwgAAACCgYGBCAAAANFfQH8IAAAAGPQFfQgAAACPINJ6CAAAABjIpHgIAAAARM59dggAAABGF110CAAAAPWHQnIIAAAAwQUucAgAAAC1dh9uCAAAAG3BFmwIAAAAFs0TaggAAABpgRZoCAAAAKbGHmYIAAAAkYUsZAgAAABxpz9iCAAAAAYWWGAIAAAAjrt1XggAAAC6gphcCAAAALFWwFoIAAAACSPtWAgAAADG0x5XCAAAAFZVVVUIAAAAkJSQUwgAAACvftBRCAAAAFEBFVAIAAAAcwpeTggAAABziKtMCAAAAAZq/UoIAAAAPJ5TSQgAAAB7FK5HCAAAAIC8DEYIAAAAV4ZvRAgAAABeYtZCCAAAAEJBQUEIAAAA/BOwPwgAAADPyyI+CAAAAEhamTwIAAAAPLETOwgAAADCwpE5CAAAADmBEzgIAAAAPt+YNggAAACzzyE1CAAAALZFrjMIAAAAozQ+MggAAAAUkNEwCAAAANtLaC8IAAAABVwCLggAAADZtJ8sCAAAANFKQCsIAAAAnxLkKQgAAAApAYsoCAAAAIkLNScIAAAACSfiJQgAAAAlSZIkCAAAAIpnRSMIAAAAE3j7IQgAAADHcLQgCAAAAN1HcB8IAAAAtPMuHggAAADbavAcCAAAAAWktBsIAAAAEpZ7GggAAAAJOEUZCAAAABmBERgIAAAAlWjgFggAAAD45bEVCAAAAOHwhRQIAAAAFIFcEwgAAAB2jjUSCAAAABIREREIAAAAEAHvDwgAAAC/Vs8OCAAAAIkKsg0IAAAA/BSXDAgAAADDbn4LCAAAAKcQaAoIAAAAkfNTCQgAAACFEEIICAAAAKVgMgcIAAAAMN0kBggAAAB+fxkFCAAAAAVBEAQIAAAAUhsJAwgAAAARCAQCCAAAAAIBAQEIAAAA/////wAAAADQAwAAaAAAAGkAAAAKAAAACwAAAF4AAABqAAAACwAAAP////8AAAAA4AMAAGsAAABsAAAADAAAAAwAAABeAAAAagAAAA0AAAD/////HBcAAAUAAAAAAAAAAAAAAF8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAQAAAAyEgAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAP//////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJxIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAABkAAAA6AMAABAnAACghgEAQEIPAICWmAAA4fUFX3CJAP8JLw8AAAAAAgAAAAMAAAAFAAAABwAAAAsAAAANAAAAEQAAABMAAAAXAAAAHQAAAB8AAAAlAAAAKQAAACsAAAAvAAAANQAAADsAAAA9AAAAQwAAAEcAAABJAAAATwAAAFMAAABZAAAAYQAAAGUAAABnAAAAawAAAG0AAABxAAAAfwAAAIMAAACJAAAAiwAAAJUAAACXAAAAnQAAAKMAAACnAAAArQAAALMAAAC1AAAAvwAAAMEAAADFAAAAxwAAANMAAAABAAAACwAAAA0AAAARAAAAEwAAABcAAAAdAAAAHwAAACUAAAApAAAAKwAAAC8AAAA1AAAAOwAAAD0AAABDAAAARwAAAEkAAABPAAAAUwAAAFkAAABhAAAAZQAAAGcAAABrAAAAbQAAAHEAAAB5AAAAfwAAAIMAAACJAAAAiwAAAI8AAACVAAAAlwAAAJ0AAACjAAAApwAAAKkAAACtAAAAswAAALUAAAC7AAAAvwAAAMEAAADFAAAAxwAAANEAAAACAAAAAAAAAPADAABtAAAAbgAAAG8AAABwAAAAEgAAAAEAAAABAAAAAwAAAAAAAAAYBAAAbQAAAHEAAABvAAAAcAAAABIAAAACAAAAAgAAAAQAAAAAAAAAKAQAAHIAAABzAAAAYAAAAAAAAAA4BAAAcgAAAHQAAABgAAAATjVkcmFjbzExRW5jb2RlckJhc2VJTlNfMThFbmNvZGVyT3B0aW9uc0Jhc2VJTlNfMTdHZW9tZXRyeUF0dHJpYnV0ZTRUeXBlRUVFRUUATjVkcmFjbzI4QXR0cmlidXRlT2N0YWhlZHJvblRyYW5zZm9ybUUATjVkcmFjbzE4QXR0cmlidXRlVHJhbnNmb3JtRQBONWRyYWNvMzBBdHRyaWJ1dGVRdWFudGl6YXRpb25UcmFuc2Zvcm1FAE41ZHJhY28xN0F0dHJpYnV0ZXNFbmNvZGVyRQBONWRyYWNvMjNLZFRyZWVBdHRyaWJ1dGVzRW5jb2RlckUATjVkcmFjbzI2U2VxdWVudGlhbEF0dHJpYnV0ZUVuY29kZXJFAE41ZHJhY28zN1NlcXVlbnRpYWxBdHRyaWJ1dGVFbmNvZGVyc0NvbnRyb2xsZXJFAE41ZHJhY28yOFByZWRpY3Rpb25TY2hlbWVEZWx0YUVuY29kZXJJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFRUUATjVkcmFjbzIzUHJlZGljdGlvblNjaGVtZUVuY29kZXJJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFRUUATjVkcmFjbzM3UHJlZGljdGlvblNjaGVtZVR5cGVkRW5jb2RlckludGVyZmFjZUlpaUVFAE41ZHJhY28zMlByZWRpY3Rpb25TY2hlbWVFbmNvZGVySW50ZXJmYWNlRQBONWRyYWNvMjVQcmVkaWN0aW9uU2NoZW1lSW50ZXJmYWNlRQBONWRyYWNvNDhNZXNoUHJlZGljdGlvblNjaGVtZUdlb21ldHJpY05vcm1hbFByZWRpY3RvckFyZWFJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMTFDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280OE1lc2hQcmVkaWN0aW9uU2NoZW1lR2VvbWV0cmljTm9ybWFsUHJlZGljdG9yQmFzZUlpTlNfMzdQcmVkaWN0aW9uU2NoZW1lV3JhcEVuY29kaW5nVHJhbnNmb3JtSWlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQyTWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxFbmNvZGVySWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzExQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvMjdNZXNoUHJlZGljdGlvblNjaGVtZUVuY29kZXJJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMTFDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280NE1lc2hQcmVkaWN0aW9uU2NoZW1lVGV4Q29vcmRzUG9ydGFibGVFbmNvZGVySWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzExQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvNTZNZXNoUHJlZGljdGlvblNjaGVtZUNvbnN0cmFpbmVkTXVsdGlQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfMzdQcmVkaWN0aW9uU2NoZW1lV3JhcEVuY29kaW5nVHJhbnNmb3JtSWlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQwTWVzaFByZWRpY3Rpb25TY2hlbWVQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfMzdQcmVkaWN0aW9uU2NoZW1lV3JhcEVuY29kaW5nVHJhbnNmb3JtSWlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ4TWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxQcmVkaWN0b3JBcmVhSWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ4TWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxQcmVkaWN0b3JCYXNlSWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQyTWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxFbmNvZGVySWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzI3TWVzaFByZWRpY3Rpb25TY2hlbWVFbmNvZGVySWlOU18zN1ByZWRpY3Rpb25TY2hlbWVXcmFwRW5jb2RpbmdUcmFuc2Zvcm1JaWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ0TWVzaFByZWRpY3Rpb25TY2hlbWVUZXhDb29yZHNQb3J0YWJsZUVuY29kZXJJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvNTZNZXNoUHJlZGljdGlvblNjaGVtZUNvbnN0cmFpbmVkTXVsdGlQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfMzdQcmVkaWN0aW9uU2NoZW1lV3JhcEVuY29kaW5nVHJhbnNmb3JtSWlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18yNE1lc2hBdHRyaWJ1dGVDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280ME1lc2hQcmVkaWN0aW9uU2NoZW1lUGFyYWxsZWxvZ3JhbUVuY29kZXJJaU5TXzM3UHJlZGljdGlvblNjaGVtZVdyYXBFbmNvZGluZ1RyYW5zZm9ybUlpaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFRUVFRQB1c2VfYnVpbHRfaW5fYXR0cmlidXRlX2NvbXByZXNzaW9uAE41ZHJhY28zM1NlcXVlbnRpYWxJbnRlZ2VyQXR0cmlidXRlRW5jb2RlckUATjVkcmFjbzI4UHJlZGljdGlvblNjaGVtZURlbHRhRW5jb2RlcklpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVFRQBONWRyYWNvMjNQcmVkaWN0aW9uU2NoZW1lRW5jb2RlcklpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVFRQBONWRyYWNvNDhNZXNoUHJlZGljdGlvblNjaGVtZUdlb21ldHJpY05vcm1hbFByZWRpY3RvckFyZWFJaU5TXzYyUHJlZGljdGlvblNjaGVtZU5vcm1hbE9jdGFoZWRyb25DYW5vbmljYWxpemVkRW5jb2RpbmdUcmFuc2Zvcm1JaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMTFDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280OE1lc2hQcmVkaWN0aW9uU2NoZW1lR2VvbWV0cmljTm9ybWFsUHJlZGljdG9yQmFzZUlpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQyTWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxFbmNvZGVySWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzExQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvMjdNZXNoUHJlZGljdGlvblNjaGVtZUVuY29kZXJJaU5TXzYyUHJlZGljdGlvblNjaGVtZU5vcm1hbE9jdGFoZWRyb25DYW5vbmljYWxpemVkRW5jb2RpbmdUcmFuc2Zvcm1JaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMTFDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280NE1lc2hQcmVkaWN0aW9uU2NoZW1lVGV4Q29vcmRzUG9ydGFibGVFbmNvZGVySWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzExQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvNTZNZXNoUHJlZGljdGlvblNjaGVtZUNvbnN0cmFpbmVkTXVsdGlQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQwTWVzaFByZWRpY3Rpb25TY2hlbWVQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18xMUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ4TWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxQcmVkaWN0b3JBcmVhSWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ4TWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxQcmVkaWN0b3JCYXNlSWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQyTWVzaFByZWRpY3Rpb25TY2hlbWVHZW9tZXRyaWNOb3JtYWxFbmNvZGVySWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzI3TWVzaFByZWRpY3Rpb25TY2hlbWVFbmNvZGVySWlOU182MlByZWRpY3Rpb25TY2hlbWVOb3JtYWxPY3RhaGVkcm9uQ2Fub25pY2FsaXplZEVuY29kaW5nVHJhbnNmb3JtSWlFRU5TXzI0TWVzaFByZWRpY3Rpb25TY2hlbWVEYXRhSU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRUVFRUUATjVkcmFjbzQ0TWVzaFByZWRpY3Rpb25TY2hlbWVUZXhDb29yZHNQb3J0YWJsZUVuY29kZXJJaU5TXzYyUHJlZGljdGlvblNjaGVtZU5vcm1hbE9jdGFoZWRyb25DYW5vbmljYWxpemVkRW5jb2RpbmdUcmFuc2Zvcm1JaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvNTZNZXNoUHJlZGljdGlvblNjaGVtZUNvbnN0cmFpbmVkTXVsdGlQYXJhbGxlbG9ncmFtRW5jb2RlcklpTlNfNjJQcmVkaWN0aW9uU2NoZW1lTm9ybWFsT2N0YWhlZHJvbkNhbm9uaWNhbGl6ZWRFbmNvZGluZ1RyYW5zZm9ybUlpRUVOU18yNE1lc2hQcmVkaWN0aW9uU2NoZW1lRGF0YUlOU18yNE1lc2hBdHRyaWJ1dGVDb3JuZXJUYWJsZUVFRUVFAE41ZHJhY280ME1lc2hQcmVkaWN0aW9uU2NoZW1lUGFyYWxsZWxvZ3JhbUVuY29kZXJJaU5TXzYyUHJlZGljdGlvblNjaGVtZU5vcm1hbE9jdGFoZWRyb25DYW5vbmljYWxpemVkRW5jb2RpbmdUcmFuc2Zvcm1JaUVFTlNfMjRNZXNoUHJlZGljdGlvblNjaGVtZURhdGFJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFRUVFRQBONWRyYWNvMzJTZXF1ZW50aWFsTm9ybWFsQXR0cmlidXRlRW5jb2RlckUATjVkcmFjbzM4U2VxdWVudGlhbFF1YW50aXphdGlvbkF0dHJpYnV0ZUVuY29kZXJFAHByZWRpY3Rpb25fc2NoZW1lAE41ZHJhY28xMUVuY29kZXJCYXNlSU5TXzE4RW5jb2Rlck9wdGlvbnNCYXNlSWlFRUVFAE41ZHJhY283RW5jb2RlckUAIABONWRyYWNvMTNFeHBlcnRFbmNvZGVyRQBlbmNvZGluZ19tZXRob2QAcXVhbnRpemF0aW9uX2JpdHMASW52YWxpZCBlbmNvZGluZyBtZXRob2QuAGVuY29kaW5nX3NwZWVkAGRlY29kaW5nX3NwZWVkAHF1YW50aXphdGlvbl9vcmlnaW4AcXVhbnRpemF0aW9uX3JhbmdlAHN5bWJvbF9lbmNvZGluZ19tZXRob2QAc3ltYm9sX2VuY29kaW5nX2NvbXByZXNzaW9uX2xldmVsAHN0YW5kYXJkX2VkZ2VicmVha2VyAHByZWRpY3RpdmVfZWRnZWJyZWFrZXIAZWRnZWJyZWFrZXJfbWV0aG9kAE41ZHJhY28yMk1lc2hFZGdlYnJlYWtlckVuY29kZXJFAEFsbCB0cmlhbmdsZXMgYXJlIGRlZ2VuZXJhdGUuAEZhaWxlZCB0byBwcm9jZXNzIG1lc2ggaG9sZXMuAEZhaWxlZCB0byBpbml0aWFsaXplIGF0dHJpYnV0ZSBkYXRhLgBGYWlsZWQgdG8gZW5jb2RlIG1lc2ggY29tcG9uZW50LgBGYWlsZWQgdG8gZW5jb2RlIHNwbGl0IGRhdGEuAE41ZHJhY28xM1RyYXZlcnNlckJhc2VJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFTlNfMzZNZXNoQXR0cmlidXRlSW5kaWNlc0VuY29kaW5nT2JzZXJ2ZXJJUzFfRUVFRQBONWRyYWNvMTlEZXB0aEZpcnN0VHJhdmVyc2VySU5TXzI0TWVzaEF0dHJpYnV0ZUNvcm5lclRhYmxlRU5TXzM2TWVzaEF0dHJpYnV0ZUluZGljZXNFbmNvZGluZ09ic2VydmVySVMxX0VFRUUATjVkcmFjbzIyTWVzaFRyYXZlcnNhbFNlcXVlbmNlcklOU18xOURlcHRoRmlyc3RUcmF2ZXJzZXJJTlNfMjRNZXNoQXR0cmlidXRlQ29ybmVyVGFibGVFTlNfMzZNZXNoQXR0cmlidXRlSW5kaWNlc0VuY29kaW5nT2JzZXJ2ZXJJUzJfRUVFRUVFAE41ZHJhY28xNVBvaW50c1NlcXVlbmNlckUATjVkcmFjbzEzVHJhdmVyc2VyQmFzZUlOU18xMUNvcm5lclRhYmxlRU5TXzM2TWVzaEF0dHJpYnV0ZUluZGljZXNFbmNvZGluZ09ic2VydmVySVMxX0VFRUUATjVkcmFjbzE5RGVwdGhGaXJzdFRyYXZlcnNlcklOU18xMUNvcm5lclRhYmxlRU5TXzM2TWVzaEF0dHJpYnV0ZUluZGljZXNFbmNvZGluZ09ic2VydmVySVMxX0VFRUUATjVkcmFjbzIyTWVzaFRyYXZlcnNhbFNlcXVlbmNlcklOU18xOURlcHRoRmlyc3RUcmF2ZXJzZXJJTlNfMTFDb3JuZXJUYWJsZUVOU18zNk1lc2hBdHRyaWJ1dGVJbmRpY2VzRW5jb2RpbmdPYnNlcnZlcklTMl9FRUVFRUUATjVkcmFjbzI4TWF4UHJlZGljdGlvbkRlZ3JlZVRyYXZlcnNlcklOU18xMUNvcm5lclRhYmxlRU5TXzM2TWVzaEF0dHJpYnV0ZUluZGljZXNFbmNvZGluZ09ic2VydmVySVMxX0VFRUUATjVkcmFjbzIyTWVzaFRyYXZlcnNhbFNlcXVlbmNlcklOU18yOE1heFByZWRpY3Rpb25EZWdyZWVUcmF2ZXJzZXJJTlNfMTFDb3JuZXJUYWJsZUVOU18zNk1lc2hBdHRyaWJ1dGVJbmRpY2VzRW5jb2RpbmdPYnNlcnZlcklTMl9FRUVFRUUAc3BsaXRfbWVzaF9vbl9zZWFtcwBONWRyYWNvMjZNZXNoRWRnZWJyZWFrZXJFbmNvZGVySW1wbElOU18zMU1lc2hFZGdlYnJlYWtlclRyYXZlcnNhbEVuY29kZXJFRUUATjVkcmFjbzM1TWVzaEVkZ2VicmVha2VyRW5jb2RlckltcGxJbnRlcmZhY2VFAE41ZHJhY28yNk1lc2hFZGdlYnJlYWtlckVuY29kZXJJbXBsSU5TXzM4TWVzaEVkZ2VicmVha2VyVHJhdmVyc2FsVmFsZW5jZUVuY29kZXJFRUUAc3RvcmVfbnVtYmVyX29mX2VuY29kZWRfZmFjZXMATjVkcmFjbzExTWVzaEVuY29kZXJFAGNvbXByZXNzX2Nvbm5lY3Rpdml0eQBONWRyYWNvMTVMaW5lYXJTZXF1ZW5jZXJFAE41ZHJhY28yMU1lc2hTZXF1ZW50aWFsRW5jb2RlckUATjVkcmFjbzE3UG9pbnRDbG91ZEVuY29kZXJFAEludmFsaWQgaW5wdXQgZ2VvbWV0cnkuAEZhaWxlZCB0byBpbml0aWFsaXplIGVuY29kZXIuAEZhaWxlZCB0byBlbmNvZGUgaW50ZXJuYWwgZGF0YS4ARmFpbGVkIHRvIGVuY29kZSBwb2ludCBhdHRyaWJ1dGVzLgBzdG9yZV9udW1iZXJfb2ZfZW5jb2RlZF9wb2ludHMARmFpbGVkIHRvIGVuY29kZSBtZXRhZGF0YS4ARFJBQ08ATjVkcmFjbzIzUG9pbnRDbG91ZEtkVHJlZUVuY29kZXJFAE41ZHJhY28yN1BvaW50Q2xvdWRTZXF1ZW50aWFsRW5jb2RlckUATjVkcmFjbzRNZXNoRQBhbGxvY2F0b3I8VD46OmFsbG9jYXRlKHNpemVfdCBuKSAnbicgZXhjZWVkcyBtYXhpbXVtIHN1cHBvcnRlZCBzaXplAE41ZHJhY28xMFBvaW50Q2xvdWRFABEACgAREREAAAAABQAAAAAAAAkAAAAACwAAAAAAAAAAEQAPChEREQMKBwABEwkLCwAACQYLAAALAAYRAAAAERERAAAAAAAAAAAAAAAAAAAAAAsAAAAAAAAAABEACgoREREACgAAAgAJCwAAAAkACwAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAMAAAAAAwAAAAACQwAAAAAAAwAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAADQAAAAQNAAAAAAkOAAAAAAAOAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA8AAAAADwAAAAAJEAAAAAAAEAAAEAAAEgAAABISEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAEhISAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAAAAAAAAACgAAAAAKAAAAAAkLAAAAAAALAAALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAwAAAAADAAAAAAJDAAAAAAADAAADAAALSsgICAwWDB4AChudWxsKQAtMFgrMFggMFgtMHgrMHggMHgAaW5mAElORgBOQU4AMDEyMzQ1Njc4OUFCQ0RFRi4AVCEiGQ0BAgMRSxwMEAQLHRIeJ2hub3BxYiAFBg8TFBUaCBYHKCQXGAkKDhsfJSODgn0mKis8PT4/Q0dKTVhZWltcXV5fYGFjZGVmZ2lqa2xyc3R5ent8AElsbGVnYWwgYnl0ZSBzZXF1ZW5jZQBEb21haW4gZXJyb3IAUmVzdWx0IG5vdCByZXByZXNlbnRhYmxlAE5vdCBhIHR0eQBQZXJtaXNzaW9uIGRlbmllZABPcGVyYXRpb24gbm90IHBlcm1pdHRlZABObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5AE5vIHN1Y2ggcHJvY2VzcwBGaWxlIGV4aXN0cwBWYWx1ZSB0b28gbGFyZ2UgZm9yIGRhdGEgdHlwZQBObyBzcGFjZSBsZWZ0IG9uIGRldmljZQBPdXQgb2YgbWVtb3J5AFJlc291cmNlIGJ1c3kASW50ZXJydXB0ZWQgc3lzdGVtIGNhbGwAUmVzb3VyY2UgdGVtcG9yYXJpbHkgdW5hdmFpbGFibGUASW52YWxpZCBzZWVrAENyb3NzLWRldmljZSBsaW5rAFJlYWQtb25seSBmaWxlIHN5c3RlbQBEaXJlY3Rvcnkgbm90IGVtcHR5AENvbm5lY3Rpb24gcmVzZXQgYnkgcGVlcgBPcGVyYXRpb24gdGltZWQgb3V0AENvbm5lY3Rpb24gcmVmdXNlZABIb3N0IGlzIGRvd24ASG9zdCBpcyB1bnJlYWNoYWJsZQBBZGRyZXNzIGluIHVzZQBCcm9rZW4gcGlwZQBJL08gZXJyb3IATm8gc3VjaCBkZXZpY2Ugb3IgYWRkcmVzcwBCbG9jayBkZXZpY2UgcmVxdWlyZWQATm8gc3VjaCBkZXZpY2UATm90IGEgZGlyZWN0b3J5AElzIGEgZGlyZWN0b3J5AFRleHQgZmlsZSBidXN5AEV4ZWMgZm9ybWF0IGVycm9yAEludmFsaWQgYXJndW1lbnQAQXJndW1lbnQgbGlzdCB0b28gbG9uZwBTeW1ib2xpYyBsaW5rIGxvb3AARmlsZW5hbWUgdG9vIGxvbmcAVG9vIG1hbnkgb3BlbiBmaWxlcyBpbiBzeXN0ZW0ATm8gZmlsZSBkZXNjcmlwdG9ycyBhdmFpbGFibGUAQmFkIGZpbGUgZGVzY3JpcHRvcgBObyBjaGlsZCBwcm9jZXNzAEJhZCBhZGRyZXNzAEZpbGUgdG9vIGxhcmdlAFRvbyBtYW55IGxpbmtzAE5vIGxvY2tzIGF2YWlsYWJsZQBSZXNvdXJjZSBkZWFkbG9jayB3b3VsZCBvY2N1cgBTdGF0ZSBub3QgcmVjb3ZlcmFibGUAUHJldmlvdXMgb3duZXIgZGllZABPcGVyYXRpb24gY2FuY2VsZWQARnVuY3Rpb24gbm90IGltcGxlbWVudGVkAE5vIG1lc3NhZ2Ugb2YgZGVzaXJlZCB0eXBlAElkZW50aWZpZXIgcmVtb3ZlZABEZXZpY2Ugbm90IGEgc3RyZWFtAE5vIGRhdGEgYXZhaWxhYmxlAERldmljZSB0aW1lb3V0AE91dCBvZiBzdHJlYW1zIHJlc291cmNlcwBMaW5rIGhhcyBiZWVuIHNldmVyZWQAUHJvdG9jb2wgZXJyb3IAQmFkIG1lc3NhZ2UARmlsZSBkZXNjcmlwdG9yIGluIGJhZCBzdGF0ZQBOb3QgYSBzb2NrZXQARGVzdGluYXRpb24gYWRkcmVzcyByZXF1aXJlZABNZXNzYWdlIHRvbyBsYXJnZQBQcm90b2NvbCB3cm9uZyB0eXBlIGZvciBzb2NrZXQAUHJvdG9jb2wgbm90IGF2YWlsYWJsZQBQcm90b2NvbCBub3Qgc3VwcG9ydGVkAFNvY2tldCB0eXBlIG5vdCBzdXBwb3J0ZWQATm90IHN1cHBvcnRlZABQcm90b2NvbCBmYW1pbHkgbm90IHN1cHBvcnRlZABBZGRyZXNzIGZhbWlseSBub3Qgc3VwcG9ydGVkIGJ5IHByb3RvY29sAEFkZHJlc3Mgbm90IGF2YWlsYWJsZQBOZXR3b3JrIGlzIGRvd24ATmV0d29yayB1bnJlYWNoYWJsZQBDb25uZWN0aW9uIHJlc2V0IGJ5IG5ldHdvcmsAQ29ubmVjdGlvbiBhYm9ydGVkAE5vIGJ1ZmZlciBzcGFjZSBhdmFpbGFibGUAU29ja2V0IGlzIGNvbm5lY3RlZABTb2NrZXQgbm90IGNvbm5lY3RlZABDYW5ub3Qgc2VuZCBhZnRlciBzb2NrZXQgc2h1dGRvd24AT3BlcmF0aW9uIGFscmVhZHkgaW4gcHJvZ3Jlc3MAT3BlcmF0aW9uIGluIHByb2dyZXNzAFN0YWxlIGZpbGUgaGFuZGxlAFJlbW90ZSBJL08gZXJyb3IAUXVvdGEgZXhjZWVkZWQATm8gbWVkaXVtIGZvdW5kAFdyb25nIG1lZGl1bSB0eXBlAE5vIGVycm9yIGluZm9ybWF0aW9uAABpbmZpbml0eQBuYW4AJWQAJWYAdGVybWluYXRpbmcgd2l0aCAlcyBleGNlcHRpb24gb2YgdHlwZSAlczogJXMAdGVybWluYXRpbmcgd2l0aCAlcyBleGNlcHRpb24gb2YgdHlwZSAlcwB0ZXJtaW5hdGluZyB3aXRoICVzIGZvcmVpZ24gZXhjZXB0aW9uAHRlcm1pbmF0aW5nAHVuY2F1Z2h0AFN0OWV4Y2VwdGlvbgBOMTBfX2N4eGFiaXYxMTZfX3NoaW1fdHlwZV9pbmZvRQBTdDl0eXBlX2luZm8ATjEwX19jeHhhYml2MTIwX19zaV9jbGFzc190eXBlX2luZm9FAE4xMF9fY3h4YWJpdjExN19fY2xhc3NfdHlwZV9pbmZvRQBwdGhyZWFkX29uY2UgZmFpbHVyZSBpbiBfX2N4YV9nZXRfZ2xvYmFsc19mYXN0KCkAY2Fubm90IGNyZWF0ZSBwdGhyZWFkIGtleSBmb3IgX19jeGFfZ2V0X2dsb2JhbHMoKQBjYW5ub3QgemVybyBvdXQgdGhyZWFkIHZhbHVlIGZvciBfX2N4YV9nZXRfZ2xvYmFscygpAHRlcm1pbmF0ZV9oYW5kbGVyIHVuZXhwZWN0ZWRseSByZXR1cm5lZABTdDExbG9naWNfZXJyb3IAU3QxMmxlbmd0aF9lcnJvcgBOMTBfX2N4eGFiaXYxMTlfX3BvaW50ZXJfdHlwZV9pbmZvRQBOMTBfX2N4eGFiaXYxMTdfX3BiYXNlX3R5cGVfaW5mb0U=';
-  var tempDoublePtr = STATICTOP;
+  let tempDoublePtr = STATICTOP;
   STATICTOP += 16;
   function ___cxa_allocate_exception(size) {
     return _malloc(size);
@@ -921,42 +921,42 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     last: 0,
     caught: [],
     infos: {},
-    deAdjust: function (adjusted) {
+    deAdjust (adjusted) {
       if (!adjusted || EXCEPTIONS.infos[adjusted]) return adjusted;
-      for (var ptr in EXCEPTIONS.infos) {
-        var info = EXCEPTIONS.infos[ptr];
+      for (let ptr in EXCEPTIONS.infos) {
+        let info = EXCEPTIONS.infos[ptr];
         if (info.adjusted === adjusted) {
           return ptr;
         }
       }
       return adjusted;
     },
-    addRef: function (ptr) {
+    addRef (ptr) {
       if (!ptr) return;
-      var info = EXCEPTIONS.infos[ptr];
+      let info = EXCEPTIONS.infos[ptr];
       info.refcount++;
     },
-    decRef: function (ptr) {
+    decRef (ptr) {
       if (!ptr) return;
-      var info = EXCEPTIONS.infos[ptr];
+      let info = EXCEPTIONS.infos[ptr];
       assert(info.refcount > 0);
       info.refcount--;
       if (info.refcount === 0 && !info.rethrown) {
         if (info.destructor) {
-          Module['dynCall_vi'](info.destructor, ptr);
+          Module.dynCall_vi(info.destructor, ptr);
         }
         delete EXCEPTIONS.infos[ptr];
         ___cxa_free_exception(ptr);
       }
     },
-    clearRef: function (ptr) {
+    clearRef (ptr) {
       if (!ptr) return;
-      var info = EXCEPTIONS.infos[ptr];
+      let info = EXCEPTIONS.infos[ptr];
       info.refcount = 0;
     },
   };
   function ___cxa_begin_catch(ptr) {
-    var info = EXCEPTIONS.infos[ptr];
+    let info = EXCEPTIONS.infos[ptr];
     if (info && !info.caught) {
       info.caught = true;
       __ZSt18uncaught_exceptionv.uncaught_exception--;
@@ -975,30 +975,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       EXCEPTIONS.last = ptr;
     }
     throw (
-      ptr +
-      ' - Exception catching is disabled, this exception cannot be caught. Compile with -s DISABLE_EXCEPTION_CATCHING=0 or DISABLE_EXCEPTION_CATCHING=2 to catch.'
+      `${ptr 
+      } - Exception catching is disabled, this exception cannot be caught. Compile with -s DISABLE_EXCEPTION_CATCHING=0 or DISABLE_EXCEPTION_CATCHING=2 to catch.`
     );
   }
   function ___cxa_find_matching_catch() {
-    var thrown = EXCEPTIONS.last;
+    let thrown = EXCEPTIONS.last;
     if (!thrown) {
       return (setTempRet0(0), 0) | 0;
     }
-    var info = EXCEPTIONS.infos[thrown];
-    var throwntype = info.type;
+    let info = EXCEPTIONS.infos[thrown];
+    let throwntype = info.type;
     if (!throwntype) {
       return (setTempRet0(0), thrown) | 0;
     }
-    var typeArray = Array.prototype.slice.call(arguments);
-    var pointer = Module['___cxa_is_pointer_type'](throwntype);
+    let typeArray = Array.prototype.slice.call(arguments);
+    let pointer = Module.___cxa_is_pointer_type(throwntype);
     if (!___cxa_find_matching_catch.buffer)
       ___cxa_find_matching_catch.buffer = _malloc(4);
     HEAP32[___cxa_find_matching_catch.buffer >> 2] = thrown;
     thrown = ___cxa_find_matching_catch.buffer;
-    for (var i = 0; i < typeArray.length; i++) {
+    for (let i = 0; i < typeArray.length; i++) {
       if (
         typeArray[i] &&
-        Module['___cxa_can_catch'](typeArray[i], throwntype, thrown)
+        Module.___cxa_can_catch(typeArray[i], throwntype, thrown)
       ) {
         thrown = HEAP32[thrown >> 2];
         info.adjusted = thrown;
@@ -1010,10 +1010,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function ___cxa_throw(ptr, type, destructor) {
     EXCEPTIONS.infos[ptr] = {
-      ptr: ptr,
+      ptr,
       adjusted: ptr,
-      type: type,
-      destructor: destructor,
+      type,
+      destructor,
       refcount: 0,
       caught: false,
       rethrown: false,
@@ -1025,11 +1025,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       __ZSt18uncaught_exceptionv.uncaught_exception++;
     }
     throw (
-      ptr +
-      ' - Exception catching is disabled, this exception cannot be caught. Compile with -s DISABLE_EXCEPTION_CATCHING=0 or DISABLE_EXCEPTION_CATCHING=2 to catch.'
+      `${ptr 
+      } - Exception catching is disabled, this exception cannot be caught. Compile with -s DISABLE_EXCEPTION_CATCHING=0 or DISABLE_EXCEPTION_CATCHING=2 to catch.`
     );
   }
-  var cttz_i8 = allocate(
+  let cttz_i8 = allocate(
     [
       8, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3,
       0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0,
@@ -1049,35 +1049,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   function ___gxx_personality_v0() {}
   var SYSCALLS = {
     varargs: 0,
-    get: function (varargs) {
+    get (varargs) {
       SYSCALLS.varargs += 4;
-      var ret = HEAP32[(SYSCALLS.varargs - 4) >> 2];
+      let ret = HEAP32[(SYSCALLS.varargs - 4) >> 2];
       return ret;
     },
-    getStr: function () {
-      var ret = Pointer_stringify(SYSCALLS.get());
+    getStr () {
+      let ret = Pointer_stringify(SYSCALLS.get());
       return ret;
     },
-    get64: function () {
-      var low = SYSCALLS.get(),
-        high = SYSCALLS.get();
+    get64 () {
+      let low = SYSCALLS.get();
+        let high = SYSCALLS.get();
       if (low >= 0) assert(high === 0);
       else assert(high === -1);
       return low;
     },
-    getZero: function () {
+    getZero () {
       assert(SYSCALLS.get() === 0);
     },
   };
   function ___syscall140(which, varargs) {
     SYSCALLS.varargs = varargs;
     try {
-      var stream = SYSCALLS.getStreamFromFD(),
-        offset_high = SYSCALLS.get(),
-        offset_low = SYSCALLS.get(),
-        result = SYSCALLS.get(),
-        whence = SYSCALLS.get();
-      var offset = offset_low;
+      let stream = SYSCALLS.getStreamFromFD();
+        let offset_high = SYSCALLS.get();
+        let offset_low = SYSCALLS.get();
+        let result = SYSCALLS.get();
+        let whence = SYSCALLS.get();
+      let offset = offset_low;
       FS.llseek(stream, offset, whence);
       HEAP32[result >> 2] = stream.position;
       if (stream.getdents && offset === 0 && whence === 0)
@@ -1089,28 +1089,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
   }
   function flush_NO_FILESYSTEM() {
-    var fflush = Module['_fflush'];
+    let fflush = Module._fflush;
     if (fflush) fflush(0);
-    var printChar = ___syscall146.printChar;
+    let {printChar} = ___syscall146;
     if (!printChar) return;
-    var buffers = ___syscall146.buffers;
+    let {buffers} = ___syscall146;
     if (buffers[1].length) printChar(1, 10);
     if (buffers[2].length) printChar(2, 10);
   }
   function ___syscall146(which, varargs) {
     SYSCALLS.varargs = varargs;
     try {
-      var stream = SYSCALLS.get(),
-        iov = SYSCALLS.get(),
-        iovcnt = SYSCALLS.get();
-      var ret = 0;
+      let stream = SYSCALLS.get();
+        let iov = SYSCALLS.get();
+        let iovcnt = SYSCALLS.get();
+      let ret = 0;
       if (!___syscall146.buffers) {
         ___syscall146.buffers = [null, [], []];
         ___syscall146.printChar = function (stream, curr) {
-          var buffer = ___syscall146.buffers[stream];
+          let buffer = ___syscall146.buffers[stream];
           assert(buffer);
           if (curr === 0 || curr === 10) {
-            (stream === 1 ? Module['print'] : Module['printErr'])(
+            (stream === 1 ? Module.print : Module.printErr)(
               UTF8ArrayToString(buffer, 0)
             );
             buffer.length = 0;
@@ -1119,10 +1119,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           }
         };
       }
-      for (var i = 0; i < iovcnt; i++) {
-        var ptr = HEAP32[(iov + i * 8) >> 2];
-        var len = HEAP32[(iov + (i * 8 + 4)) >> 2];
-        for (var j = 0; j < len; j++) {
+      for (let i = 0; i < iovcnt; i++) {
+        let ptr = HEAP32[(iov + i * 8) >> 2];
+        let len = HEAP32[(iov + (i * 8 + 4)) >> 2];
+        for (let j = 0; j < len; j++) {
           ___syscall146.printChar(stream, HEAPU8[ptr + j]);
         }
         ret += len;
@@ -1136,7 +1136,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   function ___syscall6(which, varargs) {
     SYSCALLS.varargs = varargs;
     try {
-      var stream = SYSCALLS.getStreamFromFD();
+      let stream = SYSCALLS.getStreamFromFD();
       FS.close(stream);
       return 0;
     } catch (e) {
@@ -1145,11 +1145,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
   }
   function _abort() {
-    Module['abort']();
+    Module.abort();
   }
-  var _llvm_ceil_f64 = Math_ceil;
-  var _llvm_fabs_f64 = Math_abs;
-  var _llvm_floor_f64 = Math_floor;
+  let _llvm_ceil_f64 = Math_ceil;
+  let _llvm_fabs_f64 = Math_abs;
+  let _llvm_floor_f64 = Math_floor;
   function _llvm_trap() {
     abort('trap!');
   }
@@ -1157,12 +1157,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     HEAPU8.set(HEAPU8.subarray(src, src + num), dest);
     return dest;
   }
-  var PTHREAD_SPECIFIC = {};
+  let PTHREAD_SPECIFIC = {};
   function _pthread_getspecific(key) {
     return PTHREAD_SPECIFIC[key] || 0;
   }
-  var PTHREAD_SPECIFIC_NEXT_KEY = 1;
-  var ERRNO_CODES = {
+  let PTHREAD_SPECIFIC_NEXT_KEY = 1;
+  let ERRNO_CODES = {
     EPERM: 1,
     ENOENT: 2,
     ESRCH: 3,
@@ -1297,7 +1297,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   function _pthread_once(ptr, func) {
     if (!_pthread_once.seen) _pthread_once.seen = {};
     if (ptr in _pthread_once.seen) return;
-    Module['dynCall_v'](func);
+    Module.dynCall_v(func);
     _pthread_once.seen[ptr] = 1;
   }
   function _pthread_setspecific(key, value) {
@@ -1308,8 +1308,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     return 0;
   }
   function ___setErrNo(value) {
-    if (Module['___errno_location'])
-      HEAP32[Module['___errno_location']() >> 2] = value;
+    if (Module.___errno_location)
+      HEAP32[Module.___errno_location() >> 2] = value;
     return value;
   }
   DYNAMICTOP_PTR = staticAlloc(4);
@@ -1318,11 +1318,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   DYNAMIC_BASE = alignMemory(STACK_MAX);
   HEAP32[DYNAMICTOP_PTR >> 2] = DYNAMIC_BASE;
   staticSealed = true;
-  var ASSERTIONS = false;
+  let ASSERTIONS = false;
   function intArrayFromString(stringy, dontAddNull, length) {
-    var len = length > 0 ? length : lengthBytesUTF8(stringy) + 1;
-    var u8array = new Array(len);
-    var numBytesWritten = stringToUTF8Array(
+    let len = length > 0 ? length : lengthBytesUTF8(stringy) + 1;
+    let u8array = new Array(len);
+    let numBytesWritten = stringToUTF8Array(
       stringy,
       u8array,
       0,
@@ -1332,20 +1332,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     return u8array;
   }
   function intArrayToString(array) {
-    var ret = [];
-    for (var i = 0; i < array.length; i++) {
-      var chr = array[i];
+    let ret = [];
+    for (let i = 0; i < array.length; i++) {
+      let chr = array[i];
       if (chr > 255) {
         if (ASSERTIONS) {
           assert(
             false,
-            'Character code ' +
-              chr +
-              ' (' +
-              String.fromCharCode(chr) +
-              ')  at offset ' +
-              i +
-              ' not in 0x00-0xFF.'
+            `Character code ${ 
+              chr 
+              } (${ 
+              String.fromCharCode(chr) 
+              })  at offset ${ 
+              i 
+              } not in 0x00-0xFF.`
           );
         }
         chr &= 255;
@@ -1354,16 +1354,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     return ret.join('');
   }
-  var decodeBase64 =
+  let decodeBase64 =
     typeof atob === 'function'
       ? atob
       : function (input) {
-          var keyStr =
+          let keyStr =
             'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-          var output = '';
-          var chr1, chr2, chr3;
-          var enc1, enc2, enc3, enc4;
-          var i = 0;
+          let output = '';
+          let chr1; let chr2; let chr3;
+          let enc1; let enc2; let enc3; let enc4;
+          let i = 0;
           input = input.replace(/[^A-Za-z0-9\+\/\=]/g, '');
           do {
             enc1 = keyStr.indexOf(input.charAt(i++));
@@ -1373,19 +1373,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             chr1 = (enc1 << 2) | (enc2 >> 4);
             chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
             chr3 = ((enc3 & 3) << 6) | enc4;
-            output = output + String.fromCharCode(chr1);
+            output += String.fromCharCode(chr1);
             if (enc3 !== 64) {
-              output = output + String.fromCharCode(chr2);
+              output += String.fromCharCode(chr2);
             }
             if (enc4 !== 64) {
-              output = output + String.fromCharCode(chr3);
+              output += String.fromCharCode(chr3);
             }
           } while (i < input.length);
           return output;
         };
   function intArrayFromBase64(s) {
     if (typeof ENVIRONMENT_IS_NODE === 'boolean' && ENVIRONMENT_IS_NODE) {
-      var buf;
+      let buf;
       try {
         buf = Buffer.from(s, 'base64');
       } catch (_) {
@@ -1394,9 +1394,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
     }
     try {
-      var decoded = decodeBase64(s);
-      var bytes = new Uint8Array(decoded.length);
-      for (var i = 0; i < decoded.length; ++i) {
+      let decoded = decodeBase64(s);
+      let bytes = new Uint8Array(decoded.length);
+      for (let i = 0; i < decoded.length; ++i) {
         bytes[i] = decoded.charCodeAt(i);
       }
       return bytes;
@@ -1412,249 +1412,250 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function invoke_ii(index, a1) {
     try {
-      return Module['dynCall_ii'](index, a1);
+      return Module.dynCall_ii(index, a1);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_iii(index, a1, a2) {
     try {
-      return Module['dynCall_iii'](index, a1, a2);
+      return Module.dynCall_iii(index, a1, a2);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_iiii(index, a1, a2, a3) {
     try {
-      return Module['dynCall_iiii'](index, a1, a2, a3);
+      return Module.dynCall_iiii(index, a1, a2, a3);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_iiiiiii(index, a1, a2, a3, a4, a5, a6) {
     try {
-      return Module['dynCall_iiiiiii'](index, a1, a2, a3, a4, a5, a6);
+      return Module.dynCall_iiiiiii(index, a1, a2, a3, a4, a5, a6);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_v(index) {
     try {
-      Module['dynCall_v'](index);
+      Module.dynCall_v(index);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_vi(index, a1) {
     try {
-      Module['dynCall_vi'](index, a1);
+      Module.dynCall_vi(index, a1);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_vii(index, a1, a2) {
     try {
-      Module['dynCall_vii'](index, a1, a2);
+      Module.dynCall_vii(index, a1, a2);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_viii(index, a1, a2, a3) {
     try {
-      Module['dynCall_viii'](index, a1, a2, a3);
+      Module.dynCall_viii(index, a1, a2, a3);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_viiii(index, a1, a2, a3, a4) {
     try {
-      Module['dynCall_viiii'](index, a1, a2, a3, a4);
+      Module.dynCall_viiii(index, a1, a2, a3, a4);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_viiiii(index, a1, a2, a3, a4, a5) {
     try {
-      Module['dynCall_viiiii'](index, a1, a2, a3, a4, a5);
+      Module.dynCall_viiiii(index, a1, a2, a3, a4, a5);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   function invoke_viiiiii(index, a1, a2, a3, a4, a5, a6) {
     try {
-      Module['dynCall_viiiiii'](index, a1, a2, a3, a4, a5, a6);
+      Module.dynCall_viiiiii(index, a1, a2, a3, a4, a5, a6);
     } catch (e) {
       if (typeof e !== 'number' && e !== 'longjmp') throw e;
-      Module['setThrew'](1, 0);
+      Module.setThrew(1, 0);
     }
   }
   Module.asmGlobalArg = {
-    Math: Math,
-    Int8Array: Int8Array,
-    Int16Array: Int16Array,
-    Int32Array: Int32Array,
-    Uint8Array: Uint8Array,
-    Uint16Array: Uint16Array,
-    Uint32Array: Uint32Array,
-    Float32Array: Float32Array,
-    Float64Array: Float64Array,
-    NaN: NaN,
-    Infinity: Infinity,
-    byteLength: byteLength,
+    Math,
+    Int8Array,
+    Int16Array,
+    Int32Array,
+    Uint8Array,
+    Uint16Array,
+    Uint32Array,
+    Float32Array,
+    Float64Array,
+    NaN,
+    Infinity,
+    byteLength,
   };
   Module.asmLibraryArg = {
-    abort: abort,
-    assert: assert,
-    enlargeMemory: enlargeMemory,
-    getTotalMemory: getTotalMemory,
-    abortOnCannotGrowMemory: abortOnCannotGrowMemory,
-    invoke_ii: invoke_ii,
-    invoke_iii: invoke_iii,
-    invoke_iiii: invoke_iiii,
-    invoke_iiiiiii: invoke_iiiiiii,
-    invoke_v: invoke_v,
-    invoke_vi: invoke_vi,
-    invoke_vii: invoke_vii,
-    invoke_viii: invoke_viii,
-    invoke_viiii: invoke_viiii,
-    invoke_viiiii: invoke_viiiii,
-    invoke_viiiiii: invoke_viiiiii,
-    __ZSt18uncaught_exceptionv: __ZSt18uncaught_exceptionv,
-    ___cxa_allocate_exception: ___cxa_allocate_exception,
-    ___cxa_begin_catch: ___cxa_begin_catch,
-    ___cxa_find_matching_catch: ___cxa_find_matching_catch,
-    ___cxa_pure_virtual: ___cxa_pure_virtual,
-    ___cxa_throw: ___cxa_throw,
-    ___gxx_personality_v0: ___gxx_personality_v0,
-    ___resumeException: ___resumeException,
-    ___setErrNo: ___setErrNo,
-    ___syscall140: ___syscall140,
-    ___syscall146: ___syscall146,
-    ___syscall6: ___syscall6,
-    _abort: _abort,
-    _emscripten_memcpy_big: _emscripten_memcpy_big,
-    _llvm_ceil_f64: _llvm_ceil_f64,
-    _llvm_fabs_f64: _llvm_fabs_f64,
-    _llvm_floor_f64: _llvm_floor_f64,
-    _llvm_trap: _llvm_trap,
-    _pthread_getspecific: _pthread_getspecific,
-    _pthread_key_create: _pthread_key_create,
-    _pthread_once: _pthread_once,
-    _pthread_setspecific: _pthread_setspecific,
-    flush_NO_FILESYSTEM: flush_NO_FILESYSTEM,
-    DYNAMICTOP_PTR: DYNAMICTOP_PTR,
-    tempDoublePtr: tempDoublePtr,
-    ABORT: ABORT,
-    STACKTOP: STACKTOP,
-    STACK_MAX: STACK_MAX,
-    cttz_i8: cttz_i8,
+    abort,
+    assert,
+    enlargeMemory,
+    getTotalMemory,
+    abortOnCannotGrowMemory,
+    invoke_ii,
+    invoke_iii,
+    invoke_iiii,
+    invoke_iiiiiii,
+    invoke_v,
+    invoke_vi,
+    invoke_vii,
+    invoke_viii,
+    invoke_viiii,
+    invoke_viiiii,
+    invoke_viiiiii,
+    __ZSt18uncaught_exceptionv,
+    ___cxa_allocate_exception,
+    ___cxa_begin_catch,
+    ___cxa_find_matching_catch,
+    ___cxa_pure_virtual,
+    ___cxa_throw,
+    ___gxx_personality_v0,
+    ___resumeException,
+    ___setErrNo,
+    ___syscall140,
+    ___syscall146,
+    ___syscall6,
+    _abort,
+    _emscripten_memcpy_big,
+    _llvm_ceil_f64,
+    _llvm_fabs_f64,
+    _llvm_floor_f64,
+    _llvm_trap,
+    _pthread_getspecific,
+    _pthread_key_create,
+    _pthread_once,
+    _pthread_setspecific,
+    flush_NO_FILESYSTEM,
+    DYNAMICTOP_PTR,
+    tempDoublePtr,
+    ABORT,
+    STACKTOP,
+    STACK_MAX,
+    cttz_i8,
   }; // EMSCRIPTEN_START_ASM
-  var asm = /** @suppress {uselessCode} */ (function (global, env, buffer) {
+  let asm = /** @suppress {uselessCode} */ (function (global, env, buffer) {
     'almost asm';
-    var a = global.Int8Array;
-    var b = new a(buffer);
-    var c = global.Int16Array;
-    var d = new c(buffer);
-    var e = global.Int32Array;
-    var f = new e(buffer);
-    var g = global.Uint8Array;
-    var h = new g(buffer);
-    var i = global.Uint16Array;
-    var j = new i(buffer);
-    var k = global.Uint32Array;
-    var l = new k(buffer);
-    var m = global.Float32Array;
-    var n = new m(buffer);
-    var o = global.Float64Array;
-    var p = new o(buffer);
-    var q = global.byteLength;
-    var r = env.DYNAMICTOP_PTR | 0;
-    var s = env.tempDoublePtr | 0;
-    var t = env.ABORT | 0;
-    var u = env.STACKTOP | 0;
-    var v = env.STACK_MAX | 0;
-    var w = env.cttz_i8 | 0;
-    var x = 0;
-    var y = 0;
-    var z = 0;
-    var A = 0;
-    var B = global.NaN,
-      C = global.Infinity;
-    var D = 0,
-      E = 0,
-      F = 0,
-      G = 0,
-      H = 0.0;
-    var I = 0;
-    var J = global.Math.floor;
-    var K = global.Math.abs;
-    var L = global.Math.sqrt;
-    var M = global.Math.pow;
-    var N = global.Math.cos;
-    var O = global.Math.sin;
-    var P = global.Math.tan;
-    var Q = global.Math.acos;
-    var R = global.Math.asin;
-    var S = global.Math.atan;
-    var T = global.Math.atan2;
-    var U = global.Math.exp;
-    var V = global.Math.log;
-    var W = global.Math.ceil;
-    var X = global.Math.imul;
-    var Y = global.Math.min;
-    var Z = global.Math.max;
-    var _ = global.Math.clz32;
-    var $ = global.Math.fround;
-    var aa = env.abort;
-    var ba = env.assert;
-    var ca = env.enlargeMemory;
-    var da = env.getTotalMemory;
-    var ea = env.abortOnCannotGrowMemory;
-    var fa = env.invoke_ii;
-    var ga = env.invoke_iii;
-    var ha = env.invoke_iiii;
-    var ia = env.invoke_iiiiiii;
-    var ja = env.invoke_v;
-    var ka = env.invoke_vi;
-    var la = env.invoke_vii;
-    var ma = env.invoke_viii;
-    var na = env.invoke_viiii;
-    var oa = env.invoke_viiiii;
-    var pa = env.invoke_viiiiii;
-    var qa = env.__ZSt18uncaught_exceptionv;
-    var ra = env.___cxa_allocate_exception;
-    var sa = env.___cxa_begin_catch;
-    var ta = env.___cxa_find_matching_catch;
-    var ua = env.___cxa_pure_virtual;
-    var va = env.___cxa_throw;
-    var wa = env.___gxx_personality_v0;
-    var xa = env.___resumeException;
-    var ya = env.___setErrNo;
-    var za = env.___syscall140;
-    var Aa = env.___syscall146;
-    var Ba = env.___syscall6;
-    var Ca = env._abort;
-    var Da = env._emscripten_memcpy_big;
-    var Ea = env._llvm_ceil_f64;
-    var Fa = env._llvm_fabs_f64;
-    var Ga = env._llvm_floor_f64;
-    var Ha = env._llvm_trap;
-    var Ia = env._pthread_getspecific;
-    var Ja = env._pthread_key_create;
-    var Ka = env._pthread_once;
-    var La = env._pthread_setspecific;
-    var Ma = env.flush_NO_FILESYSTEM;
-    var Na = $(0);
+
+    let a = global.Int8Array;
+    let b = new a(buffer);
+    let c = global.Int16Array;
+    let d = new c(buffer);
+    let e = global.Int32Array;
+    let f = new e(buffer);
+    let g = global.Uint8Array;
+    let h = new g(buffer);
+    let i = global.Uint16Array;
+    let j = new i(buffer);
+    let k = global.Uint32Array;
+    let l = new k(buffer);
+    let m = global.Float32Array;
+    let n = new m(buffer);
+    let o = global.Float64Array;
+    let p = new o(buffer);
+    let q = global.byteLength;
+    let r = env.DYNAMICTOP_PTR | 0;
+    let s = env.tempDoublePtr | 0;
+    let t = env.ABORT | 0;
+    let u = env.STACKTOP | 0;
+    let v = env.STACK_MAX | 0;
+    let w = env.cttz_i8 | 0;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    let A = 0;
+    let B = global.NaN;
+      let C = global.Infinity;
+    let D = 0;
+      let E = 0;
+      let F = 0;
+      let G = 0;
+      let H = 0.0;
+    let I = 0;
+    let J = global.Math.floor;
+    let K = global.Math.abs;
+    let L = global.Math.sqrt;
+    let M = global.Math.pow;
+    let N = global.Math.cos;
+    let O = global.Math.sin;
+    let P = global.Math.tan;
+    let Q = global.Math.acos;
+    let R = global.Math.asin;
+    let S = global.Math.atan;
+    let T = global.Math.atan2;
+    let U = global.Math.exp;
+    let V = global.Math.log;
+    let W = global.Math.ceil;
+    let X = global.Math.imul;
+    let Y = global.Math.min;
+    let Z = global.Math.max;
+    let _ = global.Math.clz32;
+    let $ = global.Math.fround;
+    let aa = env.abort;
+    let ba = env.assert;
+    let ca = env.enlargeMemory;
+    let da = env.getTotalMemory;
+    let ea = env.abortOnCannotGrowMemory;
+    let fa = env.invoke_ii;
+    let ga = env.invoke_iii;
+    let ha = env.invoke_iiii;
+    let ia = env.invoke_iiiiiii;
+    let ja = env.invoke_v;
+    let ka = env.invoke_vi;
+    let la = env.invoke_vii;
+    let ma = env.invoke_viii;
+    let na = env.invoke_viiii;
+    let oa = env.invoke_viiiii;
+    let pa = env.invoke_viiiiii;
+    let qa = env.__ZSt18uncaught_exceptionv;
+    let ra = env.___cxa_allocate_exception;
+    let sa = env.___cxa_begin_catch;
+    let ta = env.___cxa_find_matching_catch;
+    let ua = env.___cxa_pure_virtual;
+    let va = env.___cxa_throw;
+    let wa = env.___gxx_personality_v0;
+    let xa = env.___resumeException;
+    let ya = env.___setErrNo;
+    let za = env.___syscall140;
+    let Aa = env.___syscall146;
+    let Ba = env.___syscall6;
+    let Ca = env._abort;
+    let Da = env._emscripten_memcpy_big;
+    let Ea = env._llvm_ceil_f64;
+    let Fa = env._llvm_fabs_f64;
+    let Ga = env._llvm_floor_f64;
+    let Ha = env._llvm_trap;
+    let Ia = env._pthread_getspecific;
+    let Ja = env._pthread_key_create;
+    let Ka = env._pthread_once;
+    let La = env._pthread_setspecific;
+    let Ma = env.flush_NO_FILESYSTEM;
+    let Na = $(0);
     const Oa = $(0);
     function Pa(newBuffer) {
       if (
@@ -1676,35 +1677,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     // EMSCRIPTEN_START_FUNCS
     function wc(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       if (!a) return;
       b = (a + -8) | 0;
       c = f[4516] | 0;
@@ -1738,7 +1739,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             g = f[(h + 8) >> 2] | 0;
             j = f[(h + 12) >> 2] | 0;
             if ((j | 0) == (g | 0)) {
-              f[4512] = f[4512] & ~(1 << k);
+              f[4512] &= ~(1 << k);
               l = h;
               m = i;
               n = h;
@@ -1803,7 +1804,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             if ((f[o >> 2] | 0) == (h | 0)) {
               f[o >> 2] = r;
               if (!r) {
-                f[4513] = f[4513] & ~(1 << j);
+                f[4513] &= ~(1 << j);
                 l = h;
                 m = i;
                 n = h;
@@ -1880,7 +1881,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             t = f[(e + 8) >> 2] | 0;
             c = f[(e + 12) >> 2] | 0;
             if ((c | 0) == (t | 0)) {
-              f[4512] = f[4512] & ~(1 << s);
+              f[4512] &= ~(1 << s);
               break;
             } else {
               f[(t + 12) >> 2] = c;
@@ -1939,7 +1940,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               if ((f[h >> 2] | 0) == (e | 0)) {
                 f[h >> 2] = u;
                 if (!u) {
-                  f[4513] = f[4513] & ~(1 << c);
+                  f[4513] &= ~(1 << c);
                   break;
                 }
               } else {
@@ -1969,7 +1970,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((l | 0) == (f[4517] | 0)) {
           f[4514] = r;
           return;
-        } else x = r;
+        } x = r;
       } else {
         f[b >> 2] = a & -2;
         f[(l + 4) >> 2] = m | 1;
@@ -2030,7 +2031,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               B = 72;
               break;
             } else {
-              y = y << 1;
+              y <<= 1;
               n = m;
             }
           }
@@ -2068,42 +2069,42 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else D = (l + 8) | 0;
       }
       f[4520] = -1;
-      return;
+      
     }
     function xc(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = Oa,
-        F = Oa,
-        G = Oa,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = Oa;
+        let F = Oa;
+        let G = Oa;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
       d = b[(c + 11) >> 0] | 0;
       e = (d << 24) >> 24 < 0;
       g = e ? f[c >> 2] | 0 : c;
@@ -2202,7 +2203,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                 }
                 w = (v + 20) | 0;
                 return w | 0;
-              } else x = j;
+              } x = j;
               b: while (1) {
                 l = f[(x + 4) >> 2] | 0;
                 if (!(((l | 0) == (s | 0)) | (((l & o) | 0) == (t | 0)))) {
@@ -2277,7 +2278,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               }
               w = (v + 20) | 0;
               return w | 0;
-            } else C = j;
+            } C = j;
             c: while (1) {
               o = f[(C + 4) >> 2] | 0;
               if ((o | 0) != (s | 0)) {
@@ -2394,62 +2395,62 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function yc(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0.0,
-        q = 0.0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0.0,
-        G = 0.0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0.0,
-        P = 0,
-        Q = 0.0,
-        R = 0.0,
-        S = 0,
-        T = 0.0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0.0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0.0,
-        da = 0,
-        ea = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0.0;
+        let q = 0.0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0.0;
+        let G = 0.0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0.0;
+        let P = 0;
+        let Q = 0.0;
+        let R = 0.0;
+        let S = 0;
+        let T = 0.0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0.0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0.0;
+        let da = 0;
+        let ea = 0.0;
       g = (a + 4) | 0;
       i = f[g >> 2] | 0;
       j = (a + 100) | 0;
@@ -2813,48 +2814,48 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +T;
     }
     function zc(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
       g = u;
       u = (u + 16) | 0;
       h = (g + 4) | 0;
@@ -3081,52 +3082,52 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         j = 1;
         u = g;
         return j | 0;
-      } else {
+      } 
         gd(a, 0, 0);
         j = 1;
         u = g;
         return j | 0;
-      }
+      
       return 0;
     }
     function Ac(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 12) | 0;
@@ -3394,54 +3395,54 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else D = M;
       }
       u = d;
-      return;
+      
     }
     function Bc(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
       g = (a + 8) | 0;
       Ah(g, b, d, e);
       d = e >>> 0 > 1073741823 ? -1 : e << 2;
@@ -3683,50 +3684,50 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Cc(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
       g = (a + 8) | 0;
       Ah(g, b, d, e);
       d = e >>> 0 > 1073741823 ? -1 : e << 2;
@@ -3997,38 +3998,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Dc(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
       h = u;
       u = (u + 48) | 0;
       i = (h + 28) | 0;
@@ -4262,27 +4263,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function Ec(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
       if ((b | 0) < 0) return;
       c = (a + 12) | 0;
       d = f[c >> 2] | 0;
@@ -4546,36 +4547,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((j | 0) > (b | 0)) f[o >> 2] = j + -1;
         u = (u + 1) | 0;
       } while (u >>> 0 < d >>> 0);
-      return;
+      
     }
     function Fc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 16) | 0;
@@ -4782,55 +4783,55 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         default: {
           f[a >> 2] = 0;
           u = d;
-          return;
+          
         }
       }
     }
     function Gc(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
       b = u;
       u = (u + 32) | 0;
       c = (b + 20) | 0;
@@ -5082,38 +5083,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Hc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
       e = (a + 8) | 0;
       a: do
         if (
@@ -5299,7 +5300,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       F = f[c >> 2] | 0;
       E = f[d >> 2] | 0;
       if ((F | 0) == (E | 0)) return;
-      else G = F;
+      G = F;
       while (1) {
         Qe(a, (G + 16) | 0) | 0;
         F = f[(G + 4) >> 2] | 0;
@@ -5329,43 +5330,43 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((H | 0) == (E | 0)) break;
         else G = H;
       }
-      return;
+      
     }
     function Ic(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
       g = u;
       u = (u + 16) | 0;
       h = g;
@@ -5584,37 +5585,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       Va[f[((f[p >> 2] | 0) + 4) >> 2] & 127](p);
       u = g;
-      return;
+      
     }
     function Jc(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       b = u;
       u = (u + 32) | 0;
       c = (b + 4) | 0;
@@ -5837,50 +5838,50 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[B >> 2] = h;
       f[e >> 2] = (f[e >> 2] | 0) + 4;
       u = b;
-      return;
+      
     }
     function Kc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 8) | 0;
@@ -6111,36 +6112,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       }
       u = e;
-      return;
+      
     }
     function Lc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0.0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        D = 0,
-        E = 0,
-        F = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0.0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
       switch (c | 0) {
         case 0: {
           e = -149;
@@ -6394,44 +6395,44 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +j;
     }
     function Mc(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -6681,26 +6682,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       } else N = i;
       f[(a + 52) >> 2] = N;
       u = b;
-      return;
+      
     }
     function Nc(a, c, d, e, g, h) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
       i = u;
       u = (u + 32) | 0;
       j = (i + 4) | 0;
@@ -6878,37 +6879,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Oc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -7159,37 +7160,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Pc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -7440,37 +7441,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Qc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -7721,37 +7722,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Rc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -8002,37 +8003,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Sc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -8283,37 +8284,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Tc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -8564,37 +8565,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Uc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -8845,37 +8846,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Vc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -9126,37 +9127,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Wc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -9407,37 +9408,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Xc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -9688,37 +9689,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Yc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -9969,37 +9970,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function Zc(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -10250,37 +10251,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function _c(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -10531,37 +10532,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function $c(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -10812,37 +10813,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function ad(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -11093,37 +11094,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function bd(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -11374,37 +11375,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function cd(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -11655,37 +11656,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function dd(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0.0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0.0,
-        F = 0.0,
-        G = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0.0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0.0;
+        let F = 0.0;
+        let G = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -11936,59 +11937,59 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function ed(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
       g = u;
       u = (u + 32) | 0;
       d = (g + 16) | 0;
@@ -12162,41 +12163,41 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function fd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -12412,43 +12413,43 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[l >> 2] | 0) != (q | 0)) f[l >> 2] = q;
       br(q);
       u = d;
-      return;
+      
     }
     function gd(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
       c = u;
       u = (u + 16) | 0;
       b = (c + 8) | 0;
@@ -12650,40 +12651,40 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       }
       u = c;
-      return;
+      
     }
     function hd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -12883,60 +12884,60 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       } else Ci((o + ((s * 12) | 0)) | 0, d);
       f[k >> 2] = b;
       u = c;
-      return;
+      
     }
     function id(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       g = u;
       u = (u + 32) | 0;
       d = (g + 16) | 0;
@@ -13137,37 +13138,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function jd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       c = (a + 4) | 0;
       if (!b) {
         e = f[a >> 2] | 0;
@@ -13205,12 +13206,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = c;
       c = f[g >> 2] | 0;
       if (!c) return;
-      else {
+      
         k = j;
         l = g;
         m = c;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         c = m;
@@ -13374,37 +13375,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((E | 0) == 43) return;
     }
     function kd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -13442,12 +13443,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = d;
       d = f[g >> 2] | 0;
       if (!d) return;
-      else {
+      
         k = j;
         l = g;
         m = d;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         d = m;
@@ -13611,36 +13612,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((E | 0) == 43) return;
     }
     function ld(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       c = (a + 4) | 0;
       if (!b) {
         d = f[a >> 2] | 0;
@@ -13678,12 +13679,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (i << 2)) >> 2] = c;
       c = f[e >> 2] | 0;
       if (!c) return;
-      else {
+      
         j = i;
         k = e;
         l = c;
         m = e;
-      }
+      
       a: while (1) {
         e = k;
         c = l;
@@ -13843,41 +13844,41 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((C | 0) == 43) return;
     }
     function md(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
       i = u;
       u = (u + 352) | 0;
       j = (i + 340) | 0;
@@ -14037,36 +14038,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function nd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
       c = (a + 4) | 0;
       if (!b) {
         e = f[a >> 2] | 0;
@@ -14104,12 +14105,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = c;
       c = f[g >> 2] | 0;
       if (!c) return;
-      else {
+      
         k = j;
         l = g;
         m = c;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         c = m;
@@ -14263,36 +14264,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((D | 0) == 41) return;
     }
     function od(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -14330,12 +14331,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = d;
       d = f[g >> 2] | 0;
       if (!d) return;
-      else {
+      
         k = j;
         l = g;
         m = d;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         d = m;
@@ -14491,56 +14492,56 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     function pd(a, b) {
       a = +a;
       b = +b;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0.0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0.0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0.0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0.0;
       p[s >> 3] = a;
       c = f[s >> 2] | 0;
       d = f[(s + 4) >> 2] | 0;
@@ -14749,35 +14750,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +U;
     }
     function qd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       c = (a + 4) | 0;
       if (!b) {
         d = f[a >> 2] | 0;
@@ -14815,12 +14816,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (i << 2)) >> 2] = c;
       c = f[e >> 2] | 0;
       if (!c) return;
-      else {
+      
         j = i;
         k = e;
         l = c;
         m = e;
-      }
+      
       a: while (1) {
         e = k;
         c = l;
@@ -14970,35 +14971,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((B | 0) == 41) return;
     }
     function rd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -15036,12 +15037,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = d;
       d = f[g >> 2] | 0;
       if (!d) return;
-      else {
+      
         k = j;
         l = g;
         m = d;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         d = m;
@@ -15190,18 +15191,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((E | 0) == 43) return;
     }
     function sd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 8) | 0;
@@ -15379,18 +15380,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function td(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 8) | 0;
@@ -15568,35 +15569,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ud(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       c = (a + 4) | 0;
       if (!b) {
         e = f[a >> 2] | 0;
@@ -15634,12 +15635,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = c;
       c = f[g >> 2] | 0;
       if (!c) return;
-      else {
+      
         k = j;
         l = g;
         m = c;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         c = m;
@@ -15783,35 +15784,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((C | 0) == 39) return;
     }
     function vd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -15849,12 +15850,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = d;
       d = f[g >> 2] | 0;
       if (!d) return;
-      else {
+      
         k = j;
         l = g;
         m = d;
         n = g;
-      }
+      
       a: while (1) {
         g = l;
         d = m;
@@ -15998,35 +15999,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((C | 0) == 39) return;
     }
     function wd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 32) | 0;
@@ -16202,25 +16203,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return q | 0;
     }
     function xd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
       d = b[(c + 11) >> 0] | 0;
       e = (d << 24) >> 24 < 0;
       g = e ? f[c >> 2] | 0 : c;
@@ -16431,34 +16432,34 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function yd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
       c = (a + 4) | 0;
       if (!b) {
         d = f[a >> 2] | 0;
@@ -16496,12 +16497,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (i << 2)) >> 2] = c;
       c = f[e >> 2] | 0;
       if (!c) return;
-      else {
+      
         j = i;
         k = e;
         l = c;
         m = e;
-      }
+      
       a: while (1) {
         e = k;
         c = l;
@@ -16641,27 +16642,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((A | 0) == 39) return;
     }
     function zd(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
       h = (a + 4) | 0;
       i = f[c >> 2] | 0;
       c = i;
@@ -16750,11 +16751,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             f[d >> 2] = c;
             s = (i + 4) | 0;
             return s | 0;
-          } else {
+          } 
             f[d >> 2] = t;
             s = t;
             return s | 0;
-          }
+          
         }
       while (0);
       t = f[i >> 2] | 0;
@@ -16813,27 +16814,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[d >> 2] = i;
         s = i;
         return s | 0;
-      } else {
+      } 
         f[d >> 2] = v;
         s = (v + 4) | 0;
         return s | 0;
-      }
+      
       return 0;
     }
     function Ad(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       g = u;
       u = (u + 16) | 0;
       h = g;
@@ -16984,41 +16985,41 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       u = g;
-      return;
+      
     }
     function Bd(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       g = a;
       h = b;
       i = h;
@@ -17035,7 +17036,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           n = 0;
           o = ((g >>> 0) / (j >>> 0)) >>> 0;
           return ((I = n), o) | 0;
-        } else {
+        } 
           if (!m) {
             n = 0;
             o = 0;
@@ -17046,7 +17047,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           n = 0;
           o = 0;
           return ((I = n), o) | 0;
-        }
+        
       }
       m = (l | 0) == 0;
       do
@@ -17102,12 +17103,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             n = h | (b & 0);
             o = a | 0 | 0;
             return ((I = n), o) | 0;
-          } else {
+          } 
             r = im(j | 0) | 0;
             n = (i >>> (r >>> 0)) | 0;
             o = (i << (32 - r)) | (g >>> (r >>> 0)) | 0;
             return ((I = n), o) | 0;
-          }
+          
         } else {
           if (m) {
             if (e | 0) {
@@ -17219,24 +17220,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ((I = n), o) | 0;
     }
     function Cd(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       c = u;
       u = (u + 32) | 0;
       d = (c + 4) | 0;
@@ -17364,45 +17365,45 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           t = 0;
           u = c;
           return t | 0;
-        } else s = r;
+        } s = r;
       }
       t = Ra[f[((f[s >> 2] | 0) + 8) >> 2] & 127](s, a) | 0;
       u = c;
       return t | 0;
     }
     function Dd(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       e = (b + 12) | 0;
       g = f[e >> 2] | 0;
       h = (c + 4) | 0;
@@ -17575,34 +17576,34 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       G = ((f[(b + 4) >> 2] | 0) + A) | 0;
       f[B >> 2] = G;
-      return;
+      
     }
     function Ed(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       c = (a + 4) | 0;
       if (!b) {
         e = f[a >> 2] | 0;
@@ -17640,12 +17641,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = c;
       c = f[g >> 2] | 0;
       if (!c) return;
-      else {
+      
         k = j;
         l = g;
         m = c;
         n = g;
-      }
+      
       a: while (1) {
         b: do
           if (i) {
@@ -17752,31 +17753,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((w | 0) == 37) return;
     }
     function Fd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -17814,12 +17815,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (j << 2)) >> 2] = d;
       d = f[g >> 2] | 0;
       if (!d) return;
-      else {
+      
         k = j;
         l = g;
         m = d;
         n = g;
-      }
+      
       a: while (1) {
         b: do
           if (i) {
@@ -17926,30 +17927,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((w | 0) == 37) return;
     }
     function Gd(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       g = f[c >> 2] | 0;
       c = f[b >> 2] | 0;
       h = (g - c) | 0;
@@ -18098,31 +18099,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function Hd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
       c = (a + 4) | 0;
       if (!b) {
         d = f[a >> 2] | 0;
@@ -18160,12 +18161,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[((f[a >> 2] | 0) + (i << 2)) >> 2] = c;
       c = f[e >> 2] | 0;
       if (!c) return;
-      else {
+      
         j = i;
         k = e;
         l = c;
         m = e;
-      }
+      
       a: while (1) {
         b: do
           if (h) {
@@ -18272,35 +18273,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((v | 0) == 37) return;
     }
     function Id(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       d = (a + 4) | 0;
       if (!c) {
         e = f[a >> 2] | 0;
@@ -18444,24 +18445,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((E | 0) == 38) return;
     }
     function Jd(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0;
+      a |= 0;
+      c |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -18553,33 +18554,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       u = e;
-      return;
+      
     }
     function Kd(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = Oa,
-        x = 0,
-        y = Oa,
-        z = Oa,
-        A = Oa,
-        B = Oa;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = Oa;
+        let x = 0;
+        let y = Oa;
+        let z = Oa;
+        let A = Oa;
+        let B = Oa;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -18720,38 +18721,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return i | 0;
     }
     function Ld(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
       g = (a + 8) | 0;
       Ah(g, b, d, e);
       h = (d - e) | 0;
@@ -18889,37 +18890,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Md(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
       e = f[a >> 2] | 0;
       g = e;
       h = ((f[b >> 2] | 0) - g) | 0;
@@ -18999,10 +19000,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((k | 0) == (c | 0)) {
           m = b;
           return m | 0;
-        } else {
+        } 
           A = b;
           B = k;
-        }
+        
         while (1) {
           f[A >> 2] = f[B >> 2];
           B = (B + 4) | 0;
@@ -19071,14 +19072,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return m | 0;
     }
     function Nd(a, b, c, d, e, g, h) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
       switch (c | 0) {
         case 1: {
           c = dn(60) | 0;
@@ -19181,19 +19182,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         default: {
           i = 0;
           f[a >> 2] = i;
-          return;
+          
         }
       }
     }
     function Od(a, b, c, d, e, g, h) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
       switch (c | 0) {
         case 1: {
           c = dn(60) | 0;
@@ -19296,20 +19297,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         default: {
           i = 0;
           f[a >> 2] = i;
-          return;
+          
         }
       }
     }
     function Pd(a, b, c, d, e, g, h) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
+        let j = 0;
       switch (c | 0) {
         case 1: {
           c = dn(40) | 0;
@@ -19422,35 +19423,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         default: {
           i = 0;
           f[a >> 2] = i;
-          return;
+          
         }
       }
     }
     function Qd(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       switch (((b - a) >> 2) | 0) {
         case 2: {
           d = (b + -4) | 0;
@@ -19585,15 +19586,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Rd(a, b, c, d, e, g, h) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
+        let j = 0;
       switch (c | 0) {
         case 1: {
           c = dn(40) | 0;
@@ -19706,35 +19707,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         default: {
           i = 0;
           f[a >> 2] = i;
-          return;
+          
         }
       }
     }
     function Sd(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = Oa,
-        t = Oa,
-        u = Oa,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = Oa;
+        let t = Oa;
+        let u = Oa;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
       c = f[b >> 2] | 0;
       b = (a + 4) | 0;
       d = f[b >> 2] | 0;
@@ -19770,7 +19771,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               }
               p = (o + 12) | 0;
               return p | 0;
-            } else q = j;
+            } q = j;
             while (1) {
               h = f[q >> 2] | 0;
               if (!h) {
@@ -19859,28 +19860,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return p | 0;
     }
     function Td(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 4) | 0;
@@ -19988,7 +19989,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((i | 0) == (v | 0)) {
         u = c;
         return 1;
-      } else w = v;
+      } w = v;
       while (1) {
         v = (w + -12) | 0;
         f[h >> 2] = v;
@@ -20009,26 +20010,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Ud(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20154,26 +20155,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Vd(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20299,26 +20300,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Wd(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20444,26 +20445,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Xd(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20589,26 +20590,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Yd(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20734,26 +20735,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Zd(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -20879,26 +20880,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function _d(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21024,26 +21025,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function $d(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21169,26 +21170,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ae(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21314,26 +21315,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function be(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21459,26 +21460,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ce(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21604,26 +21605,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function de(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21749,26 +21750,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ee(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -21894,26 +21895,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function fe(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -22039,26 +22040,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ge(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -22184,26 +22185,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function he(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -22329,26 +22330,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ie(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -22474,26 +22475,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function je(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       g = u;
       u = (u + 64) | 0;
       h = (g + 48) | 0;
@@ -22619,30 +22620,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ke(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       e = f[b >> 2] | 0;
       g = (b + 4) | 0;
       h = f[g >> 2] | 0;
@@ -22763,25 +22764,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       l = (a + 4) | 0;
       m = f[j >> 2] | 0;
       f[l >> 2] = m;
-      return;
+      
     }
     function le(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -22873,38 +22874,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function me(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
       h = u;
       u = (u + 16) | 0;
       i = (h + 4) | 0;
@@ -23008,42 +23009,42 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((H | 0) == 3) {
         u = h;
         return 1;
-      } else if ((H | 0) == 4) mq(z);
+      } if ((H | 0) == 4) mq(z);
       return 0;
     }
     function ne(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
       h = u;
       u = (u + 16) | 0;
       i = (h + 4) | 0;
@@ -23147,37 +23148,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((H | 0) == 3) {
         u = h;
         return 1;
-      } else if ((H | 0) == 4) mq(z);
+      } if ((H | 0) == 4) mq(z);
       return 0;
     }
     function oe(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -23292,39 +23293,39 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((q | 0) == 3) {
         u = b;
         return 1;
-      } else if ((q | 0) == 11) mq(j);
+      } if ((q | 0) == 11) mq(j);
       return 0;
     }
     function pe(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 8) | 0;
@@ -23428,7 +23429,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
         f[z >> 2] = f[z >> 2] | (-1 >>> ((32 - A) | 0));
         u = d;
-        return;
+        
       } else {
         if (i) {
           C = m;
@@ -23453,31 +23454,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
         f[C >> 2] = f[C >> 2] & ~(-1 >>> ((32 - D) | 0));
         u = d;
-        return;
+        
       }
     }
     function qe(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
       a = u;
       u = (u + 48) | 0;
       g = (a + 36) | 0;
@@ -23603,11 +23604,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function re(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       f[a >> 2] = f[c >> 2];
       d = (c + 4) | 0;
       f[(a + 4) >> 2] = f[d >> 2];
@@ -23731,35 +23732,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[e >> 2] = 0;
       f[(a + 128) >> 2] = f[(c + 128) >> 2];
       f[(a + 132) >> 2] = f[(c + 132) >> 2];
-      return;
+      
     }
     function se(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
       h = u;
       u = (u + 48) | 0;
       i = (h + 36) | 0;
@@ -23860,22 +23861,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(g);
       u = h;
-      return;
+      
     }
     function te(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = (a + 4) | 0;
@@ -23992,21 +23993,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!n) return;
       br(n);
-      return;
+      
     }
     function ue(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = f[b >> 2] | 0;
       b = (a + 12) | 0;
       d = (c | 0) == -1;
@@ -24128,32 +24129,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ve(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -24236,28 +24237,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function we(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 16) | 0;
@@ -24354,32 +24355,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       }
       u = d;
-      return;
+      
     }
     function xe(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -24493,35 +24494,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function ye(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       g = f[a >> 2] | 0;
       h = g;
       i = ((f[c >> 2] | 0) - h) | 0;
@@ -24582,10 +24583,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((w | 0) == (d | 0)) {
           k = c;
           return k | 0;
-        } else {
+        } 
           y = d;
           z = c;
-        }
+        
         while (1) {
           b[z >> 0] = b[y >> 0] | 0;
           y = (y + 1) | 0;
@@ -24648,24 +24649,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function ze(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -24774,31 +24775,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       k = j;
       f[a >> 2] = k;
       u = e;
-      return;
+      
     }
     function Ae(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       d = (c | 0) == (a | 0);
       b[(c + 12) >> 0] = d & 1;
       if (d) return;
-      else e = c;
+      e = c;
       while (1) {
         g = (e + 8) | 0;
         h = f[g >> 2] | 0;
@@ -24878,7 +24879,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[((f[c >> 2] | 0) == (p | 0) ? c : (c + 4) | 0) >> 2] = o;
         f[a >> 2] = p;
         f[q >> 2] = o;
-        return;
+        
       } else if ((i | 0) == 16) {
         if ((f[h >> 2] | 0) == (e | 0)) {
           o = (e + 4) | 0;
@@ -24913,35 +24914,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[((f[s >> 2] | 0) == (t | 0) ? s : (s + 4) | 0) >> 2] = k;
         f[k >> 2] = t;
         f[h >> 2] = k;
-        return;
+        
       } else if ((i | 0) == 23) return;
     }
     function Be(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = Oa,
-        C = Oa;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = Oa;
+        let C = Oa;
       h = u;
       u = (u + 16) | 0;
       i = h;
@@ -25022,31 +25023,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       $q(g);
       u = h;
-      return;
+      
     }
     function Ce(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
       d = f[b >> 2] | 0;
       b = (a + 12) | 0;
       e = (d | 0) == -1;
@@ -25173,27 +25174,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return u | 0;
     }
     function De(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = (a + 100) | 0;
@@ -25305,23 +25306,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function Ee(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       b = (a + 1176) | 0;
       c = f[b >> 2] | 0;
       if (c | 0) {
@@ -25423,24 +25424,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       tj(q);
       r = (a + 12) | 0;
       xh(r);
-      return;
+      
     }
     function Fe(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -25548,16 +25549,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Ge(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -25662,37 +25663,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[j >> 2] = d + (~(((d + -4 - g) | 0) >>> 2) << 2);
       br(g);
       u = c;
-      return;
+      
     }
     function He(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0.0,
-        D = 0.0,
-        E = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0.0;
+        let D = 0.0;
+        let E = 0.0;
       g = u;
       u = (u + 16) | 0;
       h = g;
@@ -25795,17 +25796,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         b = (b + 1) | 0;
       } while ((b | 0) != (d | 0));
       u = g;
-      return;
+      
     }
     function Ie(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0.0;
       a: do
         if (b >>> 0 <= 20)
           do
@@ -25913,27 +25914,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             }
           while (0);
       while (0);
-      return;
+      
     }
     function Je(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 4) | 0;
@@ -26037,8 +26038,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function Ke(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       fd(a, b);
       fd((a + 32) | 0, b);
       fd((a + 64) | 0, b);
@@ -26072,27 +26073,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       fd((a + 960) | 0, b);
       fd((a + 992) | 0, b);
       fd((a + 1024) | 0, b);
-      return;
+      
     }
     function Le(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       e = u;
       u = (u + 64) | 0;
       g = (e + 60) | 0;
@@ -26167,33 +26168,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(p);
       u = e;
-      return;
+      
     }
     function Me(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
       c = u;
       u = (u + 32) | 0;
       d = c;
@@ -26256,10 +26257,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         Wh(d);
         u = c;
         return;
-      } else {
+      } 
         y = n;
         z = g;
-      }
+      
       do {
         y = (y + -4) | 0;
         g = f[y >> 2] | 0;
@@ -26286,27 +26287,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = r;
       Wh(d);
       u = c;
-      return;
+      
     }
     function Ne(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 12) | 0;
@@ -26387,19 +26388,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         br(a);
       }
       u = d;
-      return;
+      
     }
     function Oe(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -26503,19 +26504,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[j >> 2] = d + (~(((d + -4 - g) | 0) >>> 2) << 2);
       br(g);
       u = c;
-      return;
+      
     }
     function Pe(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -26619,33 +26620,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[j >> 2] = d + (~(((d + -4 - g) | 0) >>> 2) << 2);
       br(g);
       u = c;
-      return;
+      
     }
     function Qe(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
       d = dn(40) | 0;
       e = (d + 16) | 0;
       dj(e, c);
@@ -26734,30 +26735,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Re(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = Oa,
-        B = Oa;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = Oa;
+        let B = Oa;
       g = u;
       u = (u + 16) | 0;
       h = g;
@@ -26831,13 +26832,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       $q(k);
       u = g;
-      return;
+      
     }
     function Se(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3340;
       ii((a + 200) | 0);
       b = f[(a + 184) >> 2] | 0;
@@ -26931,25 +26932,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (!a) return;
       ui(a);
       br(a);
-      return;
+      
     }
     function Te(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       b = (a + 140) | 0;
       c = f[b >> 2] | 0;
       if (c | 0) {
@@ -27047,25 +27048,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       dl(p);
       q = (a + 12) | 0;
       dl(q);
-      return;
+      
     }
     function Ue(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       b = (a + 152) | 0;
       c = f[b >> 2] | 0;
       if (c | 0) {
@@ -27163,13 +27164,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       dl(p);
       q = (a + 12) | 0;
       tj(q);
-      return;
+      
     }
     function Ve(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3080;
       jj((a + 200) | 0);
       b = f[(a + 184) >> 2] | 0;
@@ -27263,24 +27264,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (!a) return;
       ui(a);
       br(a);
-      return;
+      
     }
     function We(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 44) | 0;
@@ -27343,24 +27344,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Xe(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       d = f[c >> 2] | 0;
       c = f[d >> 2] | 0;
       e = f[(a + 4) >> 2] | 0;
@@ -27447,29 +27448,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function Ye(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -27558,22 +27559,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Ze(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = f[(a + 12) >> 2] | 0;
       e = (a + 108) | 0;
       g = f[e >> 2] | 0;
@@ -27685,21 +27686,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function _e(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 44) | 0;
@@ -27762,21 +27763,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function $e(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -27869,22 +27870,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function af(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = f[(a + 12) >> 2] | 0;
       e = (a + 68) | 0;
       g = f[e >> 2] | 0;
@@ -27996,23 +27997,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function bf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 12) | 0;
@@ -28104,26 +28105,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function cf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = f[a >> 2] | 0;
@@ -28153,11 +28154,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           if (!l) {
             m = (h + (b << 3)) | 0;
             if ((m | 0) == (n | 0)) return;
-            else {
+            
               r = i;
               s = (n + (~(((n + -8 - m) | 0) >>> 3) << 3)) | 0;
               break;
-            }
+            
           } else {
             m = (b - k) | 0;
             j = m;
@@ -28221,29 +28222,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       while (0);
       f[r >> 2] = s;
-      return;
+      
     }
     function df(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0.0,
-        g = 0.0,
-        h = 0.0,
-        i = 0.0,
-        j = 0.0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0.0;
+        let g = 0.0;
+        let h = 0.0;
+        let i = 0.0;
+        let j = 0.0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
       e = +$(n[b >> 2]);
       g = +K(+e);
       h = +$(n[(b + 4) >> 2]);
@@ -28339,26 +28340,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       v = 0;
       f[c >> 2] = u;
       f[d >> 2] = v;
-      return;
+      
     }
     function ef(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       c = (a + 4) | 0;
       d = (b + 4) | 0;
       f[c >> 2] = f[d >> 2];
@@ -28446,18 +28447,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function ff(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 12) | 0;
@@ -28511,18 +28512,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function gf(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 12) | 0;
@@ -28576,31 +28577,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function hf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       c = u;
       u = (u + 32) | 0;
       d = c;
@@ -28687,26 +28688,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = w;
       Wh(d);
       u = c;
-      return;
+      
     }
     function jf(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
       d = u;
       u = (u + 16) | 0;
       h = d;
@@ -28802,25 +28803,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[e >> 2] = (f[e >> 2] | 0) + 12;
       }
       u = d;
-      return;
+      
     }
     function kf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       c = d[b >> 1] | 0;
       e = d[(b + 2) >> 1] | 0;
       g = d[(b + 4) >> 1] | 0;
@@ -28931,18 +28932,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function lf(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 12) | 0;
@@ -28996,18 +28997,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function mf(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 12) | 0;
@@ -29061,25 +29062,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function nf(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
       a = u;
       u = (u + 16) | 0;
       e = (a + 4) | 0;
@@ -29094,7 +29095,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           m = 0;
           u = a;
           return m | 0;
-        } else n = l;
+        } n = l;
       } else n = j & 255;
       if (!n) {
         b[h >> 0] = 0;
@@ -29143,21 +29144,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return m | 0;
     }
     function of(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((((f[c >> 2] | 0) - d) | 0) / 24) | 0;
@@ -29237,25 +29238,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!m) return;
       br(m);
-      return;
+      
     }
     function pf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = b[c >> 0] | 0;
       e = b[(c + 1) >> 0] | 0;
       g = b[(c + 2) >> 0] | 0;
@@ -29365,31 +29366,31 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function qf(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       d = u;
       u = (u + 32) | 0;
       h = (d + 24) | 0;
@@ -29454,23 +29455,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((A | 0) == 3) {
         u = d;
         return 1;
-      } else if ((A | 0) == 4) mq(y);
+      } if ((A | 0) == 4) mq(y);
       return 0;
     }
     function rf(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       h = u;
       u = (u + 32) | 0;
       i = h;
@@ -29501,7 +29502,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             }
             u = h;
             return;
-          } else {
+          } 
             f[i >> 2] = f[(b + 56) >> 2];
             f[(i + 4) >> 2] = n;
             f[(i + 12) >> 2] = m;
@@ -29513,39 +29514,39 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             }
             u = h;
             return;
-          }
+          
         }
       while (0);
       f[a >> 2] = 0;
       u = h;
-      return;
+      
     }
     function sf(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       d = u;
       u = (u + 32) | 0;
       h = (d + 24) | 0;
@@ -29610,25 +29611,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((A | 0) == 3) {
         u = d;
         return 1;
-      } else if ((A | 0) == 4) mq(y);
+      } if ((A | 0) == 4) mq(y);
       return 0;
     }
     function tf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       d = f[b >> 2] | 0;
       b = f[c >> 2] | 0;
       e = (b - d) >> 2;
@@ -29702,23 +29703,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else m = (m + 4) | 0;
       }
       f[e >> 2] = h + (((g >>> 2) + 1) << 2);
-      return;
+      
     }
     function uf(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       e = u;
       u = (u + 112) | 0;
       g = (e + 100) | 0;
@@ -29785,25 +29786,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[a >> 2] = n;
       Gi(h);
       u = e;
-      return;
+      
     }
     function vf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 4) | 0;
@@ -29892,25 +29893,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!p) return;
       br(p);
-      return;
+      
     }
     function wf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = f[(a + 12) >> 2] | 0;
       e = (a + 68) | 0;
       g = f[e >> 2] | 0;
@@ -30005,19 +30006,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function xf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30092,22 +30093,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function yf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30182,22 +30183,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function zf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30272,29 +30273,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function Af(a, c, d, e, g, h, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       a = u;
       u = (u + 96) | 0;
       j = a;
@@ -30371,26 +30372,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function Bf(a, c, d, e, g, h, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       a = u;
       u = (u + 96) | 0;
       j = a;
@@ -30467,19 +30468,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function Cf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30554,22 +30555,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function Df(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30644,22 +30645,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function Ef(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -30734,25 +30735,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function Ff(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       c = f[b >> 2] | 0;
       d = f[(b + 4) >> 2] | 0;
       e = f[(b + 8) >> 2] | 0;
@@ -30855,26 +30856,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Gf(a, c, d, e, g, h, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       a = u;
       u = (u + 96) | 0;
       j = a;
@@ -30951,19 +30952,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function Hf(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       h = u;
       u = (u + 32) | 0;
       i = h;
@@ -30994,7 +30995,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             }
             u = h;
             return;
-          } else {
+          } 
             f[i >> 2] = f[(b + 56) >> 2];
             f[(i + 4) >> 2] = n;
             f[(i + 12) >> 2] = m;
@@ -31006,37 +31007,37 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             }
             u = h;
             return;
-          }
+          
         }
       while (0);
       f[a >> 2] = 0;
       u = h;
-      return;
+      
     }
     function If(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       e = f[d >> 2] | 0;
       g = f[(d + 4) >> 2] | 0;
       if ((e | 0) == (g | 0)) {
@@ -31122,26 +31123,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           w = y;
         }
       }
-      return;
+      
     }
     function Jf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = b;
       e = (c - d) >> 2;
       g = (a + 8) | 0;
@@ -31212,27 +31213,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else b = (b + 4) | 0;
       }
       f[e >> 2] = h + (p << 2);
-      return;
+      
     }
     function Kf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -31310,19 +31311,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return s | 0;
     }
     function Lf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -31396,26 +31397,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[i >> 2] | 0) != (c | 0)) f[i >> 2] = c;
       br(c);
       u = d;
-      return;
+      
     }
     function Mf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = b;
       e = (c - d) >> 2;
       g = (a + 8) | 0;
@@ -31486,18 +31487,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else b = (b + 4) | 0;
       }
       f[e >> 2] = h + (((p >>> 2) + 1) << 2);
-      return;
+      
     }
     function Nf(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       g = u;
       u = (u + 80) | 0;
       h = g;
@@ -31576,34 +31577,34 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       f[h >> 2] = d + (~(((d + -4 - i) | 0) >>> 2) << 2);
       u = g;
-      return;
+      
     }
     function Of(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 4) | 0;
@@ -31691,24 +31692,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else k = v;
       }
       u = c;
-      return;
+      
     }
     function Pf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       c = d[b >> 1] | 0;
       e = d[(b + 2) >> 1] | 0;
       g = d[(b + 4) >> 1] | 0;
@@ -31803,21 +31804,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Qf(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       c = u;
       u = (u + 32) | 0;
       d = c;
@@ -31891,23 +31892,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[p >> 2] = 0;
       f[(p + 4) >> 2] = 0;
       u = c;
-      return;
+      
     }
     function Rf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       f[c >> 2] = 1;
       d = (a + 4) | 0;
       e = (c + 8) | 0;
@@ -31972,7 +31973,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         b[(p + 1) >> 0] = q >> 8;
         b[(p + 2) >> 0] = q >> 16;
         b[(p + 3) >> 0] = q >> 24;
-        return;
+        
       } else {
         o = a;
         p = (o + c) | 0;
@@ -31985,27 +31986,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         b[(p + 1) >> 0] = q >> 8;
         b[(p + 2) >> 0] = q >> 16;
         b[(p + 3) >> 0] = q >> 24;
-        return;
+        
       }
     }
     function Sf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = f[a >> 2] | 0;
@@ -32031,11 +32032,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           if (!l) {
             m = (h + (b << 2)) | 0;
             if ((m | 0) == (n | 0)) return;
-            else {
+            
               o = i;
               p = (n + (~(((n + -4 - m) | 0) >>> 2) << 2)) | 0;
               break;
-            }
+            
           } else {
             m = (b - k) | 0;
             j = m;
@@ -32091,22 +32092,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       while (0);
       f[o >> 2] = p;
-      return;
+      
     }
     function Tf(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       h = Qg(a, b, c, d, g) | 0;
       i = f[e >> 2] | 0;
       j = f[d >> 2] | 0;
@@ -32168,21 +32169,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function Uf(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       d = b[c >> 0] | 0;
       e = b[(c + 1) >> 0] | 0;
       g = b[(c + 2) >> 0] | 0;
@@ -32277,21 +32278,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Vf(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -32366,23 +32367,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Wf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -32426,7 +32427,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         m = 1;
         u = d;
         return m | 0;
-      } else q = e;
+      } q = e;
       while (1) {
         e = q;
         if (!(nf(0, b, (e + 8) | 0) | 0)) {
@@ -32449,23 +32450,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Xf(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -32549,21 +32550,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Yf(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       d = c;
       e = b;
       g = (d - e) | 0;
@@ -32626,21 +32627,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if ((k | 0) <= 0) return;
         Rg(j | 0, h | 0, k | 0) | 0;
         f[g >> 2] = (f[g >> 2] | 0) + ((k >>> 2) << 2);
-        return;
+        
       } else {
         if ((p | 0) == (c | 0)) return;
         f[g >> 2] = c + (~(((c + -4 - p) | 0) >>> 2) << 2);
-        return;
+        
       }
     }
     function Zf(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
       g = u;
       u = (u + 96) | 0;
       h = (g + 40) | 0;
@@ -32667,24 +32668,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Dj((h + 16) | 0, f[(h + 20) >> 2] | 0);
       sj((h + 4) | 0, f[(h + 8) >> 2] | 0);
       u = g;
-      return;
+      
     }
     function _f(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       c = f[b >> 2] | 0;
       d = f[(b + 4) >> 2] | 0;
       e = f[(b + 8) >> 2] | 0;
@@ -32778,20 +32779,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function $f(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -32861,20 +32862,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function ag(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       e = c;
       g = (d - e) | 0;
       h = (a + 8) | 0;
@@ -32902,10 +32903,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[a >> 2] = i;
         f[h >> 2] = i + m;
         if ((c | 0) == (d | 0)) return;
-        else {
+        
           n = c;
           o = i;
-        }
+        
         do {
           b[o >> 0] = b[n >> 0] | 0;
           n = (n + 1) | 0;
@@ -32945,22 +32946,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         g = ((f[n >> 2] | 0) + 1) | 0;
         f[n >> 2] = g;
       } while ((a | 0) != (d | 0));
-      return;
+      
     }
     function bg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       d = ((c >>> 1) & 1431655765) | ((c << 1) & -1431655766);
       c = ((d >>> 2) & 858993459) | ((d << 2) & -858993460);
       d = ((c >>> 4) & 252645135) | ((c << 4) & -252645136);
@@ -33033,32 +33034,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       while (0);
       f[h >> 2] = n;
       f[c >> 2] = m;
-      return;
+      
     }
     function cg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       e = c & 255;
       g = (d | 0) != 0;
       a: do
@@ -33168,27 +33169,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (u | 0 ? t : 0) | 0;
     }
     function dg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = f[a >> 2] | 0;
@@ -33262,27 +33263,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       while (0);
       f[(s + -4) >> 2] = f[b >> 2];
       f[c >> 2] = (f[c >> 2] | 0) + -4;
-      return;
+      
     }
     function eg(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -33338,30 +33339,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function fg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -33425,17 +33426,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function gg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       d = ((f[b >> 2] | 0) * 3) | 0;
       if ((d | 0) == -1) {
         e = 0;
@@ -33489,7 +33490,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             g = ((i >>> 0) % 3 | 0 | 0) == 0 ? (k + -2) | 0 : i;
             f[c >> 2] = g;
             return e | 0;
-          } else l = k;
+          } l = k;
         } else l = j;
       } else l = d;
       while (1) {
@@ -33507,22 +33508,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function hg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       e = (a + 4) | 0;
       g = f[e >> 2] | 0;
       if (!g) {
@@ -33596,11 +33597,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = a;
         h = a;
         return h | 0;
-      } else if ((o | 0) == 15) {
+      } if ((o | 0) == 15) {
         f[c >> 2] = a;
         h = r;
         return h | 0;
-      } else if ((o | 0) == 16) {
+      } if ((o | 0) == 16) {
         f[c >> 2] = a;
         h = d;
         return h | 0;
@@ -33608,26 +33609,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function ig(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
       d = u;
       u = (u + 32) | 0;
       e = (d + 24) | 0;
@@ -33699,25 +33700,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[i >> 2] = v;
       f[(i + 4) >> 2] = t;
       u = d;
-      return;
+      
     }
     function jg(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       g = u;
       u = (u + 16) | 0;
       h = g;
@@ -33785,29 +33786,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       r = f[q >> 2] | 0;
       Va[r & 127](o);
       u = g;
-      return;
+      
     }
     function kg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 12) | 0;
@@ -33878,19 +33879,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       while (0);
       f[r >> 2] = f[b >> 2];
       f[c >> 2] = (f[c >> 2] | 0) + 4;
-      return;
+      
     }
     function lg(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -33967,21 +33968,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function mg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -34039,25 +34040,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       p = (a + 16) | 0;
       f[p >> 2] = 0;
       u = c;
-      return;
+      
     }
     function ng(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 4) | 0;
@@ -34129,10 +34130,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!p) return;
       br(p);
-      return;
+      
     }
     function og(a) {
-      a = a | 0;
+      a |= 0;
       lk(a);
       lk((a + 32) | 0);
       lk((a + 64) | 0);
@@ -34166,21 +34167,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       lk((a + 960) | 0);
       lk((a + 992) | 0);
       lk((a + 1024) | 0);
-      return;
+      
     }
     function pg(a, c, d, e, g, h) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
       h = $(h);
-      var i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       i = u;
       u = (u + 16) | 0;
       j = i;
@@ -34237,25 +34238,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[k >> 2] | 0);
       u = i;
-      return;
+      
     }
     function qg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       d = c;
       e = b;
       g = (d - e) | 0;
@@ -34280,12 +34281,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           Rg(f[m >> 2] | 0, p | 0, o | 0) | 0;
           f[m >> 2] = (f[m >> 2] | 0) + ((o >>> 2) << 2);
           return;
-        } else {
+        } 
           o = f[m >> 2] | 0;
           if ((o | 0) == (n | 0)) return;
           f[m >> 2] = o + (~(((o + -4 - n) | 0) >>> 2) << 2);
           return;
-        }
+        
       }
       n = k;
       if (!k) q = j;
@@ -34312,29 +34313,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((g | 0) <= 0) return;
       Rg(j | 0, b | 0, g | 0) | 0;
       f[h >> 2] = j + ((g >>> 2) << 2);
-      return;
+      
     }
     function rg(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0.0,
-        p = 0,
-        q = 0.0,
-        r = 0.0,
-        s = 0.0,
-        t = 0,
-        v = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0.0;
+        let p = 0;
+        let q = 0.0;
+        let r = 0.0;
+        let s = 0.0;
+        let t = 0;
+        let v = 0.0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -34423,16 +34424,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return p | 0;
     }
     function sg(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       b = u;
       u = (u + 16) | 0;
       c = (b + 4) | 0;
@@ -34509,19 +34510,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function tg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -34579,18 +34580,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       b[c >> 0] = 1;
       u = e;
-      return;
+      
     }
     function ug(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -34658,30 +34659,30 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(c);
       u = d;
-      return;
+      
     }
     function vg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
       d = u;
       u = (u + 48) | 0;
       e = (d + 16) | 0;
@@ -34750,14 +34751,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return w | 0;
     }
     function wg(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       f[a >> 2] = 5880;
       b = f[(a + 68) >> 2] | 0;
       if (b | 0) {
@@ -34829,19 +34830,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       Qi(a);
       br(a);
-      return;
+      
     }
     function xg(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       c = (a + 12) | 0;
       d = f[a >> 2] | 0;
       e = (a + 8) | 0;
@@ -34947,22 +34948,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       while (0);
       f[e >> 2] = l;
       b[c >> 0] = 0;
-      return;
+      
     }
     function yg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((f[c >> 2] | 0) - d) >> 2;
@@ -35029,25 +35030,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!m) return;
       br(m);
-      return;
+      
     }
     function zg(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = (a + 4) | 0;
       a = f[d >> 2] | 0;
       do
@@ -35110,17 +35111,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return r | 0;
     }
     function Ag(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = (a + 4) | 0;
@@ -35180,22 +35181,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = j;
       if (!e) return;
       br(e);
-      return;
+      
     }
     function Bg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((f[c >> 2] | 0) - d) >> 2;
@@ -35265,22 +35266,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if (!m) return;
       br(m);
-      return;
+      
     }
     function Cg(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       e = f[b >> 2] | 0;
       g = f[a >> 2] | 0;
       h = f[d >> 2] | 0;
@@ -35337,13 +35338,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function Dg(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
       e = u;
       u = (u + 96) | 0;
       g = (e + 40) | 0;
@@ -35360,25 +35361,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Dj((g + 16) | 0, f[(g + 20) >> 2] | 0);
       sj((g + 4) | 0, f[(g + 8) >> 2] | 0);
       u = e;
-      return;
+      
     }
     function Eg(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       a = u;
       u = (u + 16) | 0;
       e = a;
@@ -35446,22 +35447,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     function Fg(a) {
       a = +a;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0.0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0.0,
-        n = 0.0,
-        o = 0.0,
-        q = 0.0,
-        r = 0.0,
-        t = 0.0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0.0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0.0;
+        let n = 0.0;
+        let o = 0.0;
+        let q = 0.0;
+        let r = 0.0;
+        let t = 0.0;
       p[s >> 3] = a;
       b = f[s >> 2] | 0;
       c = f[(s + 4) >> 2] | 0;
@@ -35486,7 +35487,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             break;
           }
         } else if (c >>> 0 <= 2146435071)
-          if (((b | 0) == 0) & (0 == 0) & ((c | 0) == 1072693248)) e = 0.0;
+          if (((b | 0) == 0) & (0 === 0) & ((c | 0) == 1072693248)) e = 0.0;
           else {
             h = -1023;
             i = c;
@@ -35536,22 +35537,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +e;
     }
     function Gg(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -35616,14 +35617,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return r | 0;
     }
     function Hg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -35695,18 +35696,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       f[h >> 2] = b + (~(((b + -4 - e) | 0) >>> 2) << 2);
       u = d;
-      return;
+      
     }
     function Ig(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -35761,16 +35762,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Jg(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = (a + 108) | 0;
       d = ((f[(a + 112) >> 2] | 0) - (f[c >> 2] | 0)) | 0;
       e = ((d | 0) / 12) | 0;
@@ -35816,15 +35817,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Kg(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -35879,25 +35880,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Lg(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 16) | 0;
@@ -35946,18 +35947,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Mg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 32) | 0;
       d = (c + 12) | 0;
@@ -36014,26 +36015,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[j >> 2] = d + ((~(((((d + -12 - a) | 0) >>> 0) / 12) | 0) * 12) | 0);
       br(a);
       u = c;
-      return;
+      
     }
     function Ng(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
       if (c >>> 0 > 4294967279) mq(a);
       d = (a + 11) | 0;
       e = b[d >> 0] | 0;
@@ -36104,23 +36105,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           }
         }
       while (0);
-      return;
+      
     }
     function Og(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       c = f[b >> 2] | 0;
       if ((c | 0) == -1) {
         d = -1;
@@ -36207,22 +36208,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Pg(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       d = (a + 8) | 0;
       Cg(a, (a + 4) | 0, d, c) | 0;
       e = (a + 12) | 0;
@@ -36283,23 +36284,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
       }
       if ((k | 0) == 3) return;
-      else if ((k | 0) == 5) mq(g);
+      if ((k | 0) == 5) mq(g);
       else if ((k | 0) == 7) mq(g);
       else if ((k | 0) == 11) mq(g);
     }
     function Qg(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = Cg(a, b, c, e) | 0;
       h = f[d >> 2] | 0;
       i = f[c >> 2] | 0;
@@ -36348,12 +36349,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return m | 0;
     }
     function Rg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
       if ((d | 0) >= 8192) return Da(a | 0, c | 0, d | 0) | 0;
       e = a | 0;
       g = (a + d) | 0;
@@ -36411,29 +36412,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Sg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 4) | 0;
@@ -36501,19 +36502,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       v = (n + (o << 2)) | 0;
       f[v >> 2] = t;
       u = c;
-      return;
+      
     }
     function Tg(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       b = (a + 4) | 0;
       c = f[b >> 2] | 0;
       d = ((f[(c + 12) >> 2] | 0) - (f[(c + 8) >> 2] | 0)) | 0;
@@ -36584,22 +36585,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function Ug(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
       d = f[(c + 88) >> 2] | 0;
       if (!d) {
         e = 0;
@@ -36675,19 +36676,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Vg(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       do
         if (!(qp(a, f[(c + 8) >> 2] | 0, g) | 0)) {
           if (!(qp(a, f[c >> 2] | 0, g) | 0)) {
@@ -36735,19 +36736,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           if ((e | 0) == 1) f[(c + 32) >> 2] = 1;
         } else Om(0, c, d, e);
       while (0);
-      return;
+      
     }
     function Wg(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 12) | 0;
@@ -36784,19 +36785,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Xg(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -36849,7 +36850,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
         f[g >> 2] = f[g >> 2] & ~(-1 >>> ((32 - d) | 0));
         u = e;
-        return;
+        
       } else {
         hj(h | 0, -1, n | 0) | 0;
         n = c & 31;
@@ -36860,23 +36861,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
         f[c >> 2] = f[c >> 2] | (-1 >>> ((32 - n) | 0));
         u = e;
-        return;
+        
       }
     }
     function Yg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -36914,19 +36915,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Zg(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -36964,21 +36965,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function _g(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       c = (a + 32) | 0;
       d = f[(a + 64) >> 2] | 0;
       e = ((Qa[f[((f[d >> 2] | 0) + 40) >> 2] & 127](d) | 0) + 56) | 0;
@@ -37033,20 +37034,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         g = f[d >> 2] | 0;
       }
       Qf(c);
-      return;
+      
     }
     function $g(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       g = u;
       u = (u + 48) | 0;
       h = g;
@@ -37093,20 +37094,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function ah(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -37171,18 +37172,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return o | 0;
     }
     function bh(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       if (b[(a + 352) >> 0] | 0) return 1;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
@@ -37223,18 +37224,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ch(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       if (b[(a + 288) >> 0] | 0) return 1;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
@@ -37275,16 +37276,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function dh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 4) | 0;
@@ -37344,21 +37345,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[c >> 2] = i;
       if (!d) return;
       br(d);
-      return;
+      
     }
     function eh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -37402,32 +37403,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function fh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = (a + 8) | 0;
       ef(c, b) | 0;
       if ((c | 0) == (b | 0)) {
         f[(a + 92) >> 2] = f[(b + 84) >> 2];
-        return;
+        
       } else {
         Yf((a + 56) | 0, f[(b + 48) >> 2] | 0, f[(b + 52) >> 2] | 0);
         Yf((a + 68) | 0, f[(b + 60) >> 2] | 0, f[(b + 64) >> 2] | 0);
         Yf((a + 80) | 0, f[(b + 72) >> 2] | 0, f[(b + 76) >> 2] | 0);
         f[(a + 92) >> 2] = f[(b + 84) >> 2];
         qg((a + 96) | 0, f[(b + 88) >> 2] | 0, f[(b + 92) >> 2] | 0);
-        return;
+        
       }
     }
     function gh(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
       g = f[((f[((f[(d + 4) >> 2] | 0) + 8) >> 2] | 0) + (c << 2)) >> 2] | 0;
       if ((b | 0) == -1) h = Ki(c, d) | 0;
       else h = b;
@@ -37457,27 +37458,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         i = c;
       }
       f[a >> 2] = i;
-      return;
+      
     }
     function hh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       e = u;
       u = (u + 224) | 0;
       g = (e + 120) | 0;
@@ -37532,14 +37533,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return m | 0;
     }
     function ih(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -37597,14 +37598,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function jh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = f[a >> 2] | 0;
@@ -37617,7 +37618,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (g >>> 0 <= b >>> 0) return;
       g = (e + (b << 2)) | 0;
       if ((g | 0) == (h | 0)) return;
-      else i = h;
+      i = h;
       do {
         h = (i + -4) | 0;
         f[c >> 2] = h;
@@ -37660,23 +37661,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         }
         i = f[c >> 2] | 0;
       } while ((i | 0) != (g | 0));
-      return;
+      
     }
     function kh(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = (a + 4) | 0;
@@ -37736,27 +37737,27 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = h;
       if (!i) return;
       br(i);
-      return;
+      
     }
     function lh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
       e = ((f[a >> 2] | 0) + 1794895138) | 0;
       g = rp(f[(a + 8) >> 2] | 0, e) | 0;
       h = rp(f[(a + 12) >> 2] | 0, e) | 0;
@@ -37813,20 +37814,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return t | 0;
     }
     function mh(a, c, e, g) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       h = u;
       u = (u + 64) | 0;
       i = h;
@@ -37895,19 +37896,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return q | 0;
     }
     function nh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 4) | 0;
@@ -37967,18 +37968,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[c >> 2] = g;
       if (!h) return;
       br(h);
-      return;
+      
     }
     function oh(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -38024,16 +38025,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function ph(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       c = (a + 12) | 0;
       d = f[a >> 2] | 0;
       e = (a + 8) | 0;
@@ -38109,15 +38110,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       while (0);
       f[e >> 2] = l;
       b[c >> 0] = 0;
-      return;
+      
     }
     function qh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38136,20 +38137,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       Id(a, e);
-      return;
+      
     }
     function rh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       e = u;
       u = (u + 48) | 0;
       g = e;
@@ -38199,18 +38200,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function sh(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       d = f[(a + 4) >> 2] | 0;
       if (!d) {
         e = 0;
@@ -38272,15 +38273,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function th(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 12) | 0;
@@ -38313,17 +38314,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = f[h >> 2];
       Hc((a + 28) | 0, e, d);
       u = c;
-      return;
+      
     }
     function uh(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -38386,22 +38387,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return i | 0;
     }
     function vh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
       e = u;
       u = (u + 16) | 0;
       g = (e + 4) | 0;
@@ -38450,14 +38451,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function wh(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       f[a >> 2] = 1392;
       b = (a + 72) | 0;
       c = f[b >> 2] | 0;
@@ -38509,10 +38510,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (g | 0))
         f[d >> 2] = a + (~(((a + -4 - g) | 0) >>> 2) << 2);
       br(g);
-      return;
+      
     }
     function xh(a) {
-      a = a | 0;
+      a |= 0;
       tj((a + 992) | 0);
       tj((a + 960) | 0);
       tj((a + 928) | 0);
@@ -38545,10 +38546,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       tj((a + 64) | 0);
       tj((a + 32) | 0);
       tj(a);
-      return;
+      
     }
     function yh(a) {
-      a = a | 0;
+      a |= 0;
       rn(a);
       rn((a + 32) | 0);
       rn((a + 64) | 0);
@@ -38581,19 +38582,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       rn((a + 928) | 0);
       rn((a + 960) | 0);
       rn((a + 992) | 0);
-      return;
+      
     }
     function zh(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       a = u;
       u = (u + 16) | 0;
       e = a;
@@ -38648,19 +38649,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function Ah(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       f[a >> 2] = d;
       e = (a + 24) | 0;
       g = (a + 28) | 0;
@@ -38719,18 +38720,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 20) >> 2] = 0 - j;
       if ((n & 1) | 0) return;
       f[m >> 2] = j + -1;
-      return;
+      
     }
     function Bh(a, c, d, e, g, h, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
       c = u;
       u = (u + 64) | 0;
       j = c;
@@ -38780,15 +38781,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       f[a >> 2] = e + (~(((e + -4 - j) | 0) >>> 2) << 2);
       u = c;
-      return;
+      
     }
     function Ch(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38807,15 +38808,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       jd(a, e);
-      return;
+      
     }
     function Dh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38834,15 +38835,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       nd(a, e);
-      return;
+      
     }
     function Eh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38861,15 +38862,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       ud(a, e);
-      return;
+      
     }
     function Fh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38888,15 +38889,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       Ed(a, e);
-      return;
+      
     }
     function Gh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38915,15 +38916,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       ld(a, e);
-      return;
+      
     }
     function Hh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38942,15 +38943,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       qd(a, e);
-      return;
+      
     }
     function Ih(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38969,15 +38970,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       yd(a, e);
-      return;
+      
     }
     function Jh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -38996,15 +38997,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       kd(a, e);
-      return;
+      
     }
     function Kh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -39023,15 +39024,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       od(a, e);
-      return;
+      
     }
     function Lh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -39050,15 +39051,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       vd(a, e);
-      return;
+      
     }
     function Mh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -39077,19 +39078,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       Fd(a, e);
-      return;
+      
     }
     function Nh(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -39131,11 +39132,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return l | 0;
     }
     function Oh(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -39184,12 +39185,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Ph(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -39208,17 +39209,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       rd(a, e);
-      return;
+      
     }
     function Qh(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       e = u;
       u = (u + 48) | 0;
       g = e;
@@ -39261,11 +39262,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return i | 0;
     }
     function Rh(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -39314,15 +39315,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Sh(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       b = f[a >> 2] | 0;
       if (!b) return;
       c = (a + 4) | 0;
@@ -39375,21 +39376,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         e = f[a >> 2] | 0;
       }
       br(e);
-      return;
+      
     }
     function Th(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       e = (d | 0) < 0;
       do
         if (!b) {
@@ -39417,7 +39418,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           i = f[a >> 2] | 0;
           j = (h - i) | 0;
           do
-            if ((0 < (d | 0)) | ((0 == (d | 0)) & (j >>> 0 < c >>> 0))) {
+            if (((d | 0) > 0) | (((d | 0) == 0) & (j >>> 0 < c >>> 0))) {
               if (j >>> 0 < c >>> 0) {
                 ri(a, (c - j) | 0);
                 break;
@@ -39444,21 +39445,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function Uh(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -39501,13 +39502,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return i | 0;
     }
     function Vh(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -39558,17 +39559,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[d >> 2] | 0);
       u = c;
-      return;
+      
     }
     function Wh(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       b = f[(a + 4) >> 2] | 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
@@ -39620,21 +39621,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[a >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Xh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -39668,18 +39669,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function Yh(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -39729,18 +39730,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return n | 0;
     }
     function Zh(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -39774,18 +39775,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function _h(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       g = dn(32) | 0;
       f[a >> 2] = g;
       f[(a + 4) >> 2] = c + 8;
@@ -39822,18 +39823,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       c = f[a >> 2] | 0;
       f[(c + 4) >> 2] = d;
       f[c >> 2] = 0;
-      return;
+      
     }
     function $h(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       b = (a + 32) | 0;
       fd(a, b);
       c = (a + 80) | 0;
@@ -39875,23 +39876,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         if (c >>> 0 >= (((((f[d >> 2] | 0) - j) | 0) / 12) | 0) >>> 0) break;
         else g = j;
       }
-      return;
+      
     }
     function ai(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       e = (d + 16) | 0;
       g = f[e >> 2] | 0;
       if (!g)
@@ -39951,13 +39952,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function bi(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = (a + 12) | 0;
       d = f[c >> 2] | 0;
       f[c >> 2] = 0;
@@ -40000,21 +40001,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       if ((b[(a + 11) >> 0] | 0) >= 0) return;
       br(f[a >> 2] | 0);
-      return;
+      
     }
     function ci(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
       g = u;
       u = (u + 32) | 0;
       h = (g + 12) | 0;
@@ -40043,23 +40044,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[h >> 2] | 0);
       u = g;
-      return;
+      
     }
     function di(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       if ((f[(d + 56) >> 2] | 0) == -1) {
         h = 0;
         f[a >> 2] = h;
@@ -40106,22 +40107,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       pj(i, g) | 0;
       h = d;
       f[a >> 2] = h;
-      return;
+      
     }
     function ei(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((f[c >> 2] | 0) - d) | 0;
@@ -40162,21 +40163,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[i >> 2] = m + (l << 3);
       if (!d) return;
       br(d);
-      return;
+      
     }
     function fi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -40218,13 +40219,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function gi(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       f[a >> 2] = 1276;
       Sh((a + 60) | 0);
       b = f[(a + 48) >> 2] | 0;
@@ -40269,20 +40270,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (g | 0))
         f[d >> 2] = a + (~(((a + -4 - g) | 0) >>> 2) << 2);
       br(g);
-      return;
+      
     }
     function hi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       c = u;
       u = (u + 32) | 0;
       d = (c + 16) | 0;
@@ -40323,19 +40324,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[j >> 2] = d;
       if (g | 0) br(g);
       u = c;
-      return;
+      
     }
     function ii(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       b = (a + 136) | 0;
       c = f[b >> 2] | 0;
       if (c | 0) {
@@ -40383,14 +40384,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[j >> 2] = b + (~(((b + -4 - g) | 0) >>> 2) << 2);
       br(g);
       jj(a);
-      return;
+      
     }
     function ji(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       f[a >> 2] = 3340;
       c = (a + 72) | 0;
       d = (a + 136) | 0;
@@ -40441,21 +40442,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 340) >> 2] = 0;
       f[(a + 344) >> 2] = 0;
       b[(a + 352) >> 0] = 0;
-      return;
+      
     }
     function ki(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((f[c >> 2] | 0) - d) | 0;
@@ -40490,21 +40491,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[i >> 2] = m + ((l * 12) | 0);
       if (!d) return;
       br(d);
-      return;
+      
     }
     function li(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       g = (a + 16) | 0;
       h = g;
       i = f[(h + 4) >> 2] | 0;
@@ -40556,15 +40557,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function mi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -40602,20 +40603,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return i | 0;
     }
     function ni(a, c, d, e, g, h, i, j) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      j = j | 0;
-      var k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      j |= 0;
+      let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       k = u;
       u = (u + 16) | 0;
       l = k;
@@ -40642,22 +40643,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b[l >> 0] = 0;
       Hp((o + p) | 0, l);
       u = k;
-      return;
+      
     }
     function oi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 8) | 0;
       d = f[c >> 2] | 0;
       e = (a + 4) | 0;
@@ -40701,21 +40702,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[c >> 2] = m + (l << 2);
       if (!h) return;
       br(h);
-      return;
+      
     }
     function pi(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       g = dn(32) | 0;
       f[a >> 2] = g;
       f[(a + 4) >> 2] = c + 8;
@@ -40746,22 +40747,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       c = f[a >> 2] | 0;
       f[(c + 4) >> 2] = d;
       f[c >> 2] = 0;
-      return;
+      
     }
     function qi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
+      a |= 0;
+      c |= 0;
       d = $(d);
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0.0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0.0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -40796,19 +40797,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         a = (a + 1) | 0;
       }
       u = e;
-      return;
+      
     }
     function ri(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       d = (a + 8) | 0;
       e = f[d >> 2] | 0;
       g = (a + 4) | 0;
@@ -40853,17 +40854,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[d >> 2] = j;
       if (!e) return;
       br(e);
-      return;
+      
     }
     function si(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = f[a >> 2] | 0;
@@ -40876,7 +40877,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (g >>> 0 <= b >>> 0) return;
       g = (e + ((b * 136) | 0)) | 0;
       if ((g | 0) == (h | 0)) return;
-      else i = h;
+      i = h;
       do {
         f[c >> 2] = i + -136;
         h = f[(i + -20) >> 2] | 0;
@@ -40898,15 +40899,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         yi((i + -132) | 0);
         i = f[c >> 2] | 0;
       } while ((i | 0) != (g | 0));
-      return;
+      
     }
     function ti(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = Oa,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = Oa;
+        let e = 0;
+        let g = 0;
       if ((b | 0) != 1)
         if (!((b + -1) & b)) c = b;
         else c = cb(b) | 0;
@@ -40925,13 +40926,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = c >>> 0 < g >>> 0 ? g : c;
       if (e >>> 0 >= b >>> 0) return;
       Hd(a, e);
-      return;
+      
     }
     function ui(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       b = f[(a + 76) >> 2] | 0;
       if (b | 0) {
         c = (a + 80) | 0;
@@ -40977,21 +40978,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function vi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -41025,21 +41026,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         a = (a + 1) | 0;
       }
       u = e;
-      return;
+      
     }
     function wi(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       b = (a + 8) | 0;
       c = f[b >> 2] | 0;
       if ((c | 0) < 0) {
@@ -41092,14 +41093,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function xi(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -41139,13 +41140,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[e >> 2] | 0);
       u = d;
-      return;
+      
     }
     function yi(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       b = f[(a + 84) >> 2] | 0;
       if (b | 0) {
         c = (a + 88) | 0;
@@ -41189,14 +41190,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[a >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function zi(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 1336;
       b = (a + 32) | 0;
       c = f[b >> 2] | 0;
@@ -41243,19 +41244,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (c | 0))
         f[e >> 2] = a + (~(((a + -4 - c) | 0) >>> 2) << 2);
       br(c);
-      return;
+      
     }
     function Ai() {
-      var a = 0,
-        b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      let a = 0;
+        let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       a = u;
       u = (u + 48) | 0;
       b = (a + 32) | 0;
@@ -41294,10 +41295,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Dn(17595, b);
     }
     function Bi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
       do
         if (a) {
           if (c >>> 0 < 128) {
@@ -41348,19 +41349,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Ci(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       c = (a + 4) | 0;
       d = f[a >> 2] | 0;
       e = ((f[c >> 2] | 0) - d) | 0;
@@ -41397,21 +41398,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[i >> 2] = m + (l << 2);
       if (!d) return;
       br(d);
-      return;
+      
     }
     function Di(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
       c = (a + 104) | 0;
       d = f[c >> 2] | 0;
       if ((d | 0) != 0 ? (f[(a + 108) >> 2] | 0) >= (d | 0) : 0) e = 4;
@@ -41461,10 +41462,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return o | 0;
     }
     function Ei(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       f[a >> 2] = 1528;
       f[(a + 4) >> 2] = b;
       b = (a + 8) | 0;
@@ -41493,18 +41494,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 152) >> 2] = 0;
       f[(a + 156) >> 2] = 0;
       f[(a + 160) >> 2] = 0;
-      return;
+      
     }
     function Fi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -41543,13 +41544,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[g >> 2] | 0);
       u = e;
-      return;
+      
     }
     function Gi(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3320;
       b = f[(a + 88) >> 2] | 0;
       if (b | 0) {
@@ -41589,13 +41590,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 24) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Hi(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       f[a >> 2] = 1528;
       f[(a + 4) >> 2] = b;
       b = (a + 8) | 0;
@@ -41624,13 +41625,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 152) >> 2] = 0;
       f[(a + 156) >> 2] = 0;
       f[(a + 160) >> 2] = 0;
-      return;
+      
     }
     function Ii(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2200;
       b = f[(a + 152) >> 2] | 0;
       if (b | 0) {
@@ -41664,16 +41665,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Ji(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -41710,15 +41711,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[(a + 12) >> 2] = 0;
       }
       u = d;
-      return;
+      
     }
     function Ki(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       c = (b + 48) | 0;
       if ((Yh(f[c >> 2] | 0) | 0) > 9) {
         d = 0;
@@ -41756,15 +41757,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((Yh(f[c >> 2] | 0) | 0) > 1) {
         d = 1;
         return d | 0;
-      } else
-        return ((f[((f[e >> 2] | 0) + 80) >> 2] | 0) >>> 0 < 40 ? 1 : 4) | 0;
+      } return ((f[((f[e >> 2] | 0) + 80) >> 2] | 0) >>> 0 < 40 ? 1 : 4) | 0;
       return 0;
     }
     function Li(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1892;
       b = f[(a + 152) >> 2] | 0;
       if (b | 0) {
@@ -41798,23 +41798,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Mi(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
       g = u;
       u = (u + 128) | 0;
       h = (g + 124) | 0;
@@ -41865,11 +41865,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return p | 0;
     }
     function Ni(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       f[a >> 2] = 3080;
       c = (a + 72) | 0;
       d = (a + 136) | 0;
@@ -41912,21 +41912,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(d + 16) >> 2] = 0;
       f[(d + 20) >> 2] = 0;
       b[(d + 24) >> 0] = 0;
-      return;
+      
     }
     function Oi(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
       e = +e;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       a = u;
       u = (u + 16) | 0;
       g = a;
@@ -41968,18 +41968,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function Pi(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       a = u;
       u = (u + 16) | 0;
       g = a;
@@ -42021,12 +42021,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function Qi(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       c = f[(a + 28) >> 2] | 0;
       if (c | 0) {
         d = c;
@@ -42070,18 +42070,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[a >> 2] = 0;
       if (!d) return;
       br(d);
-      return;
+      
     }
     function Ri(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -42114,19 +42114,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       u = d;
-      return;
+      
     }
     function Si(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -42155,21 +42155,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (!g) {
         Ic(a, c, h, d);
         u = e;
-        return;
+        
       } else {
         jg(a, c, g, d);
         u = e;
-        return;
+        
       }
     }
     function Ti(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       lk(a);
       b = (a + 84) | 0;
       c = f[b >> 2] | 0;
@@ -42207,18 +42207,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         lk(((f[e >> 2] | 0) + (h << 5)) | 0);
         h = (h + 1) | 0;
       } while ((h | 0) < (f[b >> 2] | 0));
-      return;
+      
     }
     function Ui(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       if (!b) {
         d = 0;
         return d | 0;
@@ -42268,13 +42268,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Vi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       c = f[a >> 2] | 0;
       if (b) {
         b = (c + 8) | 0;
@@ -42312,13 +42312,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       f[g >> 2] = 0;
       f[e >> 2] = 0;
-      return;
+      
     }
     function Wi(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       c = (a + 32) | 0;
       a = f[b >> 2] | 0;
       f[b >> 2] = 0;
@@ -42358,20 +42358,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         br(d);
       }
       br(b);
-      return;
+      
     }
     function Xi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -42402,16 +42402,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function Yi(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 48) | 0;
       e = (d + 4) | 0;
@@ -42440,20 +42440,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       k = f[g >> 2] | 0;
       f[a >> 2] = k;
       u = d;
-      return;
+      
     }
     function Zi(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -42486,14 +42486,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function _i(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       b = f[a >> 2] | 0;
       if (!b) return;
       c = (a + 4) | 0;
@@ -42525,20 +42525,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         e = f[a >> 2] | 0;
       }
       br(e);
-      return;
+      
     }
     function $i(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -42568,13 +42568,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function aj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       f[a >> 2] = 3608;
       b = f[(a + 32) >> 2] | 0;
       if (b | 0) {
@@ -42611,17 +42611,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         e = f[b >> 2] | 0;
       }
       br(e);
-      return;
+      
     }
     function bj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = (a + 4) | 0;
       if ((Qa[f[((f[b >> 2] | 0) + 20) >> 2] & 127](b) | 0) <= 0) {
         d = 1;
@@ -42654,15 +42654,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function cj(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       if (!(lo(a, b, c) | 0)) {
         d = 0;
         return d | 0;
@@ -42708,15 +42708,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function dj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -42747,17 +42747,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[(a + 8) >> 2] = f[(c + 8) >> 2];
       }
       u = d;
-      return;
+      
     }
     function ej(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -42783,16 +42783,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       u = c;
-      return;
+      
     }
     function fj(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
       b[(c + 53) >> 0] = 1;
       do
         if ((f[(c + 4) >> 2] | 0) == (e | 0)) {
@@ -42823,18 +42823,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             b[(c + 54) >> 0] = 1;
         }
       while (0);
-      return;
+      
     }
     function gj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = (a + 36) | 0;
       d = (a + 40) | 0;
       e = f[c >> 2] | 0;
@@ -42851,10 +42851,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       d = (a + 52) | 0;
       a = f[h >> 2] | 0;
       if ((f[d >> 2] | 0) == (a | 0)) return 1;
-      else {
+      
         i = 0;
         j = a;
-      }
+      
       do {
         a = f[(j + (i << 2)) >> 2] | 0;
         Nh((a << 1) ^ (a >> 31), b) | 0;
@@ -42864,15 +42864,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function hj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       e = (a + d) | 0;
-      c = c & 255;
+      c &= 255;
       if ((d | 0) >= 67) {
         while (a & 3) {
           b[a >> 0] = c;
@@ -42912,12 +42912,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (e - d) | 0;
     }
     function ij(a, c, d, e, g) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
       do
         if (!(qp(a, f[(c + 8) >> 2] | 0, g) | 0)) {
           if (qp(a, f[c >> 2] | 0, g) | 0) {
@@ -42939,14 +42939,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           }
         } else Om(0, c, d, e);
       while (0);
-      return;
+      
     }
     function jj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       b = (a + 80) | 0;
       c = f[b >> 2] | 0;
       f[b >> 2] = 0;
@@ -42983,13 +42983,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[b >> 2] | 0) != (e | 0)) f[b >> 2] = e;
       br(e);
       tj(a);
-      return;
+      
     }
     function kj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2684;
       b = f[(a + 136) >> 2] | 0;
       if (b | 0) {
@@ -43016,20 +43016,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 40) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function lj(a, c, d, e, g, h, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
       if (((-17 - c) | 0) >>> 0 < d >>> 0) mq(a);
       if ((b[(a + 11) >> 0] | 0) < 0) j = f[a >> 2] | 0;
       else j = a;
@@ -43046,13 +43046,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((c | 0) != 10) br(j);
       f[a >> 2] = l;
       f[(a + 8) >> 2] = m | -2147483648;
-      return;
+      
     }
     function mj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2432;
       b = f[(a + 136) >> 2] | 0;
       if (b | 0) {
@@ -43079,26 +43079,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 40) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function nj(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       if (!b) return;
-      else {
+      
         nj(a, f[b >> 2] | 0);
         nj(a, f[(b + 4) >> 2] | 0);
         sj((b + 20) | 0, f[(b + 24) >> 2] | 0);
         br(b);
-        return;
-      }
+        
+      
     }
     function oj(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       If(a, b, c);
       c = f[(a + 100) >> 2] | 0;
       d = f[(a + 96) >> 2] | 0;
@@ -43116,17 +43116,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = f[(e + (f[c >> 2] << 2)) >> 2];
         d = (d + 1) | 0;
       } while (d >>> 0 < b >>> 0);
-      return;
+      
     }
     function pj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = (a + 64) | 0;
       if (
         (f[d >> 2] | 0) == 0
@@ -43160,15 +43160,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function qj(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = u;
       u = (u + 64) | 0;
       e = d;
@@ -43196,13 +43196,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function rj(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       if (!c) {
         d = 0;
         return d | 0;
@@ -43228,9 +43228,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function sj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       if (!c) return;
       sj(a, f[c >> 2] | 0);
       sj(a, f[(c + 4) >> 2] | 0);
@@ -43239,16 +43239,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((b[(d + 11) >> 0] | 0) < 0) br(f[d >> 2] | 0);
       if ((b[(a + 11) >> 0] | 0) < 0) br(f[a >> 2] | 0);
       br(c);
-      return;
+      
     }
     function tj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -43283,87 +43283,87 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[g >> 2] = a + (~(((a + -8 - c) | 0) >>> 3) << 3);
       br(c);
       u = b;
-      return;
+      
     }
     function $a(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -43611,7 +43611,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                 o = (t + 8) | 0;
                 u = b;
                 return o | 0;
-              } else B = d;
+              } B = d;
             } else B = d;
           } else B = d;
         } else if (a >>> 0 <= 4294967231) {
@@ -43676,7 +43676,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                   } else {
                     l = N;
                     k = O;
-                    h = h << ((J ^ 1) & 1);
+                    h <<= ((J ^ 1) & 1);
                     I = P;
                   }
                 }
@@ -43894,7 +43894,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                       H = 96;
                       break;
                     } else {
-                      d = d << 1;
+                      d <<= 1;
                       j = n;
                     }
                   }
@@ -43924,7 +43924,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               o = (S + 8) | 0;
               u = b;
               return o | 0;
-            } else B = e;
+            } B = e;
           } else B = e;
         } else B = -1;
       while (0);
@@ -44111,7 +44111,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
               }
             }
           while (0);
-          f[4623] = f[4623] | 4;
+          f[4623] |= 4;
           ha = ca;
           H = 133;
         } else {
@@ -44221,7 +44221,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                           T = f[(aa + 8) >> 2] | 0;
                           X = f[(aa + 12) >> 2] | 0;
                           if ((X | 0) == (T | 0)) {
-                            f[4512] = f[4512] & ~(1 << $);
+                            f[4512] &= ~(1 << $);
                             break;
                           } else {
                             f[(T + 12) >> 2] = X;
@@ -44290,7 +44290,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                             } else {
                               f[Y >> 2] = ma;
                               if (ma | 0) break;
-                              f[4513] = f[4513] & ~(1 << X);
+                              f[4513] &= ~(1 << X);
                               break d;
                             }
                           while (0);
@@ -44382,7 +44382,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                         H = 191;
                         break;
                       } else {
-                        j = j << 1;
+                        j <<= 1;
                         _ = ba;
                       }
                     }
@@ -44521,7 +44521,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                   H = 212;
                   break;
                 } else {
-                  ba = ba << 1;
+                  ba <<= 1;
                   S = Z;
                 }
               }
@@ -44647,141 +44647,141 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return o | 0;
     }
     function ab(a, c, d, e, g, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0,
-        Ua = 0,
-        Va = 0.0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0,
-        kb = 0,
-        lb = 0,
-        mb = 0,
-        nb = 0,
-        ob = 0,
-        pb = 0,
-        qb = 0,
-        rb = 0,
-        sb = 0,
-        tb = 0,
-        ub = 0,
-        vb = 0,
-        wb = 0,
-        xb = 0,
-        yb = 0,
-        zb = 0,
-        Ab = 0,
-        Bb = 0,
-        Cb = 0,
-        Db = 0,
-        Eb = 0,
-        Fb = 0,
-        Gb = 0,
-        Hb = 0,
-        Ib = 0,
-        Jb = 0,
-        Kb = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0;
+        let Ua = 0;
+        let Va = 0.0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0;
+        let kb = 0;
+        let lb = 0;
+        let mb = 0;
+        let nb = 0;
+        let ob = 0;
+        let pb = 0;
+        let qb = 0;
+        let rb = 0;
+        let sb = 0;
+        let tb = 0;
+        let ub = 0;
+        let vb = 0;
+        let wb = 0;
+        let xb = 0;
+        let yb = 0;
+        let zb = 0;
+        let Ab = 0;
+        let Bb = 0;
+        let Cb = 0;
+        let Db = 0;
+        let Eb = 0;
+        let Fb = 0;
+        let Gb = 0;
+        let Hb = 0;
+        let Ib = 0;
+        let Jb = 0;
+        let Kb = 0;
       i = u;
       u = (u + 240) | 0;
       j = (i + 104) | 0;
@@ -45776,143 +45776,143 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function bb(a, c, d, e, g, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0,
-        Ua = 0,
-        Va = 0.0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0,
-        kb = 0,
-        lb = 0,
-        mb = 0,
-        nb = 0,
-        ob = 0,
-        pb = 0,
-        qb = 0,
-        rb = 0,
-        sb = 0,
-        tb = 0,
-        ub = 0,
-        vb = 0,
-        wb = 0,
-        xb = 0,
-        yb = 0,
-        zb = 0,
-        Ab = 0,
-        Bb = 0,
-        Cb = 0,
-        Db = 0,
-        Eb = 0,
-        Fb = 0,
-        Gb = 0,
-        Hb = 0,
-        Ib = 0,
-        Jb = 0,
-        Kb = 0,
-        Lb = 0,
-        Mb = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0;
+        let Ua = 0;
+        let Va = 0.0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0;
+        let kb = 0;
+        let lb = 0;
+        let mb = 0;
+        let nb = 0;
+        let ob = 0;
+        let pb = 0;
+        let qb = 0;
+        let rb = 0;
+        let sb = 0;
+        let tb = 0;
+        let ub = 0;
+        let vb = 0;
+        let wb = 0;
+        let xb = 0;
+        let yb = 0;
+        let zb = 0;
+        let Ab = 0;
+        let Bb = 0;
+        let Cb = 0;
+        let Db = 0;
+        let Eb = 0;
+        let Fb = 0;
+        let Gb = 0;
+        let Hb = 0;
+        let Ib = 0;
+        let Jb = 0;
+        let Kb = 0;
+        let Lb = 0;
+        let Mb = 0;
       i = u;
       u = (u + 240) | 0;
       j = (i + 104) | 0;
@@ -46842,35 +46842,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function cb(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -47626,133 +47626,133 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return E | 0;
     }
     function db(a, c, d, e, g, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0.0,
-        Ua = 0,
-        Va = 0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0,
-        kb = 0,
-        lb = 0,
-        mb = 0,
-        nb = 0,
-        ob = 0,
-        pb = 0,
-        qb = 0,
-        rb = 0,
-        sb = 0,
-        tb = 0,
-        ub = 0,
-        vb = 0,
-        wb = 0,
-        xb = 0,
-        yb = 0,
-        zb = 0,
-        Ab = 0,
-        Bb = 0,
-        Cb = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0.0;
+        let Ua = 0;
+        let Va = 0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0;
+        let kb = 0;
+        let lb = 0;
+        let mb = 0;
+        let nb = 0;
+        let ob = 0;
+        let pb = 0;
+        let qb = 0;
+        let rb = 0;
+        let sb = 0;
+        let tb = 0;
+        let ub = 0;
+        let vb = 0;
+        let wb = 0;
+        let xb = 0;
+        let yb = 0;
+        let zb = 0;
+        let Ab = 0;
+        let Bb = 0;
+        let Cb = 0;
       i = u;
       u = (u + 256) | 0;
       e = (i + 104) | 0;
@@ -48654,135 +48654,135 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function eb(a, c, d, e, g, i) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0.0,
-        Ua = 0,
-        Va = 0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0,
-        kb = 0,
-        lb = 0,
-        mb = 0,
-        nb = 0,
-        ob = 0,
-        pb = 0,
-        qb = 0,
-        rb = 0,
-        sb = 0,
-        tb = 0,
-        ub = 0,
-        vb = 0,
-        wb = 0,
-        xb = 0,
-        yb = 0,
-        zb = 0,
-        Ab = 0,
-        Bb = 0,
-        Cb = 0,
-        Db = 0,
-        Eb = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0.0;
+        let Ua = 0;
+        let Va = 0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0;
+        let kb = 0;
+        let lb = 0;
+        let mb = 0;
+        let nb = 0;
+        let ob = 0;
+        let pb = 0;
+        let qb = 0;
+        let rb = 0;
+        let sb = 0;
+        let tb = 0;
+        let ub = 0;
+        let vb = 0;
+        let wb = 0;
+        let xb = 0;
+        let yb = 0;
+        let zb = 0;
+        let Ab = 0;
+        let Bb = 0;
+        let Cb = 0;
+        let Db = 0;
+        let Eb = 0;
       i = u;
       u = (u + 256) | 0;
       e = (i + 104) | 0;
@@ -49619,165 +49619,165 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function fb(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0,
-        Ua = 0,
-        Va = 0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0,
-        kb = 0,
-        lb = 0,
-        mb = 0,
-        nb = 0,
-        ob = 0,
-        pb = 0,
-        qb = 0,
-        rb = 0,
-        sb = 0,
-        tb = 0,
-        ub = 0,
-        vb = 0,
-        wb = 0,
-        xb = 0,
-        yb = 0,
-        zb = 0,
-        Ab = 0,
-        Bb = 0,
-        Cb = 0,
-        Db = 0,
-        Eb = 0,
-        Fb = 0,
-        Gb = 0,
-        Hb = 0,
-        Ib = 0,
-        Jb = 0,
-        Kb = 0,
-        Lb = 0,
-        Mb = 0,
-        Nb = 0,
-        Ob = 0,
-        Pb = 0,
-        Qb = 0,
-        Rb = 0,
-        Sb = 0,
-        Tb = 0,
-        Ub = 0,
-        Vb = 0,
-        Wb = 0,
-        Xb = 0,
-        Yb = 0,
-        Zb = 0,
-        _b = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0;
+        let Ua = 0;
+        let Va = 0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0;
+        let kb = 0;
+        let lb = 0;
+        let mb = 0;
+        let nb = 0;
+        let ob = 0;
+        let pb = 0;
+        let qb = 0;
+        let rb = 0;
+        let sb = 0;
+        let tb = 0;
+        let ub = 0;
+        let vb = 0;
+        let wb = 0;
+        let xb = 0;
+        let yb = 0;
+        let zb = 0;
+        let Ab = 0;
+        let Bb = 0;
+        let Cb = 0;
+        let Db = 0;
+        let Eb = 0;
+        let Fb = 0;
+        let Gb = 0;
+        let Hb = 0;
+        let Ib = 0;
+        let Jb = 0;
+        let Kb = 0;
+        let Lb = 0;
+        let Mb = 0;
+        let Nb = 0;
+        let Ob = 0;
+        let Pb = 0;
+        let Qb = 0;
+        let Rb = 0;
+        let Sb = 0;
+        let Tb = 0;
+        let Ub = 0;
+        let Vb = 0;
+        let Wb = 0;
+        let Xb = 0;
+        let Yb = 0;
+        let Zb = 0;
+        let _b = 0;
       c = u;
       u = (u + 32) | 0;
       d = (c + 16) | 0;
@@ -50646,102 +50646,102 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function gb(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = Oa,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Pa = 0,
-        Qa = Oa,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0,
-        Ua = 0,
-        Va = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = Oa;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Pa = 0;
+        let Qa = Oa;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0;
+        let Ua = 0;
+        let Va = 0;
       c = u;
       u = (u + 80) | 0;
       d = (c + 60) | 0;
@@ -51433,100 +51433,100 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function hb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -52177,64 +52177,64 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(Qa);
       u = d;
-      return;
+      
     }
     function ib(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
       d = u;
       u = (u + 80) | 0;
       e = (d + 56) | 0;
@@ -52759,99 +52759,99 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       dj((a + 4) | 0, e);
       if ((b[(e + 11) >> 0] | 0) < 0) br(f[e >> 2] | 0);
       u = d;
-      return;
+      
     }
     function jb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
       d = u;
       u = (u + 48) | 0;
       e = (d + 36) | 0;
@@ -53264,7 +53264,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                     Vi((a + 12 + (ba << 5)) | 0, ((ha & ia) | 0) != 0);
                     ba = (ba + 1) | 0;
                     if ((ba | 0) == (Z | 0)) break;
-                    else ha = ha >>> 1;
+                    else ha >>>= 1;
                   }
                 }
               } else {
@@ -53276,7 +53276,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                     Vi((a + 12 + (ba << 5)) | 0, ((ia & ha) | 0) != 0);
                     ba = (ba + 1) | 0;
                     if ((ba | 0) == (Z | 0)) break;
-                    else ia = ia >>> 1;
+                    else ia >>>= 1;
                   }
                 }
               }
@@ -53460,95 +53460,95 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(Ma);
       u = d;
-      return;
+      
     }
     function kb(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
       d = u;
       u = (u + 1424) | 0;
       e = (d + 1408) | 0;
@@ -54122,60 +54122,60 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ia | 0;
     }
     function lb(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
       d = u;
       u = (u + 80) | 0;
       e = (d + 56) | 0;
@@ -54682,95 +54682,95 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       dj((a + 4) | 0, e);
       if ((b[(e + 11) >> 0] | 0) < 0) br(f[e >> 2] | 0);
       u = d;
-      return;
+      
     }
     function mb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -55174,7 +55174,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                     Vi((a + 12 + (Z << 5)) | 0, ((ea & fa) | 0) != 0);
                     Z = (Z + 1) | 0;
                     if ((Z | 0) == (W | 0)) break;
-                    else ea = ea >>> 1;
+                    else ea >>>= 1;
                   }
                 }
               } else {
@@ -55186,7 +55186,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                     Vi((a + 12 + (Z << 5)) | 0, ((fa & ea) | 0) != 0);
                     Z = (Z + 1) | 0;
                     if ((Z | 0) == (W | 0)) break;
-                    else fa = fa >>> 1;
+                    else fa >>>= 1;
                   }
                 }
               }
@@ -55370,96 +55370,96 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(Ia);
       u = d;
-      return;
+      
     }
     function nb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -56037,131 +56037,131 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(Ja);
       u = d;
-      return;
+      
     }
     function ob(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0.0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0,
-        Ja = 0,
-        Ka = 0,
-        La = 0,
-        Ma = 0,
-        Na = 0,
-        Oa = 0,
-        Pa = 0,
-        Qa = 0,
-        Ra = 0,
-        Sa = 0,
-        Ta = 0,
-        Ua = 0,
-        Va = 0,
-        Wa = 0,
-        Xa = 0,
-        Ya = 0,
-        Za = 0,
-        _a = 0,
-        $a = 0,
-        ab = 0,
-        bb = 0.0,
-        cb = 0,
-        db = 0,
-        eb = 0,
-        fb = 0,
-        gb = 0,
-        hb = 0,
-        ib = 0,
-        jb = 0.0,
-        kb = 0.0,
-        lb = 0.0,
-        mb = 0.0,
-        nb = 0.0,
-        ob = 0.0,
-        pb = 0.0,
-        qb = 0.0,
-        rb = 0.0,
-        sb = 0.0,
-        tb = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0.0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
+        let Ja = 0;
+        let Ka = 0;
+        let La = 0;
+        let Ma = 0;
+        let Na = 0;
+        let Oa = 0;
+        let Pa = 0;
+        let Qa = 0;
+        let Ra = 0;
+        let Sa = 0;
+        let Ta = 0;
+        let Ua = 0;
+        let Va = 0;
+        let Wa = 0;
+        let Xa = 0;
+        let Ya = 0;
+        let Za = 0;
+        let _a = 0;
+        let $a = 0;
+        let ab = 0;
+        let bb = 0.0;
+        let cb = 0;
+        let db = 0;
+        let eb = 0;
+        let fb = 0;
+        let gb = 0;
+        let hb = 0;
+        let ib = 0;
+        let jb = 0.0;
+        let kb = 0.0;
+        let lb = 0.0;
+        let mb = 0.0;
+        let nb = 0.0;
+        let ob = 0.0;
+        let pb = 0.0;
+        let qb = 0.0;
+        let rb = 0.0;
+        let sb = 0.0;
+        let tb = 0;
       i = u;
       u = (u + 512) | 0;
       j = i;
@@ -56837,86 +56837,86 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +Aa;
     }
     function pb(a, c, d, e, g, i) {
-      a = a | 0;
+      a |= 0;
       c = +c;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      i = i | 0;
-      var j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0.0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0.0,
-        C = 0,
-        D = 0.0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0.0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0.0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0.0,
-        ga = 0.0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      i |= 0;
+      let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0.0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0.0;
+        let C = 0;
+        let D = 0.0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0.0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0.0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0.0;
+        let ga = 0.0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
       j = u;
       u = (u + 560) | 0;
       k = (j + 8) | 0;
@@ -56939,14 +56939,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       xo(q) | 0;
       do
-        if ((0 == 0) & (((I & 2146435072) | 0) == 2146435072)) {
+        if ((0 === 0) & (((I & 2146435072) | 0) == 2146435072)) {
           t = ((i & 32) | 0) != 0;
           v = (r + 3) | 0;
           Hk(a, 32, d, v, g & -65537);
           ep(a, s, r);
           ep(
             a,
-            (q != q) | (0.0 != 0.0) ? (t ? 17461 : 15538) : t ? 15530 : 15534,
+            (q != q) | (0.0 !== 0.0) ? (t ? 17461 : 15538) : t ? 15530 : 15534,
             3
           );
           Hk(a, 32, d, v, g ^ 8192);
@@ -56967,7 +56967,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
                 C = A;
                 do {
                   C = (C + -1) | 0;
-                  B = B * 16.0;
+                  B *= 16.0;
                 } while ((C | 0) != 0);
                 if ((b[y >> 0] | 0) == 45) {
                   D = -(B + (-c - B));
@@ -57492,89 +57492,89 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ((w | 0) < (d | 0) ? d : w) | 0;
     }
     function qb(a, c, e, g, h) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      var i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0,
-        Aa = 0,
-        Ba = 0,
-        Ca = 0,
-        Da = 0,
-        Ea = 0,
-        Fa = 0,
-        Ga = 0,
-        Ha = 0,
-        Ia = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
+        let Aa = 0;
+        let Ba = 0;
+        let Ca = 0;
+        let Da = 0;
+        let Ea = 0;
+        let Fa = 0;
+        let Ga = 0;
+        let Ha = 0;
+        let Ia = 0;
       i = u;
       u = (u + 64) | 0;
       j = (i + 16) | 0;
@@ -58235,73 +58235,73 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return V | 0;
     }
     function rb(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = Oa,
-        ma = Oa,
-        na = Oa,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = Oa;
+        let ma = Oa;
+        let na = Oa;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
       c = u;
       u = (u + 64) | 0;
       d = (c + 28) | 0;
@@ -58758,69 +58758,69 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(e);
       u = c;
-      return;
+      
     }
     function sb(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
       g = u;
       u = (u + 80) | 0;
       h = (g + 76) | 0;
@@ -59217,66 +59217,66 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function tb(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
       g = u;
       u = (u + 80) | 0;
       h = (g + 76) | 0;
@@ -59677,32 +59677,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ub(a, c, e, g) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      g = g | 0;
-      var i = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = Oa,
-        D = 0,
-        E = 0.0,
-        F = 0,
-        G = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      g |= 0;
+      let i = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = Oa;
+        let D = 0;
+        let E = 0.0;
+        let F = 0;
+        let G = 0;
       if (!g) {
         i = 0;
         return i | 0;
@@ -60135,48 +60135,48 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function vb(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -60567,59 +60567,59 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function wb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -61067,63 +61067,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function xb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -61571,63 +61571,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function yb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -62075,63 +62075,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function zb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -62579,63 +62579,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Ab(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -63083,63 +63083,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Bb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -63587,63 +63587,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Cb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -64091,63 +64091,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Db(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -64595,63 +64595,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Eb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -65099,63 +65099,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Fb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -65603,63 +65603,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Gb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -66107,63 +66107,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Hb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -66611,63 +66611,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Ib(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -67115,63 +67115,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Jb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -67619,63 +67619,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Kb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -68123,63 +68123,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Lb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -68627,63 +68627,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Mb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -69131,63 +69131,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Nb(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
       d = a;
       a = b;
       a: while (1) {
@@ -69635,33 +69635,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           break;
         }
         case 84:
-          return;
+          
       }
     }
     function Ob(a, c, e, g) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      g = g | 0;
-      var i = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      g |= 0;
+      let i = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       if (!g) {
         i = 0;
         return i | 0;
@@ -70052,29 +70052,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Pb(a, c, e, g) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      g = g | 0;
-      var i = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        u = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      g |= 0;
+      let i = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let u = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
       if (!g) {
         i = 0;
         return i | 0;
@@ -70465,42 +70465,42 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Qb(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = Oa,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = Oa;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = Oa;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = Oa;
       e = u;
       u = (u + 48) | 0;
       g = (e + 36) | 0;
@@ -70846,80 +70846,80 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return k | 0;
     }
     function Rb(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
       e = u;
       u = (u + 64) | 0;
       d = (e + 48) | 0;
@@ -71328,84 +71328,84 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((la | 0) == 3) {
         u = e;
         return 1;
-      } else if ((la | 0) == 4) mq(J);
+      } if ((la | 0) == 4) mq(J);
       return 0;
     }
     function Sb(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
       e = u;
       u = (u + 64) | 0;
       d = (e + 48) | 0;
@@ -71814,52 +71814,52 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((la | 0) == 3) {
         u = e;
         return 1;
-      } else if ((la | 0) == 4) mq(J);
+      } if ((la | 0) == 4) mq(J);
       return 0;
     }
     function Tb(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -72318,54 +72318,54 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Ub(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = Oa,
-        V = Oa,
-        Y = Oa,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = Oa;
+        let V = Oa;
+        let Y = Oa;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -72683,7 +72683,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (!e) {
         u = d;
         return;
-      } else ba = e;
+      } ba = e;
       do {
         e = ba;
         c = dn(40) | 0;
@@ -72731,70 +72731,70 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         ba = f[ba >> 2] | 0;
       } while ((ba | 0) != 0);
       u = d;
-      return;
+      
     }
     function Vb(a, c, e) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      var g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = Oa,
-        fa = Oa,
-        ga = Oa,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = Oa;
+        let fa = Oa;
+        let ga = Oa;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
       g = u;
       u = (u + 48) | 0;
       i = (g + 16) | 0;
@@ -73192,47 +73192,47 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return pa | 0;
     }
     function Wb(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -73644,66 +73644,66 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Xb(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = Oa,
-        da = Oa,
-        ea = Oa,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = Oa;
+        let da = Oa;
+        let ea = Oa;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
       e = u;
       u = (u + 48) | 0;
       g = (e + 20) | 0;
@@ -74099,67 +74099,67 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return na | 0;
     }
     function Yb(a, c, e) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      var g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = Oa,
-        fa = Oa,
-        ga = Oa,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = Oa;
+        let fa = Oa;
+        let ga = Oa;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
       g = u;
       u = (u + 48) | 0;
       i = (g + 12) | 0;
@@ -74553,66 +74553,66 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return pa | 0;
     }
     function Zb(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -74945,43 +74945,43 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function _b(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = Oa,
-        K = Oa,
-        L = Oa,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = Oa;
+        let K = Oa;
+        let L = Oa;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
       e = u;
       u = (u + 64) | 0;
       g = (e + 40) | 0;
@@ -75325,85 +75325,85 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[k >> 2] | 0) != (i | 0)) f[k >> 2] = i;
       br(i);
       u = e;
-      return;
+      
     }
     function $b(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0,
-        ua = 0,
-        va = 0,
-        wa = 0,
-        xa = 0,
-        ya = 0,
-        za = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
+        let ua = 0;
+        let va = 0;
+        let wa = 0;
+        let xa = 0;
+        let ya = 0;
+        let za = 0;
       e = u;
       u = (u + 96) | 0;
       g = (e + 92) | 0;
@@ -75699,7 +75699,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         za = (d + 8) | 0;
         f[za >> 2] = xa;
         u = e;
-        return;
+        
       } else {
         if (!(((V | 0) > 0) | (((V | 0) == 0) & (v >>> 0 > 536870912)))) {
           va = qa;
@@ -75727,49 +75727,49 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         za = (d + 8) | 0;
         f[za >> 2] = xa;
         u = e;
-        return;
+        
       }
     }
     function ac(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = Oa,
-        M = Oa,
-        N = Oa,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = Oa;
+        let M = Oa;
+        let N = Oa;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
       e = u;
       u = (u + 64) | 0;
       g = (e + 40) | 0;
@@ -76105,70 +76105,70 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[k >> 2] | 0) != (i | 0)) f[k >> 2] = i;
       br(i);
       u = e;
-      return;
+      
     }
     function bc(a, c, e) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      var g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = Oa,
-        fa = Oa,
-        ga = Oa,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = Oa;
+        let fa = Oa;
+        let ga = Oa;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
       g = u;
       u = (u + 48) | 0;
       i = (g + 12) | 0;
@@ -76519,43 +76519,43 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return pa | 0;
     }
     function cc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = Oa,
-        K = Oa,
-        L = Oa,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = Oa;
+        let K = Oa;
+        let L = Oa;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
       e = u;
       u = (u + 64) | 0;
       g = (e + 40) | 0;
@@ -76885,70 +76885,70 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((f[k >> 2] | 0) != (i | 0)) f[k >> 2] = i;
       br(i);
       u = e;
-      return;
+      
     }
     function dc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = Oa,
-        da = Oa,
-        ea = Oa,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = Oa;
+        let da = Oa;
+        let ea = Oa;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
       e = u;
       u = (u + 48) | 0;
       g = (e + 12) | 0;
@@ -77298,67 +77298,67 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return na | 0;
     }
     function ec(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = Oa,
-        ea = Oa,
-        fa = Oa,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = Oa;
+        let ea = Oa;
+        let fa = Oa;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
       e = u;
       u = (u + 48) | 0;
       g = (e + 16) | 0;
@@ -77713,76 +77713,76 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return oa | 0;
     }
     function fc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0,
-        na = 0,
-        oa = 0,
-        pa = 0,
-        qa = 0,
-        ra = 0,
-        sa = 0,
-        ta = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
+        let na = 0;
+        let oa = 0;
+        let pa = 0;
+        let qa = 0;
+        let ra = 0;
+        let sa = 0;
+        let ta = 0;
       e = u;
       u = (u + 96) | 0;
       g = (e + 92) | 0;
@@ -78057,7 +78057,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         ta = (d + 8) | 0;
         f[ta >> 2] = ra;
         u = e;
-        return;
+        
       } else {
         if (!(((R | 0) > 0) | (((R | 0) == 0) & (t >>> 0 > 536870912)))) {
           pa = ka;
@@ -78085,63 +78085,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         ta = (d + 8) | 0;
         f[ta >> 2] = ra;
         u = e;
-        return;
+        
       }
     }
     function gc(a, c, e) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      var g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = Oa,
-        V = Oa,
-        X = Oa,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = Oa;
+        let V = Oa;
+        let X = Oa;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
       g = u;
       u = (u + 48) | 0;
       i = (g + 28) | 0;
@@ -78482,55 +78482,55 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ha | 0;
     }
     function hc(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 8) | 0;
@@ -78836,60 +78836,60 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function ic(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = Oa,
-        V = Oa,
-        X = Oa,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = Oa;
+        let V = Oa;
+        let X = Oa;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
       e = u;
       u = (u + 48) | 0;
       g = (e + 20) | 0;
@@ -79215,61 +79215,61 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ha | 0;
     }
     function jc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = Oa,
-        V = Oa,
-        X = Oa,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = Oa;
+        let V = Oa;
+        let X = Oa;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
       e = u;
       u = (u + 80) | 0;
       g = (e + 48) | 0;
@@ -79590,58 +79590,58 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ha | 0;
     }
     function kc(a, c, e) {
-      a = a | 0;
-      c = c | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = Oa,
-        T = Oa,
-        U = Oa,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0;
+      a |= 0;
+      c |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = Oa;
+        let T = Oa;
+        let U = Oa;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
       g = u;
       u = (u + 48) | 0;
       h = (g + 12) | 0;
@@ -79952,44 +79952,44 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return fa | 0;
     }
     function lc(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
       d = u;
       u = (u + 80) | 0;
       e = (d + 72) | 0;
@@ -80259,44 +80259,44 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return A | 0;
     }
     function mc(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
       d = u;
       u = (u + 80) | 0;
       e = (d + 72) | 0;
@@ -80566,70 +80566,70 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return A | 0;
     }
     function nc(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
       e = u;
       u = (u + 64) | 0;
       d = (e + 48) | 0;
@@ -80945,65 +80945,65 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((ma | 0) == 5) {
         u = e;
         return 1;
-      } else if ((ma | 0) == 6) mq(J);
+      } if ((ma | 0) == 6) mq(J);
       return 0;
     }
     function oc(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
       c = u;
       u = (u + 48) | 0;
       d = (c + 24) | 0;
@@ -81397,58 +81397,58 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function pc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = Oa,
-        S = Oa,
-        T = Oa,
-        U = 0,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = Oa;
+        let S = Oa;
+        let T = Oa;
+        let U = 0;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
       e = u;
       u = (u + 48) | 0;
       g = (e + 12) | 0;
@@ -81755,70 +81755,70 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ea | 0;
     }
     function qc(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        $ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0,
-        ga = 0,
-        ha = 0,
-        ia = 0,
-        ja = 0,
-        ka = 0,
-        la = 0,
-        ma = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let $ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
+        let ga = 0;
+        let ha = 0;
+        let ia = 0;
+        let ja = 0;
+        let ka = 0;
+        let la = 0;
+        let ma = 0;
       e = u;
       u = (u + 64) | 0;
       d = (e + 48) | 0;
@@ -82134,63 +82134,63 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((ma | 0) == 5) {
         u = e;
         return 1;
-      } else if ((ma | 0) == 6) mq(J);
+      } if ((ma | 0) == 6) mq(J);
       return 0;
     }
     function rc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = Oa,
-        T = Oa,
-        U = Oa,
-        V = 0,
-        X = 0,
-        Y = 0,
-        Z = 0,
-        _ = 0,
-        aa = 0,
-        ba = 0,
-        ca = 0,
-        da = 0,
-        ea = 0,
-        fa = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = Oa;
+        let T = Oa;
+        let U = Oa;
+        let V = 0;
+        let X = 0;
+        let Y = 0;
+        let Z = 0;
+        let _ = 0;
+        let aa = 0;
+        let ba = 0;
+        let ca = 0;
+        let da = 0;
+        let ea = 0;
+        let fa = 0;
       e = u;
       u = (u + 64) | 0;
       g = (e + 36) | 0;
@@ -82500,41 +82500,41 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return fa | 0;
     }
     function sc(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0;
+      a |= 0;
+      c |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
       e = u;
       u = (u + 32) | 0;
       g = (e + 4) | 0;
@@ -82787,28 +82787,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       u = e;
-      return;
+      
     }
     function tc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
       e = u;
       u = (u + 32) | 0;
       g = (e + 16) | 0;
@@ -83060,34 +83060,34 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return v | 0;
     }
     function uc(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
       e = u;
       u = (u + 32) | 0;
       g = (e + 16) | 0;
@@ -83336,54 +83336,54 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return l | 0;
     }
     function vc(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0,
-        o = 0,
-        p = 0,
-        q = 0,
-        r = 0,
-        s = 0,
-        t = 0,
-        v = 0,
-        w = 0,
-        x = 0,
-        y = 0,
-        z = 0,
-        A = 0,
-        B = 0,
-        C = 0,
-        D = 0,
-        E = 0,
-        F = 0,
-        G = 0,
-        H = 0,
-        I = 0,
-        J = 0,
-        K = 0,
-        L = 0,
-        M = 0,
-        N = 0,
-        O = 0,
-        P = 0,
-        Q = 0,
-        R = 0,
-        S = 0,
-        T = 0,
-        U = 0,
-        V = 0,
-        W = 0,
-        X = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
+        let o = 0;
+        let p = 0;
+        let q = 0;
+        let r = 0;
+        let s = 0;
+        let t = 0;
+        let v = 0;
+        let w = 0;
+        let x = 0;
+        let y = 0;
+        let z = 0;
+        let A = 0;
+        let B = 0;
+        let C = 0;
+        let D = 0;
+        let E = 0;
+        let F = 0;
+        let G = 0;
+        let H = 0;
+        let I = 0;
+        let J = 0;
+        let K = 0;
+        let L = 0;
+        let M = 0;
+        let N = 0;
+        let O = 0;
+        let P = 0;
+        let Q = 0;
+        let R = 0;
+        let S = 0;
+        let T = 0;
+        let U = 0;
+        let V = 0;
+        let W = 0;
+        let X = 0;
       b = u;
       u = (u + 48) | 0;
       c = (b + 24) | 0;
@@ -83715,13 +83715,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return N | 0;
     }
     function uj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -83741,19 +83741,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(g + 8) >> 2] = f[(d + 8) >> 2];
       f[(g + 12) >> 2] = f[(d + 12) >> 2];
       u = e;
-      return;
+      
     }
     function vj(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
       c = a;
       a: do
         if (!(c & 3)) {
@@ -83801,15 +83801,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (i - c) | 0;
     }
     function wj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -83835,13 +83835,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         else Xi(a, (c - k) | 0, d) | 0;
       while (0);
       u = e;
-      return;
+      
     }
     function xj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       if (!a) return;
       b = (a + 88) | 0;
       c = f[b >> 2] | 0;
@@ -83876,22 +83876,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         br(d);
       }
       br(a);
-      return;
+      
     }
     function yj(a, c, d, e, g, h, i, j, k, l) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      h = h | 0;
-      i = i | 0;
-      j = j | 0;
-      k = k | 0;
-      l = l | 0;
-      var m = 0,
-        n = 0,
-        o = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      h |= 0;
+      i |= 0;
+      j |= 0;
+      k |= 0;
+      l |= 0;
+      let m = 0;
+        let n = 0;
+        let o = 0;
       f[a >> 2] = d;
       if (d | 0) {
         m = (d + 16) | 0;
@@ -83915,18 +83915,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[j >> 2] = k;
       f[(j + 4) >> 2] = l;
       f[(a + 56) >> 2] = c;
-      return;
+      
     }
     function zj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       if ((f[(c + 76) >> 2] | 0) >= 0 ? (gr(c) | 0) != 0 : 0) {
         d = a & 255;
         e = a & 255;
@@ -83966,14 +83966,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Aj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = u;
       u = (u + 16) | 0;
       e = (d + 4) | 0;
@@ -83998,17 +83998,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Bj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0,
-        l = 0,
-        m = 0,
-        n = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        let m = 0;
+        let n = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -84047,12 +84047,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return m | 0;
     }
     function Cj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       c = dn(88) | 0;
       d = (c + 60) | 0;
       e = c;
@@ -84075,28 +84075,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (d) return;
       ui(a);
       br(a);
-      return;
+      
     }
     function Dj(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       if (!b) return;
-      else {
+      
         Dj(a, f[b >> 2] | 0);
         Dj(a, f[(b + 4) >> 2] | 0);
         sj((b + 20) | 0, f[(b + 24) >> 2] | 0);
         br(b);
-        return;
-      }
+        
+      
     }
     function Ej(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -84115,18 +84115,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(g + 8) >> 2] = f[(d + 8) >> 2];
       f[(g + 12) >> 2] = f[(d + 12) >> 2];
       u = e;
-      return;
+      
     }
     function Fj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -84153,14 +84153,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[h >> 2] | 0);
       u = e;
-      return;
+      
     }
     function Gj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = f[(a + 16) >> 2] | 0;
       if (((((f[(a + 20) >> 2] | 0) - c) >> 2) | 0) <= (b | 0)) {
         d = 0;
@@ -84185,33 +84185,33 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Hj(a) {
-      a = a | 0;
+      a |= 0;
       if (!a) return;
       f[a >> 2] = 1136;
       sj((a + 28) | 0, f[(a + 32) >> 2] | 0);
       nj((a + 16) | 0, f[(a + 20) >> 2] | 0);
       sj((a + 4) | 0, f[(a + 8) >> 2] | 0);
       br(a);
-      return;
+      
     }
     function Ij(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 1136;
       sj((a + 28) | 0, f[(a + 32) >> 2] | 0);
       nj((a + 16) | 0, f[(a + 20) >> 2] | 0);
       sj((a + 4) | 0, f[(a + 8) >> 2] | 0);
-      return;
+      
     }
     function Jj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        f = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let f = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       if ((c >>> 0 > 0) | (((c | 0) == 0) & (a >>> 0 > 4294967295))) {
         e = d;
         f = a;
@@ -84251,15 +84251,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Kj(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        f = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let f = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = a;
       while (1) {
         d = (c + 1) | 0;
@@ -84305,12 +84305,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (g | 0 ? j : (0 - j) | 0) | 0;
     }
     function Lj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
+      a |= 0;
+      c |= 0;
       d = $(d);
-      var e = 0,
-        g = 0,
-        h = 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -84329,14 +84329,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(h + 4) >> 2] = f[(g + 4) >> 2];
       f[(h + 8) >> 2] = f[(g + 8) >> 2];
       u = e;
-      return;
+      
     }
     function Mj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -84355,14 +84355,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(d + 4) >> 2] = f[(g + 4) >> 2];
       f[(d + 8) >> 2] = f[(g + 8) >> 2];
       u = e;
-      return;
+      
     }
     function Nj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -84381,18 +84381,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(d + 4) >> 2] = f[(g + 4) >> 2];
       f[(d + 8) >> 2] = f[(g + 8) >> 2];
       u = e;
-      return;
+      
     }
     function Oj(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       e = zg(a, c) | 0;
       if ((e | 0) == ((a + 4) | 0)) {
         g = -1;
@@ -84411,15 +84411,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function Pj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -84448,22 +84448,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function Qj(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 1136;
       sj((a + 28) | 0, f[(a + 32) >> 2] | 0);
       nj((a + 16) | 0, f[(a + 20) >> 2] | 0);
       sj((a + 4) | 0, f[(a + 8) >> 2] | 0);
       br(a);
-      return;
+      
     }
     function Rj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       c = f[b >> 2] | 0;
       if ((c | 0) == -1) return 1;
       b = (c * 3) | 0;
@@ -84478,26 +84478,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((e | 0) == -1) h = -1;
       else h = f[(c + (e << 2)) >> 2] | 0;
       if ((a | 0) == (g | 0)) return 1;
-      else return ((a | 0) == (h | 0)) | ((g | 0) == (h | 0)) | 0;
+      return ((a | 0) == (h | 0)) | ((g | 0) == (h | 0)) | 0;
       return 0;
     }
     function Sj(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2968;
       sj((a + 28) | 0, f[(a + 32) >> 2] | 0);
       Dj((a + 16) | 0, f[(a + 20) >> 2] | 0);
       sj((a + 4) | 0, f[(a + 8) >> 2] | 0);
-      return;
+      
     }
     function Tj(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0,
-        j = 0,
-        k = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
+        let j = 0;
+        let k = 0;
       d = 0;
       while (1) {
         if ((h[(15560 + d) >> 0] | 0) == (a | 0)) {
@@ -84540,14 +84540,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     function Uj(a, b) {
       a = +a;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0.0,
-        h = 0.0,
-        i = 0,
-        j = 0.0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0.0;
+        let h = 0.0;
+        let i = 0;
+        let j = 0.0;
       p[s >> 3] = a;
       c = f[s >> 2] | 0;
       d = f[(s + 4) >> 2] | 0;
@@ -84580,22 +84580,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +j;
     }
     function Vj(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2968;
       sj((a + 28) | 0, f[(a + 32) >> 2] | 0);
       Dj((a + 16) | 0, f[(a + 20) >> 2] | 0);
       sj((a + 4) | 0, f[(a + 8) >> 2] | 0);
       br(a);
-      return;
+      
     }
     function Wj(a, b) {
       a = +a;
-      b = b | 0;
-      var c = 0.0,
-        d = 0,
-        e = 0,
-        g = 0.0,
-        h = 0;
+      b |= 0;
+      let c = 0.0;
+        let d = 0;
+        let e = 0;
+        let g = 0.0;
+        let h = 0;
       if ((b | 0) <= 1023)
         if ((b | 0) < -1022) {
           c = a * 2.2250738585072014e-308;
@@ -84621,13 +84621,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +(g * +p[s >> 3]);
     }
     function Xj(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       if (!(f[(a + 80) >> 2] | 0)) {
         b = 0;
         return b | 0;
@@ -84661,15 +84661,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Yj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = (a + 36) | 0;
       d = (a + 40) | 0;
       e = f[c >> 2] | 0;
@@ -84699,24 +84699,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function Zj(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       c = (a + 36) | 0;
       d = (a + 40) | 0;
       a = f[c >> 2] | 0;
       if ((f[d >> 2] | 0) == (a | 0)) {
         e = 1;
         return e | 0;
-      } else {
+      } 
         g = 0;
         h = a;
-      }
+      
       while (1) {
         a = f[(h + (g << 2)) >> 2] | 0;
         g = (g + 1) | 0;
@@ -84736,13 +84736,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function _j(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       f[a >> 2] = 0;
       c = (a + 4) | 0;
       f[c >> 2] = 0;
@@ -84761,16 +84761,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((b | 0) <= 0) return;
       Rg(h | 0, g | 0, b | 0) | 0;
       f[c >> 2] = h + ((b >>> 2) << 2);
-      return;
+      
     }
     function $j(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       c = (a + 8) | 0;
       d = f[a >> 2] | 0;
       if ((((f[c >> 2] | 0) - d) >> 2) >>> 0 >= b >>> 0) return;
@@ -84789,17 +84789,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[c >> 2] = h + (b << 2);
       if (!d) return;
       br(d);
-      return;
+      
     }
     function ak(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       b = (a + 36) | 0;
       c = (a + 40) | 0;
       d = f[b >> 2] | 0;
@@ -84829,14 +84829,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function bk(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -84860,13 +84860,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(f[e >> 2] | 0);
       u = d;
-      return;
+      
     }
     function ck(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = b;
       if (b | 0 ? ((c = mh(b, 992, 976, 0) | 0), c | 0) : 0) {
@@ -84884,15 +84884,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[a >> 2] = c;
       if (!b) return;
       Va[f[((f[b >> 2] | 0) + 4) >> 2] & 127](b);
-      return;
+      
     }
     function dk(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       d = f[(a + 176) >> 2] | 0;
       e = f[(a + 172) >> 2] | 0;
       a = e;
@@ -84917,14 +84917,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
             ? 0
             : (a + ((e * 136) | 0) + 4) | 0) | 0
         );
-      else if ((h | 0) == 6) return 0;
+      if ((h | 0) == 6) return 0;
       return 0;
     }
     function ek(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       c = f[(a + 72) >> 2] | 0;
       if (!c) {
         d = 0;
@@ -84947,11 +84947,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function fk(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       f[a >> 2] = 0;
       d = (a + 4) | 0;
       f[d >> 2] = 0;
@@ -84970,15 +84970,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[d >> 2] = b;
         a = (a + -1) | 0;
       } while ((a | 0) != 0);
-      return;
+      
     }
     function gk(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       c = f[b >> 2] | 0;
       if (!c) {
         d = 0;
@@ -84992,18 +84992,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[e >> 2] = (f[e >> 2] | 0) + 4;
         d = 1;
         return d | 0;
-      } else {
+      } 
         Bg((a + 40) | 0, b);
         d = 1;
         return d | 0;
-      }
+      
       return 0;
     }
     function hk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2880;
       f[(a + 40) >> 2] = 1180;
       b = f[(a + 48) >> 2] | 0;
@@ -85026,15 +85026,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Va[f[((f[d >> 2] | 0) + 4) >> 2] & 127](d);
       zi(a);
       br(a);
-      return;
+      
     }
     function ik(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        i = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let i = 0;
       f[c >> 2] = 2;
       d = (a + 4) | 0;
       a = (c + 8) | 0;
@@ -85054,14 +85054,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b[(e + 1) >> 0] = g >> 8;
       b[(e + 2) >> 0] = g >> 16;
       b[(e + 3) >> 0] = g >> 24;
-      return;
+      
     }
     function jk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 3164;
       b = (a + 8) | 0;
       f[b >> 2] = 3188;
@@ -85083,15 +85083,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function kk(a, c, d) {
-      a = a | 0;
-      c = c | 0;
+      a |= 0;
+      c |= 0;
       d = $(d);
-      var e = 0,
-        g = Oa,
-        h = 0;
+      let e = 0;
+        let g = Oa;
+        let h = 0;
       e = zg(a, c) | 0;
       if ((e | 0) == ((a + 4) | 0)) {
         g = d;
@@ -85104,13 +85104,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return $(g);
     }
     function lk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -85135,18 +85135,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       h = (a + 28) | 0;
       f[h >> 2] = 0;
       u = b;
-      return;
+      
     }
     function mk(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       c = f[(a + 176) >> 2] | 0;
       d = f[(a + 172) >> 2] | 0;
       e = d;
@@ -85168,11 +85168,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return j | 0;
     }
     function nk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 3232;
       b = (a + 8) | 0;
       f[b >> 2] = 3256;
@@ -85194,13 +85194,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function ok(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2880;
       f[(a + 40) >> 2] = 1180;
       b = f[(a + 48) >> 2] | 0;
@@ -85221,16 +85221,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       Va[f[((f[d >> 2] | 0) + 4) >> 2] & 127](d);
       zi(a);
-      return;
+      
     }
     function pk(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       Ec(a, b);
       if ((b | 0) <= -1) return;
       c = (a + 88) | 0;
@@ -85249,16 +85249,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = (a + (g << 2)) | 0;
       if ((h | 0) == (e | 0)) return;
       f[c >> 2] = h + (~(((h + -4 - e) | 0) >>> 2) << 2);
-      return;
+      
     }
     function qk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       b = f[(a + 32) >> 2] | 0;
       c = f[(a + 36) >> 2] | 0;
       if ((b | 0) == (c | 0)) {
@@ -85286,11 +85286,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 0;
     }
     function rk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 3164;
       b = (a + 8) | 0;
       f[b >> 2] = 3188;
@@ -85308,17 +85308,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 32) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function sk(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0,
-        i = 0.0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0.0;
       d = u;
       u = (u + 128) | 0;
       e = d;
@@ -85342,12 +85342,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +i;
     }
     function tk(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var g = 0,
-        h = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let g = 0;
+        let h = 0;
       a = (c + 16) | 0;
       g = f[a >> 2] | 0;
       do
@@ -85367,13 +85367,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           f[(c + 36) >> 2] = 1;
         }
       while (0);
-      return;
+      
     }
     function uk(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = (a + 74) | 0;
       d = b[c >> 0] | 0;
       b[c >> 0] = (d + 255) | d;
@@ -85397,11 +85397,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function vk(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       d = zg(a, c) | 0;
       if ((d | 0) == ((a + 4) | 0)) {
         e = 0;
@@ -85414,10 +85414,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function wk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 5840;
       b = f[(a + 96) >> 2] | 0;
       if (b | 0) {
@@ -85441,14 +85441,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       br(b);
       wg(a);
       br(a);
-      return;
+      
     }
     function xk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 3232;
       b = (a + 8) | 0;
       f[b >> 2] = 3256;
@@ -85466,15 +85466,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 32) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function yk(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
+        let h = 0;
       e = zg(a, c) | 0;
       if ((e | 0) == ((a + 4) | 0)) {
         g = d;
@@ -85487,15 +85487,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return g | 0;
     }
     function zk(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        f = 0,
-        g = 0,
-        h = 0,
-        i = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let f = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
       e = (b >> 31) | (((b | 0) < 0 ? -1 : 0) << 1);
       f = (((b | 0) < 0 ? -1 : 0) >> 31) | (((b | 0) < 0 ? -1 : 0) << 1);
       g = (d >> 31) | (((d | 0) < 0 ? -1 : 0) << 1);
@@ -85517,15 +85517,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     function Ak(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
+        let i = 0;
+        let j = 0;
       f[a >> 2] = b;
       h = (b + 16) | 0;
       i = f[(h + 4) >> 2] | 0;
@@ -85543,16 +85543,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       d = (a + 48) | 0;
       f[d >> 2] = e;
       f[(d + 4) >> 2] = g;
-      return;
+      
     }
     function Bk(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = f[a >> 2] | 0;
@@ -85569,14 +85569,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       a = g;
       f[a >> 2] = b;
       f[(a + 4) >> 2] = I;
-      return;
+      
     }
     function Ck(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       d = zg(a, c) | 0;
       if ((d | 0) == ((a + 4) | 0)) {
         e = -1;
@@ -85589,10 +85589,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Dk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 5840;
       b = f[(a + 96) >> 2] | 0;
       if (b | 0) {
@@ -85614,13 +85614,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[d >> 2] = c + (~(((c + -4 - b) | 0) >>> 2) << 2);
       br(b);
       wg(a);
-      return;
+      
     }
     function Ek(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -85643,13 +85643,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(c + 12) >> 2] = 0;
       f[(c + 16) >> 2] = 0;
       f[(c + 20) >> 2] = 0;
-      return;
+      
     }
     function Fk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3188;
       b = f[(a + 48) >> 2] | 0;
       if (b | 0) {
@@ -85669,13 +85669,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function Gk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2004;
       b = f[(a + 76) >> 2] | 0;
       if (b | 0) br(b);
@@ -85691,17 +85691,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Hk(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var f = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let f = 0;
+        let g = 0;
+        let h = 0;
       f = u;
       u = (u + 256) | 0;
       g = f;
@@ -85720,13 +85720,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         ep(a, g, h);
       }
       u = f;
-      return;
+      
     }
     function Ik(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3256;
       b = f[(a + 48) >> 2] | 0;
       if (b | 0) {
@@ -85746,13 +85746,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function Jk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1696;
       b = f[(a + 76) >> 2] | 0;
       if (b | 0) br(b);
@@ -85768,28 +85768,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Kk(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
-      var h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
+      let h = 0;
       if (qp(a, f[(b + 8) >> 2] | 0, g) | 0) fj(0, b, c, d, e);
       else {
         h = f[(a + 8) >> 2] | 0;
         _a[f[((f[h >> 2] | 0) + 20) >> 2] & 3](h, b, c, d, e, g);
       }
-      return;
+      
     }
     function Lk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3188;
       b = f[(a + 48) >> 2] | 0;
       if (b | 0) {
@@ -85805,13 +85805,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 24) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Mk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 2060;
       tj((a + 108) | 0);
       f[a >> 2] = 1528;
@@ -85826,13 +85826,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Nk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 3256;
       b = f[(a + 48) >> 2] | 0;
       if (b | 0) {
@@ -85848,13 +85848,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       b = f[(a + 24) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Ok(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1752;
       tj((a + 108) | 0);
       f[a >> 2] = 1528;
@@ -85869,18 +85869,18 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Pk(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        f = 0,
-        g = 0,
-        h = 0,
-        i = 0,
-        j = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let f = 0;
+        let g = 0;
+        let h = 0;
+        let i = 0;
+        let j = 0;
       a: do
         if (!d) e = 0;
         else {
@@ -85906,19 +85906,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Qk(a) {
-      a = a | 0;
+      a |= 0;
       if (!(f[(a + 44) >> 2] | 0)) return 0;
       if (!(f[(a + 48) >> 2] | 0)) return 0;
       if (!(f[(a + 24) >> 2] | 0)) return 0;
       if (!(f[(a + 28) >> 2] | 0)) return 0;
       if (!(f[(a + 32) >> 2] | 0)) return 0;
-      else return ((f[(a + 36) >> 2] | 0) != 0) | 0;
+      return ((f[(a + 36) >> 2] | 0) != 0) | 0;
       return 0;
     }
     function Rk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 2004;
       b = f[(a + 76) >> 2] | 0;
       if (b | 0) br(b);
@@ -85930,12 +85930,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Sk(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -85949,15 +85949,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         d = ((f[(a + 8) >> 2] & 2147483647) + -1) | 0;
       else d = 10;
       wj(a, d, 0);
-      return;
+      
     }
     function Tk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0.0,
-        g = 0.0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0.0;
+        let g = 0.0;
       b = f[(a + 8) >> 2] | 0;
       if ((b | 0) < 2) {
         c = 0;
@@ -85979,9 +85979,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Uk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1696;
       b = f[(a + 76) >> 2] | 0;
       if (b | 0) br(b);
@@ -85993,14 +85993,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Vk(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = f[(a + 16) >> 2] | 0;
       if (((((f[(a + 20) >> 2] | 0) - c) >> 2) | 0) <= (b | 0)) {
         d = 0;
@@ -86021,10 +86021,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Wk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1216;
       b = f[(a + 16) >> 2] | 0;
       if (b | 0) {
@@ -86041,12 +86041,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[d >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Xk(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 2060;
       tj((a + 108) | 0);
       f[a >> 2] = 1528;
@@ -86057,35 +86057,35 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Yk(a) {
-      a = a | 0;
+      a |= 0;
       if (!(f[(a + 64) >> 2] | 0)) return 0;
       if (!(f[(a + 68) >> 2] | 0)) return 0;
       if (!(f[(a + 44) >> 2] | 0)) return 0;
       if (!(f[(a + 48) >> 2] | 0)) return 0;
       if (!(f[(a + 52) >> 2] | 0)) return 0;
-      else return ((f[(a + 56) >> 2] | 0) != 0) | 0;
+      return ((f[(a + 56) >> 2] | 0) != 0) | 0;
       return 0;
     }
     function Zk(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
       if (qp(a, f[(b + 8) >> 2] | 0, 0) | 0) tk(0, b, c, d);
       else {
         e = f[(a + 8) >> 2] | 0;
         Ya[f[((f[e >> 2] | 0) + 28) >> 2] & 7](e, b, c, d);
       }
-      return;
+      
     }
     function _k(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1752;
       tj((a + 108) | 0);
       f[a >> 2] = 1528;
@@ -86096,13 +86096,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function $k(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       if ((b | 0) < 0) {
         c = 0;
         return c | 0;
@@ -86125,10 +86125,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function al(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       if ((b | 0) < 0) {
         c = 0;
         return c | 0;
@@ -86151,12 +86151,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function bl(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        f = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let f = 0;
+        let g = 0;
       d = b[a >> 0] | 0;
       e = b[c >> 0] | 0;
       if ((d << 24) >> 24 == 0 ? 1 : (d << 24) >> 24 != (e << 24) >> 24) {
@@ -86179,10 +86179,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ((g & 255) - (f & 255)) | 0;
     }
     function cl(a, b) {
-      a = a | 0;
+      a |= 0;
       b = $(b);
-      var c = 0,
-        d = 0;
+      let c = 0;
+        let d = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -86190,15 +86190,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       qi(a, d, b);
       Go(d);
       u = c;
-      return;
+      
     }
     function dl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
       b = f[a >> 2] | 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
@@ -86214,15 +86214,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((e | 0) != (b | 0))
         f[c >> 2] = e + (~(((e + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function el(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       d = f[(a + 16) >> 2] | 0;
       if (((((f[(a + 20) >> 2] | 0) - d) >> 2) | 0) <= (b | 0)) {
         e = -1;
@@ -86243,10 +86243,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function fl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -86254,16 +86254,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       vi(a, d, b);
       Go(d);
       u = c;
-      return;
+      
     }
     function gl(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       d = u;
       u = (u + 32) | 0;
       e = d;
@@ -86281,10 +86281,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return h | 0;
     }
     function hl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       if (((b | 0) == -1) | ((b | 0) > 4)) {
         c = 0;
         return c | 0;
@@ -86303,20 +86303,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function il(a) {
-      a = a | 0;
+      a |= 0;
       if (!(f[(a + 40) >> 2] | 0)) return 0;
       if (!(f[(a + 24) >> 2] | 0)) return 0;
       if (!(f[(a + 28) >> 2] | 0)) return 0;
       if (!(f[(a + 32) >> 2] | 0)) return 0;
-      else return ((f[(a + 36) >> 2] | 0) != 0) | 0;
+      return ((f[(a + 36) >> 2] | 0) != 0) | 0;
       return 0;
     }
     function jl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = f[(a + 16) >> 2] | 0;
       if (((((f[(a + 20) >> 2] | 0) - c) >> 2) | 0) <= (b | 0)) {
         d = 0;
@@ -86332,8 +86332,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function kl(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       if (!(f[(a + 24) >> 2] | 0)) {
         b = 0;
         return b | 0;
@@ -86350,19 +86350,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return b | 0;
     }
     function ll(a) {
-      a = a | 0;
+      a |= 0;
       if (!(f[(a + 60) >> 2] | 0)) return 0;
       if (!(f[(a + 44) >> 2] | 0)) return 0;
       if (!(f[(a + 48) >> 2] | 0)) return 0;
       if (!(f[(a + 52) >> 2] | 0)) return 0;
-      else return ((f[(a + 56) >> 2] | 0) != 0) | 0;
+      return ((f[(a + 56) >> 2] | 0) != 0) | 0;
       return 0;
     }
     function ml(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
       Sg(a, c);
       f[a >> 2] = 1392;
       c = (a + 72) | 0;
@@ -86375,13 +86375,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       d = f[b >> 2] | 0;
       f[b >> 2] = 0;
       f[c >> 2] = d;
-      return;
+      
     }
     function nl(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       d = a;
       e = c;
       c = (d + 64) | 0;
@@ -86398,15 +86398,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(e + 12) >> 2] = 0;
       f[(e + 16) >> 2] = 0;
       b[(e + 20) >> 0] = 0;
-      return;
+      
     }
     function ol(a, c, d, e) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      var f = 0,
-        g = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      let f = 0;
+        let g = 0;
       if (((a | 0) == 0) & ((c | 0) == 0)) f = d;
       else {
         g = d;
@@ -86426,10 +86426,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return f | 0;
     }
     function pl(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = (a + 74) | 0;
       d = b[c >> 0] | 0;
       b[c >> 0] = (d + 255) | d;
@@ -86449,10 +86449,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function ql(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       c = f[(b + 88) >> 2] | 0;
       if (!c) {
         d = 0;
@@ -86472,8 +86472,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function rl(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       if (!(f[(a + 44) >> 2] | 0)) {
         b = 0;
         return b | 0;
@@ -86490,15 +86490,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return b | 0;
     }
     function sl(a) {
-      a = a | 0;
+      a |= 0;
       kj(a);
       br(a);
-      return;
+      
     }
     function tl(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       if (f[(c + 56) >> 2] | 0) {
         d = 0;
         return d | 0;
@@ -86512,9 +86512,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function ul(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       if (f[(c + 56) >> 2] | 0) {
         d = 0;
         return d | 0;
@@ -86528,12 +86528,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function vl(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
       e = f[a >> 2] | 0;
@@ -86546,23 +86546,23 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       g = (e + b) | 0;
       if ((g | 0) == (d | 0)) return;
       f[c >> 2] = g;
-      return;
+      
     }
     function wl(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       e = $(e);
       f[(a + 4) >> 2] = b;
       Jf((a + 8) | 0, c, (c + (d << 2)) | 0);
       n[(a + 20) >> 2] = e;
-      return;
+      
     }
     function xl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       if (!(Qa[f[((f[a >> 2] | 0) + 40) >> 2] & 127](a) | 0)) {
         c = 0;
         return c | 0;
@@ -86575,11 +86575,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function yl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = u;
       u = (u + 16) | 0;
       d = (c + 4) | 0;
@@ -86591,12 +86591,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function zl(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
       d = f[c >> 2] | 0;
       c = a;
       e = (b - a) >> 2;
@@ -86611,8 +86611,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function Al(a) {
-      a = a | 0;
-      var c = 0;
+      a |= 0;
+      let c = 0;
       f[a >> 2] = 0;
       c = (a + 8) | 0;
       f[c >> 2] = 0;
@@ -86628,21 +86628,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(c + 12) >> 2] = 0;
       f[(a + 56) >> 2] = -1;
       f[(a + 60) >> 2] = 0;
-      return;
+      
     }
     function Bl(a) {
-      a = a | 0;
+      a |= 0;
       mj(a);
       br(a);
-      return;
+      
     }
     function Cl(a) {
-      a = a | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        g = 0,
-        h = 0;
+      a |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let g = 0;
+        let h = 0;
       if (!(Pq(b[f[a >> 2] >> 0] | 0) | 0)) c = 0;
       else {
         d = 0;
@@ -86660,9 +86660,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function Dl(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       if (f[(c + 56) >> 2] | 0) {
         d = 0;
         return d | 0;
@@ -86676,9 +86676,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function El(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       if (f[(c + 56) >> 2] | 0) {
         d = 0;
         return d | 0;
@@ -86692,9 +86692,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Fl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = f[r >> 2] | 0;
       c = (b + a) | 0;
       if ((((a | 0) > 0) & ((c | 0) < (b | 0))) | ((c | 0) < 0)) {
@@ -86711,11 +86711,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return b | 0;
     }
     function Gl(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        f = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let f = 0;
       if (((a | 0) == 0) & ((c | 0) == 0)) e = d;
       else {
         f = d;
@@ -86735,10 +86735,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return e | 0;
     }
     function Hl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1528;
       b = f[(a + 32) >> 2] | 0;
       if (!b) {
@@ -86751,22 +86751,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Il(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      g = g | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      g |= 0;
       if (qp(a, f[(b + 8) >> 2] | 0, g) | 0) fj(0, b, c, d, e);
-      return;
+      
     }
     function Jl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = f[(a + 64) >> 2] | 0;
       if (!b) return;
       c = Qa[f[((f[b >> 2] | 0) + 32) >> 2] & 127](b) | 0;
@@ -86774,17 +86774,17 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 60) >> 2] =
         ((((((f[(c + 4) >> 2] | 0) - (f[c >> 2] | 0)) >> 2) >>> 0) / 3) | 0) -
         (f[(c + 40) >> 2] | 0);
-      return;
+      
     }
     function Kl(a) {
-      a = a | 0;
+      a |= 0;
       Ii(a);
       br(a);
-      return;
+      
     }
     function Ll(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       switch (a | 0) {
         case 11:
         case 2:
@@ -86821,8 +86821,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return b | 0;
     }
     function Ml() {
-      var a = 0,
-        b = 0;
+      let a = 0;
+        let b = 0;
       a = dn(40) | 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
@@ -86840,9 +86840,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     function Nl(a, b) {
       a = +a;
       b = +b;
-      var c = 0,
-        d = 0,
-        e = 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       p[s >> 3] = a;
       c = f[s >> 2] | 0;
       d = f[(s + 4) >> 2] | 0;
@@ -86853,38 +86853,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +(+p[s >> 3]);
     }
     function Ol(a, b, c) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       c = +c;
-      var d = 0,
-        e = 0;
+      let d = 0;
+        let e = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
       p[e >> 3] = c;
       _b(a, b, e);
       u = d;
-      return;
+      
     }
     function Pl(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
       f[e >> 2] = c;
       cc(a, b, e);
       u = d;
-      return;
+      
     }
     function Ql(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       if ((a | 0) != (c | 0)) {
         d = b[(c + 11) >> 0] | 0;
         e = (d << 24) >> 24 < 0;
@@ -86893,12 +86893,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function Rl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0,
-        f = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
+        let f = 0;
       c = a & 65535;
       d = b & 65535;
       e = X(d, c) | 0;
@@ -86913,11 +86913,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     function Sl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       c = vj(b) | 0;
       d = dn((c + 13) | 0) | 0;
       f[d >> 2] = c;
@@ -86926,13 +86926,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       e = Sp(d) | 0;
       Rg(e | 0, b | 0, (c + 1) | 0) | 0;
       f[a >> 2] = e;
-      return;
+      
     }
     function Tl(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       if (((b | 0) == -1) | ((b | 0) > 4)) {
         c = -1;
         return c | 0;
@@ -86946,15 +86946,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function Ul(a) {
-      a = a | 0;
+      a |= 0;
       Li(a);
       br(a);
-      return;
+      
     }
     function Vl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1528;
       b = f[(a + 32) >> 2] | 0;
       if (!b) return;
@@ -86963,21 +86963,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Wl(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       if (qp(a, f[(b + 8) >> 2] | 0, 0) | 0) tk(0, b, c, d);
-      return;
+      
     }
     function Xl(a, c, d) {
-      a = a | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0;
+      a |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
       if (((c | 0) < (a | 0)) & ((a | 0) < ((c + d) | 0))) {
         e = a;
         c = (c + d) | 0;
@@ -86993,10 +86993,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return a | 0;
     }
     function Yl(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       f[a >> 2] = 1180;
       b = f[(a + 8) >> 2] | 0;
       if (!b) {
@@ -87009,11 +87009,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       br(b);
       br(a);
-      return;
+      
     }
     function Zl(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 2740;
       b = f[(a + 56) >> 2] | 0;
       if (!b) {
@@ -87022,15 +87022,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function _l(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       d = u;
       u = (u + 16) | 0;
       e = d;
@@ -87041,9 +87041,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (g & 1) | 0;
     }
     function $l(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       if (b >>> 0 >= 2) {
         c = 0;
         return c | 0;
@@ -87053,9 +87053,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function am(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 3e3;
       b = (a + 64) | 0;
       c = f[b >> 2] | 0;
@@ -87066,11 +87066,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       Va[f[((f[c >> 2] | 0) + 4) >> 2] & 127](c);
       aj(a);
-      return;
+      
     }
     function bm() {
-      var a = 0,
-        b = 0;
+      let a = 0;
+        let b = 0;
       a = mn() | 0;
       if (
         (a | 0 ? ((b = f[a >> 2] | 0), b | 0) : 0)
@@ -87084,44 +87084,44 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Qo(bq() | 0);
     }
     function cm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Bf(a, b, c, d, e, f, 6) | 0;
     }
     function dm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Af(a, b, c, d, e, f, 4) | 0;
     }
     function em(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Gf(a, b, c, d, e, f, 2) | 0;
     }
     function fm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Af(a, b, c, d, e, f, 3) | 0;
     }
     function gm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 2488;
       b = f[(a + 56) >> 2] | 0;
       if (!b) {
@@ -87130,20 +87130,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function hm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Gf(a, b, c, d, e, f, 1) | 0;
     }
     function im(a) {
-      a = a | 0;
-      var c = 0;
+      a |= 0;
+      let c = 0;
       c = b[(w + (a & 255)) >> 0] | 0;
       if ((c | 0) < 8) return c | 0;
       c = b[(w + ((a >> 8) & 255)) >> 0] | 0;
@@ -87153,12 +87153,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ((b[(w + (a >>> 24)) >> 0] | 0) + 24) | 0;
     }
     function jm(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0.0,
-        d = 0.0,
-        e = 0.0,
-        f = 0.0;
+      a |= 0;
+      b |= 0;
+      let c = 0.0;
+        let d = 0.0;
+        let e = 0.0;
+        let f = 0.0;
       if (!a) {
         c = 0.0;
         return +c;
@@ -87174,11 +87174,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +c;
     }
     function km(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
       if ((b | 0) > 0) d = 0;
       else return;
       do {
@@ -87186,12 +87186,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[(c + (d << 2)) >> 2] = (e << 1) ^ (e >> 31);
         d = (d + 1) | 0;
       } while ((d | 0) != (b | 0));
-      return;
+      
     }
     function lm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       if (
         Eq(a) | 0
           ? ((b = Zp(f[a >> 2] | 0) | 0),
@@ -87202,11 +87202,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           : 0
       )
         br(b);
-      return;
+      
     }
     function mm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       Ao(a);
       f[a >> 2] = 2880;
       f[(a + 40) >> 2] = 1180;
@@ -87216,12 +87216,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(b + 4) >> 2] = 0;
       f[(b + 8) >> 2] = 0;
       f[(b + 12) >> 2] = 0;
-      return;
+      
     }
     function nm(a, c) {
-      a = a | 0;
-      c = c | 0;
-      var d = 0;
+      a |= 0;
+      c |= 0;
+      let d = 0;
       b[(c + 84) >> 0] = 1;
       a = f[(c + 68) >> 2] | 0;
       d = (c + 72) | 0;
@@ -87231,9 +87231,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function om(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = f[(a + 16) >> 2] | 0;
       c = ((((((f[(a + 12) >> 2] | 0) + 1 - b) | 0) / 64) | 0) + b) << 3;
       a = b << 3;
@@ -87247,26 +87247,26 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return b | 0;
     }
     function pm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Bf(a, b, c, d, e, f, 5) | 0;
     }
     function qm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return Bf(a, b, c, d, e, f, 9) | 0;
     }
     function rm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 3208;
       b = f[(a + 36) >> 2] | 0;
       if (b | 0) br(b);
@@ -87277,21 +87277,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function sm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 2740;
       b = f[(a + 56) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function tm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1460;
       b = (a + 36) | 0;
       c = f[b >> 2] | 0;
@@ -87299,12 +87299,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (c | 0) Va[f[((f[c >> 2] | 0) + 4) >> 2] & 127](c);
       zi(a);
       br(a);
-      return;
+      
     }
     function um(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1180;
       b = f[(a + 8) >> 2] | 0;
       if (!b) return;
@@ -87313,11 +87313,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function vm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 3276;
       b = f[(a + 36) >> 2] | 0;
       if (b | 0) br(b);
@@ -87328,11 +87328,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       br(b);
       br(a);
-      return;
+      
     }
     function wm(a) {
-      a = a | 0;
-      var c = 0;
+      a |= 0;
+      let c = 0;
       f[a >> 2] = 1336;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -87343,39 +87343,39 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(c + 4) >> 2] = 0;
       f[(c + 8) >> 2] = 0;
       b[(c + 12) >> 0] = 0;
-      return;
+      
     }
     function xm(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 3296;
       Gi((a + 8) | 0);
       br(a);
-      return;
+      
     }
     function ym(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 2488;
       b = f[(a + 56) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function zm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 1460;
       b = (a + 36) | 0;
       c = f[b >> 2] | 0;
       f[b >> 2] = 0;
       if (c | 0) Va[f[((f[c >> 2] | 0) + 4) >> 2] & 127](c);
       zi(a);
-      return;
+      
     }
     function Am(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[a >> 2] = 2968;
       Vh((a + 4) | 0);
       f[(a + 40) >> 2] = 0;
@@ -87383,12 +87383,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[a >> 2] = 2984;
       f[(a + 48) >> 2] = b;
       f[(a + 52) >> 2] = 0;
-      return;
+      
     }
     function Bm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       f[a >> 2] = 3e3;
       b = (a + 64) | 0;
       c = f[b >> 2] | 0;
@@ -87396,13 +87396,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if (c | 0) Va[f[((f[c >> 2] | 0) + 4) >> 2] & 127](c);
       aj(a);
       br(a);
-      return;
+      
     }
     function Cm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       b = f[a >> 2] | 0;
       c = (a + 4) | 0;
       d = f[c >> 2] | 0;
@@ -87410,15 +87410,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[c >> 2] = d + (~(((d + -4 - b) | 0) >>> 2) << 2);
       f[(a + 12) >> 2] = 0;
       f[(a + 16) >> 2] = 0;
-      return;
+      
     }
     function Dm(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      var d = 0,
-        e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      let d = 0;
+        let e = 0;
+        let g = 0;
       d = (a + 20) | 0;
       e = f[d >> 2] | 0;
       g = ((f[(a + 16) >> 2] | 0) - e) | 0;
@@ -87428,25 +87428,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function Em(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 3208;
       b = f[(a + 36) >> 2] | 0;
       if (b | 0) br(b);
       b = f[(a + 24) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Fm(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 3296;
       Gi((a + 8) | 0);
-      return;
+      
     }
     function Gm(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[a >> 2] = 2968;
       Vh((a + 4) | 0);
       f[(a + 40) >> 2] = 0;
@@ -87454,12 +87454,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[a >> 2] = 2984;
       f[(a + 48) >> 2] = b;
       f[(a + 52) >> 2] = b;
-      return;
+      
     }
     function Hm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = f[a >> 2] | 0;
       if (!b) return;
       c = (a + 4) | 0;
@@ -87467,12 +87467,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -8 - b) | 0) >>> 3) << 3);
       br(b);
-      return;
+      
     }
     function Im(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = f[a >> 2] | 0;
       if (!b) return;
       c = (a + 4) | 0;
@@ -87480,12 +87480,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       if ((a | 0) != (b | 0))
         f[c >> 2] = a + (~(((a + -4 - b) | 0) >>> 2) << 2);
       br(b);
-      return;
+      
     }
     function Jm(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[b >> 2] | 0;
       return (
         ((((1 << (c & 31)) &
@@ -87496,14 +87496,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     function Km(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Sa[f[((f[a >> 2] | 0) + 44) >> 2] & 31](a, b, c) | 0;
     }
     function Lm(a) {
-      a = a | 0;
-      var c = 0;
+      a |= 0;
+      let c = 0;
       Al(a);
       c = (a + 64) | 0;
       f[(a + 88) >> 2] = 0;
@@ -87513,54 +87513,54 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(c + 12) >> 2] = 0;
       f[(c + 16) >> 2] = 0;
       b[(c + 20) >> 0] = 0;
-      return;
+      
     }
     function Mm(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2796;
       tj((a + 88) | 0);
       br(a);
-      return;
+      
     }
     function Nm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 3276;
       b = f[(a + 36) >> 2] | 0;
       if (b | 0) br(b);
       b = f[(a + 24) >> 2] | 0;
       if (!b) return;
       br(b);
-      return;
+      
     }
     function Om(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       if (
         (f[(b + 4) >> 2] | 0) == (c | 0)
           ? ((c = (b + 28) | 0), (f[c >> 2] | 0) != 1)
           : 0
       )
         f[c >> 2] = d;
-      return;
+      
     }
     function Pm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       f = $(f);
       pg(a, b, c, d, e, f);
-      return;
+      
     }
     function Qm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -87571,11 +87571,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function Rm(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0,
-        e = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
+        let e = 0;
       f[(a + 104) >> 2] = b;
       c = f[(a + 8) >> 2] | 0;
       d = f[(a + 4) >> 2] | 0;
@@ -87583,11 +87583,11 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 108) >> 2] = e;
       f[(a + 100) >> 2] =
         ((b | 0) != 0) & ((e | 0) > (b | 0)) ? (d + b) | 0 : c;
-      return;
+      
     }
     function Sm(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -87597,50 +87597,50 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(b + 8) >> 2] = 0;
       f[(b + 12) >> 2] = 0;
       f[(b + 16) >> 2] = 0;
-      return;
+      
     }
     function Tm(a, b, c, d, e, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       g = $(g);
       pg(f[a >> 2] | 0, b, c, d, e, g);
-      return;
+      
     }
     function Um(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       f = $(f);
       Pm(a, b, c, d, e, f);
-      return;
+      
     }
     function Vm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return cm(a, b, c, d, e, f) | 0;
     }
     function Wm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return dm(a, b, c, d, e, f) | 0;
     }
     function Xm(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       if (!a) return;
       b = f[a >> 2] | 0;
       if (b | 0) {
@@ -87649,46 +87649,46 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         br(b);
       }
       br(a);
-      return;
+      
     }
     function Ym(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2544;
       tj((a + 88) | 0);
       br(a);
-      return;
+      
     }
     function Zm(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return em(a, b, c, d, e, f) | 0;
     }
     function _m(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return fm(a, b, c, d, e, f) | 0;
     }
     function $m(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2796;
       tj((a + 88) | 0);
-      return;
+      
     }
     function an(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
       e = u;
       u = (u + 16) | 0;
       g = e | 0;
@@ -87697,8 +87697,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return ((I = f[(g + 4) >> 2] | 0), f[g >> 2] | 0) | 0;
     }
     function bn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       $n(a);
       f[a >> 2] = 5840;
       b = (a + 84) | 0;
@@ -87708,21 +87708,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(b + 12) >> 2] = 0;
       f[(b + 16) >> 2] = 0;
       f[(b + 20) >> 2] = 0;
-      return;
+      
     }
     function cn(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return hm(a, b, c, d, e, f) | 0;
     }
     function dn(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       b = (a | 0) == 0 ? 1 : a;
       while (1) {
         a = $a(b) | 0;
@@ -87740,16 +87740,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function en(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       ac(a, b, c);
-      return;
+      
     }
     function fn(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       f[(a + 4) >> 2] = b;
       f[(a + 8) >> 2] =
         f[((f[((f[(b + 4) >> 2] | 0) + 8) >> 2] | 0) + (c << 2)) >> 2];
@@ -87757,44 +87757,44 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 1;
     }
     function gn(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return pm(a, b, c, d, e, f) | 0;
     }
     function hn(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       return qm(a, b, c, d, e, f) | 0;
     }
     function jn(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       f = $(f);
       Tm(a, b, c, d, e, f);
-      return;
+      
     }
     function kn(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 2544;
       tj((a + 88) | 0);
-      return;
+      
     }
     function ln(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0,
-        d = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
+        let d = 0;
       b = u;
       u = (u + 16) | 0;
       c = b;
@@ -87805,34 +87805,34 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function mn() {
-      var a = 0,
-        b = 0;
+      let a = 0;
+        let b = 0;
       a = u;
       u = (u + 16) | 0;
       if (!(Ka(18612, 3) | 0)) {
         b = Ia(f[4654] | 0) | 0;
         u = a;
         return b | 0;
-      } else Dn(17746, a);
+      } Dn(17746, a);
       return 0;
     }
     function nn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       if (!a) return;
       b = f[a >> 2] | 0;
       f[a >> 2] = 0;
       if (b | 0) Va[f[((f[b >> 2] | 0) + 4) >> 2] & 127](b);
       br(a);
-      return;
+      
     }
     function on(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        f = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let f = 0;
       e = a;
       a = c;
       c = Rl(e, a) | 0;
@@ -87842,8 +87842,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     function pn(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       Sg(a, b);
       f[a >> 2] = 1276;
       b = (a + 36) | 0;
@@ -87852,16 +87852,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[b >> 2] = 0;
         b = (b + 4) | 0;
       } while ((b | 0) < (a | 0));
-      return;
+      
     }
     function qn(a) {
-      a = a | 0;
+      a |= 0;
       Gi(a);
       br(a);
-      return;
+      
     }
     function rn(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -87870,22 +87870,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 20) >> 2] = 0;
       f[(a + 24) >> 2] = 0;
       f[(a + 28) >> 2] = 0;
-      return;
+      
     }
     function sn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = u;
       u = (u + 16) | 0;
       wc(a);
       if (!(La(f[4654] | 0, 0) | 0)) {
         u = b;
-        return;
+        
       } else Dn(17845, b);
     }
     function tn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -87894,25 +87894,25 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(b + 4) >> 2] = 0;
       f[(b + 8) >> 2] = 0;
       f[(b + 12) >> 2] = 0;
-      return;
+      
     }
     function un(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return eg((a + 40) | 0, b) | 0;
     }
     function vn(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return $i(a, b, Aq(b) | 0) | 0;
     }
     function wn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0,
-        g = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
+        let g = 0;
       e = u;
       u = (u + 16) | 0;
       g = e;
@@ -87922,20 +87922,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return d | 0;
     }
     function xn(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return Aj((a + 40) | 0, b) | 0;
     }
     function yn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return zh(a, b, c, d) | 0;
     }
     function zn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 3608;
       f[(a + 52) >> 2] = 0;
       b = (a + 4) | 0;
@@ -87944,24 +87944,24 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[b >> 2] = 0;
         b = (b + 4) | 0;
       } while ((b | 0) < (a | 0));
-      return;
+      
     }
     function An(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return $g(a, b, c, d) | 0;
     }
     function Bn(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[(a + 64) >> 2] | 0;
       return Ra[f[((f[c >> 2] | 0) + 24) >> 2] & 127](c, b) | 0;
     }
     function Cn(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
@@ -87969,13 +87969,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       f[(a + 16) >> 2] = 0;
       f[(a + 20) >> 2] = 0;
       b[(a + 24) >> 0] = 0;
-      return;
+      
     }
     function Dn(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0,
-        d = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
+        let d = 0;
       c = u;
       u = (u + 16) | 0;
       d = c;
@@ -87986,107 +87986,107 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       Ca();
     }
     function En(a, b, c, d, e, f, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
-      g = g | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
+      g |= 0;
       return Ta[a & 31](b | 0, c | 0, d | 0, e | 0, f | 0, g | 0) | 0;
     }
     function Fn(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = f[(a + 56) >> 2] | 0;
       f[(a + 60) >> 2] =
         ((((f[(b + 100) >> 2] | 0) - (f[(b + 96) >> 2] | 0)) | 0) / 12) | 0;
-      return;
+      
     }
     function Gn(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[(a + 64) >> 2] | 0;
       return Ra[f[((f[c >> 2] | 0) + 16) >> 2] & 127](c, b) | 0;
     }
     function Hn(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[(a + 64) >> 2] | 0;
       return Ra[f[((f[c >> 2] | 0) + 20) >> 2] & 127](c, b) | 0;
     }
     function In(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[(a + 64) >> 2] | 0;
       return Ra[f[((f[c >> 2] | 0) + 12) >> 2] & 127](c, b) | 0;
     }
     function Jn() {
-      var a = 0;
+      let a = 0;
       a = u;
       u = (u + 16) | 0;
       if (!(Ja(18616, 117) | 0)) {
         u = a;
-        return;
+        
       } else Dn(17795, a);
     }
     function Kn(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 1136;
       Vh((a + 4) | 0);
       f[(a + 40) >> 2] = 0;
       f[(a + 44) >> 2] = 0;
       f[a >> 2] = 2944;
-      return;
+      
     }
     function Ln(a) {
-      a = a | 0;
+      a |= 0;
       Se(a);
       br(a);
-      return;
+      
     }
     function Mn(a, b, c, d, e, f, g) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
-      g = g | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
+      g |= 0;
       _a[a & 3](b | 0, c | 0, d | 0, e | 0, f | 0, g | 0);
     }
     function Nn(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = f[(b + 64) >> 2] | 0;
       Wa[f[((f[c >> 2] | 0) + 28) >> 2] & 15](a, c);
-      return;
+      
     }
     function On(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if (b | 0) hj(a | 0, ((zq(c) | 0) & 255) | 0, b | 0) | 0;
       return a | 0;
     }
     function Pn(a) {
-      a = a | 0;
+      a |= 0;
       return 4;
     }
     function Qn(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Ui(0, b, c) | 0;
     }
     function Rn(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if ((c | 0) < 32) {
         I = (b << c) | ((a & (((1 << c) - 1) << (32 - c))) >>> (32 - c));
         return a << c;
@@ -88096,36 +88096,36 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     function Sn() {}
     function Tn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
       e = (a + c) >>> 0;
       return ((I = (b + d + ((e >>> 0 < a >>> 0) | 0)) >>> 0), e | 0) | 0;
     }
     function Un(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       if (!b) c = 0;
       else c = lh(f[b >> 2] | 0, f[(b + 4) >> 2] | 0, a) | 0;
       return (c | 0 ? c : a) | 0;
     }
     function Vn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      var e = 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      let e = 0;
       e = (b - d) >>> 0;
       e = (b - d - ((c >>> 0 > a >>> 0) | 0)) >>> 0;
       return ((I = e), ((a - c) >>> 0) | 0) | 0;
     }
     function Wn(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if ((c | 0) < 32) {
         I = b >>> c;
         return (a >>> c) | ((b & ((1 << c) - 1)) << (32 - c));
@@ -88134,32 +88134,32 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return (b >>> (c - 32)) | 0;
     }
     function Xn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return qe(a, b, c, d) | 0;
     }
     function Yn(a) {
-      a = a | 0;
+      a |= 0;
       Ve(a);
       br(a);
-      return;
+      
     }
     function Zn(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       d = +d;
       return Oi(a, b, c, d) | 0;
     }
     function _n(a) {
-      a = a | 0;
+      a |= 0;
       return 5;
     }
     function $n(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       f[a >> 2] = 5880;
       b = (a + 4) | 0;
       a = (b + 80) | 0;
@@ -88167,123 +88167,123 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         f[b >> 2] = 0;
         b = (b + 4) | 0;
       } while ((b | 0) < (a | 0));
-      return;
+      
     }
     function ao(a) {
-      a = a | 0;
+      a |= 0;
       return 6;
     }
     function bo(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return Pi(a, b, c, d) | 0;
     }
     function co(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Fj(a, b, c);
-      return;
+      
     }
     function eo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       xi(f[a >> 2] | 0, b);
-      return;
+      
     }
     function fo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       co(a, b, c);
-      return;
+      
     }
     function go(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       He(a, b, c, d, 1);
-      return;
+      
     }
     function ho(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       He(a, b, c, d, 0);
-      return;
+      
     }
     function io(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return Eg(a, b, c, d) | 0;
     }
     function jo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Qh(a, b, c) | 0;
     }
     function ko(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = f[(a + 64) >> 2] | 0;
       return Qa[f[((f[b >> 2] | 0) + 32) >> 2] & 127](b) | 0;
     }
     function lo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       f[(a + 28) >> 2] = b;
       f[(a + 32) >> 2] = c;
       return 1;
     }
     function mo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
-      return;
+      
     }
     function no(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Fj(f[a >> 2] | 0, b, c);
-      return;
+      
     }
     function oo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Ui(a, b, c) | 0;
     }
     function po(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Qn(a, b, c) | 0;
     }
     function qo(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       Za[a & 3](b | 0, c | 0, d | 0, e | 0, f | 0);
     }
     function ro(a) {
-      a = a | 0;
-      var b = 0,
-        c = 0;
+      a |= 0;
+      let b = 0;
+        let c = 0;
       if (a >>> 0 > 4294963200) {
         b = ir() | 0;
         f[b >> 2] = 0 - a;
@@ -88292,438 +88292,438 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return c | 0;
     }
     function so(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return rh(a, b, c) | 0;
     }
     function to(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
       f[(a + 12) >> 2] = 0;
       f[(a + 16) >> 2] = 0;
-      return;
+      
     }
     function uo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[(a + 8) >> 2] = b;
       f[(a + 12) >> 2] = -1;
       return 1;
     }
     function vo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[(a + 56) >> 2] = b;
       tp(a, b);
-      return;
+      
     }
     function wo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       no(a, b, c);
-      return;
+      
     }
     function xo(a) {
       a = +a;
-      var b = 0;
+      let b = 0;
       p[s >> 3] = a;
       b = f[s >> 2] | 0;
       I = f[(s + 4) >> 2] | 0;
       return b | 0;
     }
     function yo(a, b, c) {
-      a = a | 0;
+      a |= 0;
       b = $(b);
-      c = c | 0;
-      var d = Oa;
+      c |= 0;
+      let d = Oa;
       d = $($(c | 0) / b);
       n[a >> 2] = d;
-      return;
+      
     }
     function zo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       xi(a, b);
-      return;
+      
     }
     function Ao(a) {
-      a = a | 0;
+      a |= 0;
       wm(a);
       f[a >> 2] = 1460;
       f[(a + 36) >> 2] = 0;
-      return;
+      
     }
     function Bo(a) {
-      a = a | 0;
+      a |= 0;
       zn(a);
       f[a >> 2] = 3424;
       f[(a + 56) >> 2] = 0;
       f[(a + 60) >> 2] = 0;
-      return;
+      
     }
     function Co(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       if (!a) b = 0;
       else b = ((mh(a, 1024, 1112, 0) | 0) != 0) & 1;
       return b | 0;
     }
     function Do(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Eo(f[a >> 2] | 0, b, c);
-      return;
+      
     }
     function Eo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Fi((a + 4) | 0, b, c);
-      return;
+      
     }
     function Fo(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = dn(8) | 0;
       ck(b, a);
       return b | 0;
     }
     function Go(a) {
-      a = a | 0;
+      a |= 0;
       if ((b[(a + 11) >> 0] | 0) < 0) br(f[a >> 2] | 0);
-      return;
+      
     }
     function Ho(a) {
-      a = a | 0;
+      a |= 0;
       if (!a) return;
       Va[f[((f[a >> 2] | 0) + 4) >> 2] & 127](a);
-      return;
+      
     }
     function Io(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       Ya[a & 7](b | 0, c | 0, d | 0, e | 0);
     }
     function Jo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if (c | 0) Xl(a | 0, b | 0, c | 0) | 0;
       return a | 0;
     }
     function Ko(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Do(a, b, c);
-      return;
+      
     }
     function Lo(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if (c | 0) Rg(a | 0, b | 0, c | 0) | 0;
       return a | 0;
     }
     function Mo(a) {
-      a = a | 0;
+      a |= 0;
       f[(a + 52) >> 2] = f[((f[(a + 4) >> 2] | 0) + 80) >> 2];
-      return;
+      
     }
     function No(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       eo(a, b);
-      return;
+      
     }
     function Oo(a) {
-      a = a | 0;
+      a |= 0;
       f[(a + 52) >> 2] = f[((f[(a + 56) >> 2] | 0) + 80) >> 2];
-      return;
+      
     }
     function Po(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return -1;
     }
     function Qo(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = u;
       u = (u + 16) | 0;
       Ua[a & 3]();
       Dn(17898, b);
     }
     function Ro(a) {
-      a = a | 0;
+      a |= 0;
       wh(a);
       br(a);
-      return;
+      
     }
     function So(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       $o(a, b, c);
-      return;
+      
     }
     function To(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       bk(f[a >> 2] | 0, b);
-      return;
+      
     }
     function Uo(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return Sa[a & 31](b | 0, c | 0, d | 0) | 0;
     }
     function Vo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return (((Jp(a, b) | 0) << 24) >> 24) | 0;
     }
     function Wo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[a >> 2] = 6924;
       Sl((a + 4) | 0, b);
-      return;
+      
     }
     function Xo(a) {
-      a = a | 0;
+      a |= 0;
       Bo(a);
       f[a >> 2] = 3e3;
       f[(a + 64) >> 2] = 0;
-      return;
+      
     }
     function Yo(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       if (!a) c = 0;
       else c = Bi(a, b, 0) | 0;
       return c | 0;
     }
     function Zo(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       zo(a, b);
-      return;
+      
     }
     function _o(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 12) >> 2] | 0;
     }
     function $o(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Eo(a, b, c);
-      return;
+      
     }
     function ap() {
-      var a = 0;
+      let a = 0;
       a = dn(64) | 0;
       Al(a);
       return a | 0;
     }
     function bp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       To(a, b);
-      return;
+      
     }
     function cp(a) {
-      a = a | 0;
+      a |= 0;
       if (!a) return;
       Qi(a);
       br(a);
-      return;
+      
     }
     function dp(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 4) >> 2] | 0;
     }
     function ep(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       if (!(f[a >> 2] & 32)) ai(b, c, a) | 0;
-      return;
+      
     }
     function fp(a) {
-      a = a | 0;
+      a |= 0;
       return Mp(a) | 0;
     }
     function gp(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       Xa[a & 15](b | 0, c | 0, d | 0);
     }
     function hp() {
-      var a = 0;
+      let a = 0;
       a = dn(96) | 0;
       Lm(a);
       return a | 0;
     }
     function ip(a) {
-      a = a | 0;
+      a |= 0;
       return Np(a) | 0;
     }
     function jp(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = u;
       u = (u + a) | 0;
       u = (u + 15) & -16;
       return b | 0;
     }
     function kp(a) {
-      a = a | 0;
-      var b = 0;
+      a |= 0;
+      let b = 0;
       b = ((Yq() | 0) + 188) | 0;
       return Tj(a, f[b >> 2] | 0) | 0;
     }
     function lp(a) {
-      a = a | 0;
+      a |= 0;
       return (
         ((((f[(a + 100) >> 2] | 0) - (f[(a + 96) >> 2] | 0)) | 0) / 12) | 0 | 0
       );
     }
     function mp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       vp(a, b);
-      return;
+      
     }
     function np(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       aa(3);
       return 0;
     }
     function op() {
-      var a = 0;
+      let a = 0;
       a = dn(12) | 0;
       Bp(a);
       return a | 0;
     }
     function pp(a) {
-      a = a | 0;
+      a |= 0;
       zi(a);
       br(a);
-      return;
+      
     }
     function qp(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return ((a | 0) == (b | 0)) | 0;
     }
     function rp(a, b) {
-      a = a | 0;
-      b = b | 0;
-      var c = 0;
+      a |= 0;
+      b |= 0;
+      let c = 0;
       c = Fp(a | 0) | 0;
       return ((b | 0) == 0 ? a : c) | 0;
     }
     function sp(a) {
-      a = a | 0;
+      a |= 0;
       return (((f[(a + 12) >> 2] | 0) - (f[(a + 8) >> 2] | 0)) >> 2) | 0;
     }
     function tp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[(a + 4) >> 2] = b;
-      return;
+      
     }
     function up(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       return Bd(a, b, c, d, 0) | 0;
     }
     function vp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       bk(a, b);
-      return;
+      
     }
     function wp(a) {
-      a = a | 0;
+      a |= 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
       f[a >> 2] = a + 4;
-      return;
+      
     }
     function xp(a) {
-      a = a | 0;
+      a |= 0;
       return nq(a) | 0;
     }
     function yp() {
-      var a = 0;
+      let a = 0;
       a = dn(84) | 0;
       $n(a);
       return a | 0;
     }
     function zp(a) {
-      a = a | 0;
+      a |= 0;
       gi(a);
       br(a);
-      return;
+      
     }
     function Ap(a) {
-      a = a | 0;
+      a |= 0;
       return oq(a) | 0;
     }
     function Bp(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 0;
       f[(a + 4) >> 2] = 0;
       f[(a + 8) >> 2] = 0;
-      return;
+      
     }
     function Cp(a) {
-      a = a | 0;
+      a |= 0;
       f[a >> 2] = 6924;
       lm((a + 4) | 0);
-      return;
+      
     }
     function Dp(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return Ra[a & 127](b | 0, c | 0) | 0;
     }
     function Ep(a, b, c, d, e, f) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
-      f = f | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
+      f |= 0;
       aa(10);
     }
     function Fp(a) {
-      a = a | 0;
+      a |= 0;
       return (
         ((a & 255) << 24) |
         (((a >> 8) & 255) << 16) |
@@ -88733,276 +88733,276 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       );
     }
     function Gp(a) {
-      a = a | 0;
+      a |= 0;
       Bo(a);
       f[a >> 2] = 3504;
-      return;
+      
     }
     function Hp(a, c) {
-      a = a | 0;
-      c = c | 0;
+      a |= 0;
+      c |= 0;
       b[a >> 0] = b[c >> 0] | 0;
-      return;
+      
     }
     function Ip(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       return -1;
     }
     function Jp(a, c) {
-      a = a | 0;
-      c = c | 0;
+      a |= 0;
+      c |= 0;
       return b[((f[a >> 2] | 0) + c) >> 0] | 0;
     }
     function Kp(a) {
-      a = a | 0;
+      a |= 0;
       return ((f[(a + 4) >> 2] | 0) - (f[a >> 2] | 0)) | 0;
     }
     function Lp(a) {
-      a = a | 0;
+      a |= 0;
       aj(a);
       br(a);
-      return;
+      
     }
     function Mp(a) {
-      a = a | 0;
+      a |= 0;
       return f[((f[a >> 2] | 0) + 40) >> 2] | 0;
     }
     function Np(a) {
-      a = a | 0;
+      a |= 0;
       return f[((f[a >> 2] | 0) + 44) >> 2] | 0;
     }
     function Op(a) {
-      a = a | 0;
+      a |= 0;
       if (!a) return;
       br(a);
-      return;
+      
     }
     function Pp(a) {
-      a = a | 0;
+      a |= 0;
       b[(a + 28) >> 0] = 1;
-      return;
+      
     }
     function Qp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       if (!x) {
         x = a;
         y = b;
       }
     }
     function Rp(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return 1;
     }
     function Sp(a) {
-      a = a | 0;
+      a |= 0;
       return (a + 12) | 0;
     }
     function Tp(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       Wa[a & 15](b | 0, c | 0);
     }
     function Up(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       f[(a + 80) >> 2] = b;
-      return;
+      
     }
     function Vp() {
-      var a = 0;
+      let a = 0;
       a = dn(48) | 0;
       Fq(a);
       return a | 0;
     }
     function Wp(a) {
-      a = a | 0;
+      a |= 0;
       return vq((a + 4) | 0) | 0;
     }
     function Xp() {
-      var a = 0;
+      let a = 0;
       a = dn(108) | 0;
       bn(a);
       return a | 0;
     }
     function Yp(a) {
-      a = a | 0;
+      a |= 0;
       return ((b[(a + 32) >> 0] | 0) != 0) | 0;
     }
     function Zp(a) {
-      a = a | 0;
+      a |= 0;
       return (a + -12) | 0;
     }
     function _p(a, b, c, d, e) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
-      e = e | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
+      e |= 0;
       aa(9);
     }
     function $p() {
-      var a = 0;
+      let a = 0;
       a = f[4655] | 0;
       f[4655] = a + 0;
       return a | 0;
     }
     function aq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 56) >> 2] | 0;
     }
     function bq() {
-      var a = 0;
+      let a = 0;
       a = f[1708] | 0;
       f[1708] = a + 0;
       return a | 0;
     }
     function cq(a) {
-      a = a | 0;
+      a |= 0;
       wg(a);
       br(a);
-      return;
+      
     }
     function dq(a) {
-      a = a | 0;
+      a |= 0;
       fr(a);
       br(a);
-      return;
+      
     }
     function eq(a) {
-      a = a | 0;
+      a |= 0;
       return b[(a + 24) >> 0] | 0;
     }
     function fq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return 0;
     }
     function gq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 48) >> 2] | 0;
     }
     function hq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return Qa[a & 127](b | 0) | 0;
     }
     function iq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 60) >> 2] | 0;
     }
     function jq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 28) >> 2] | 0;
     }
     function kq(a) {
-      a = a | 0;
+      a |= 0;
       sa(a | 0) | 0;
       bm();
     }
     function lq(a) {
-      a = a | 0;
+      a |= 0;
       Cp(a);
       br(a);
-      return;
+      
     }
     function mq(a) {
-      a = a | 0;
+      a |= 0;
       Ca();
     }
     function nq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 40) >> 2] | 0;
     }
     function oq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 44) >> 2] | 0;
     }
     function pq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return $(+sk(a, b, 0));
     }
     function qq(a) {
-      a = a | 0;
+      a |= 0;
       return 3;
     }
     function rq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       u = a;
       v = b;
     }
     function sq(a) {
-      a = a | 0;
+      a |= 0;
       n[a >> 2] = $(1.0);
-      return;
+      
     }
     function tq(a) {
-      a = a | 0;
+      a |= 0;
       return ((((a | 0) == 32) | (((a + -9) | 0) >>> 0 < 5)) & 1) | 0;
     }
     function uq(a) {
-      a = a | 0;
+      a |= 0;
       return f[(a + 80) >> 2] | 0;
     }
     function vq(a) {
-      a = a | 0;
+      a |= 0;
       return f[a >> 2] | 0;
     }
     function wq(a, b, c, d) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
-      d = d | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
+      d |= 0;
       aa(8);
     }
     function xq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       Va[a & 127](b | 0);
     }
     function yq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return Un(a, b) | 0;
     }
     function zq(a) {
-      a = a | 0;
+      a |= 0;
       return (a & 255) | 0;
     }
     function Aq(a) {
-      a = a | 0;
+      a |= 0;
       return vj(a) | 0;
     }
     function Bq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       return +(+sk(a, b, 1));
     }
     function Cq(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       aa(2);
       return 0;
     }
     function Dq(a) {
-      a = a | 0;
+      a |= 0;
       return 2;
     }
     function Eq(a) {
-      a = a | 0;
+      a |= 0;
       return 1;
     }
     function Fq(a) {
-      a = a | 0;
+      a |= 0;
       Kn(a);
-      return;
+      
     }
     function Gq(a, b) {
       a = +a;
@@ -89011,21 +89011,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     function Hq(a, b) {
       a = +a;
-      b = b | 0;
+      b |= 0;
       return +(+Wj(a, b));
     }
     function Iq(a, b) {
       a = +a;
-      b = b | 0;
+      b |= 0;
       return +(+Uj(a, b));
     }
     function Jq() {
       return 3;
     }
     function Kq(a, b, c) {
-      a = a | 0;
-      b = b | 0;
-      c = c | 0;
+      a |= 0;
+      b |= 0;
+      c |= 0;
       aa(7);
     }
     function Lq() {
@@ -89041,7 +89041,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return 4;
     }
     function Pq(a) {
-      a = a | 0;
+      a |= 0;
       return (((a + -48) | 0) >>> 0 < 10) | 0;
     }
     function Qq() {
@@ -89056,71 +89056,71 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return +(+pd(a, b));
     }
     function Tq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       aa(1);
       return 0;
     }
     function Uq(a) {
-      a = a | 0;
+      a |= 0;
       Ha();
     }
     function Vq(a) {
-      a = a | 0;
+      a |= 0;
       Ua[a & 3]();
     }
     function Wq() {
       ua();
     }
     function Xq(a) {
-      a = a | 0;
+      a |= 0;
       return +(+Bq(a, 0));
     }
     function Yq() {
       return lr() | 0;
     }
     function Zq(a, b) {
-      a = a | 0;
-      b = b | 0;
+      a |= 0;
+      b |= 0;
       aa(6);
     }
     function _q(a) {
-      a = a | 0;
+      a |= 0;
       return dn(a) | 0;
     }
     function $q(a) {
-      a = a | 0;
+      a |= 0;
       br(a);
-      return;
+      
     }
     function ar(a) {
-      a = a | 0;
+      a |= 0;
       u = a;
     }
     function br(a) {
-      a = a | 0;
+      a |= 0;
       wc(a);
-      return;
+      
     }
     function cr(a) {
-      a = a | 0;
+      a |= 0;
       I = a;
     }
     function dr(a) {
-      a = a | 0;
+      a |= 0;
       return a | 0;
     }
     function er(a) {
-      a = a | 0;
+      a |= 0;
       aa(0);
       return 0;
     }
     function fr(a) {
-      a = a | 0;
-      return;
+      a |= 0;
+      
     }
     function gr(a) {
-      a = a | 0;
+      a |= 0;
       return 0;
     }
     function hr() {
@@ -89133,7 +89133,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       return u | 0;
     }
     function kr(a) {
-      a = a | 0;
+      a |= 0;
       aa(5);
     }
     function lr() {
@@ -89745,379 +89745,195 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     Module.asmLibraryArg,
     buffer
   );
-  var ___cxa_can_catch = (Module['___cxa_can_catch'] = asm['___cxa_can_catch']);
-  var ___cxa_is_pointer_type = (Module['___cxa_is_pointer_type'] =
-    asm['___cxa_is_pointer_type']);
-  var ___divdi3 = (Module['___divdi3'] = asm['___divdi3']);
-  var ___muldi3 = (Module['___muldi3'] = asm['___muldi3']);
-  var ___udivdi3 = (Module['___udivdi3'] = asm['___udivdi3']);
-  var ___uremdi3 = (Module['___uremdi3'] = asm['___uremdi3']);
-  var _bitshift64Lshr = (Module['_bitshift64Lshr'] = asm['_bitshift64Lshr']);
-  var _bitshift64Shl = (Module['_bitshift64Shl'] = asm['_bitshift64Shl']);
-  var _emscripten_bind_DracoInt8Array_DracoInt8Array_0 = (Module[
-    '_emscripten_bind_DracoInt8Array_DracoInt8Array_0'
-  ] = asm['_emscripten_bind_DracoInt8Array_DracoInt8Array_0']);
-  var _emscripten_bind_DracoInt8Array_GetValue_1 = (Module[
-    '_emscripten_bind_DracoInt8Array_GetValue_1'
-  ] = asm['_emscripten_bind_DracoInt8Array_GetValue_1']);
-  var _emscripten_bind_DracoInt8Array___destroy___0 = (Module[
-    '_emscripten_bind_DracoInt8Array___destroy___0'
-  ] = asm['_emscripten_bind_DracoInt8Array___destroy___0']);
-  var _emscripten_bind_DracoInt8Array_size_0 = (Module[
-    '_emscripten_bind_DracoInt8Array_size_0'
-  ] = asm['_emscripten_bind_DracoInt8Array_size_0']);
-  var _emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2 = (Module[
-    '_emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2'
-  ] = asm['_emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2']);
-  var _emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3 = (Module[
-    '_emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3'
-  ] = asm['_emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3']);
-  var _emscripten_bind_Encoder_Encoder_0 = (Module[
-    '_emscripten_bind_Encoder_Encoder_0'
-  ] = asm['_emscripten_bind_Encoder_Encoder_0']);
-  var _emscripten_bind_Encoder_GetNumberOfEncodedFaces_0 = (Module[
-    '_emscripten_bind_Encoder_GetNumberOfEncodedFaces_0'
-  ] = asm['_emscripten_bind_Encoder_GetNumberOfEncodedFaces_0']);
-  var _emscripten_bind_Encoder_GetNumberOfEncodedPoints_0 = (Module[
-    '_emscripten_bind_Encoder_GetNumberOfEncodedPoints_0'
-  ] = asm['_emscripten_bind_Encoder_GetNumberOfEncodedPoints_0']);
-  var _emscripten_bind_Encoder_SetAttributeExplicitQuantization_5 = (Module[
-    '_emscripten_bind_Encoder_SetAttributeExplicitQuantization_5'
-  ] = asm['_emscripten_bind_Encoder_SetAttributeExplicitQuantization_5']);
-  var _emscripten_bind_Encoder_SetAttributeQuantization_2 = (Module[
-    '_emscripten_bind_Encoder_SetAttributeQuantization_2'
-  ] = asm['_emscripten_bind_Encoder_SetAttributeQuantization_2']);
-  var _emscripten_bind_Encoder_SetEncodingMethod_1 = (Module[
-    '_emscripten_bind_Encoder_SetEncodingMethod_1'
-  ] = asm['_emscripten_bind_Encoder_SetEncodingMethod_1']);
-  var _emscripten_bind_Encoder_SetSpeedOptions_2 = (Module[
-    '_emscripten_bind_Encoder_SetSpeedOptions_2'
-  ] = asm['_emscripten_bind_Encoder_SetSpeedOptions_2']);
-  var _emscripten_bind_Encoder_SetTrackEncodedProperties_1 = (Module[
-    '_emscripten_bind_Encoder_SetTrackEncodedProperties_1'
-  ] = asm['_emscripten_bind_Encoder_SetTrackEncodedProperties_1']);
-  var _emscripten_bind_Encoder___destroy___0 = (Module[
-    '_emscripten_bind_Encoder___destroy___0'
-  ] = asm['_emscripten_bind_Encoder___destroy___0']);
-  var _emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2 = (Module[
-    '_emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2'
-  ] = asm['_emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2']);
-  var _emscripten_bind_ExpertEncoder_ExpertEncoder_1 = (Module[
-    '_emscripten_bind_ExpertEncoder_ExpertEncoder_1'
-  ] = asm['_emscripten_bind_ExpertEncoder_ExpertEncoder_1']);
-  var _emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0 = (Module[
-    '_emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0'
-  ] = asm['_emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0']);
-  var _emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0 = (Module[
-    '_emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0'
-  ] = asm['_emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0']);
-  var _emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5 =
-    (Module[
-      '_emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5'
-    ] =
-      asm['_emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5']);
-  var _emscripten_bind_ExpertEncoder_SetAttributeQuantization_2 = (Module[
-    '_emscripten_bind_ExpertEncoder_SetAttributeQuantization_2'
-  ] = asm['_emscripten_bind_ExpertEncoder_SetAttributeQuantization_2']);
-  var _emscripten_bind_ExpertEncoder_SetEncodingMethod_1 = (Module[
-    '_emscripten_bind_ExpertEncoder_SetEncodingMethod_1'
-  ] = asm['_emscripten_bind_ExpertEncoder_SetEncodingMethod_1']);
-  var _emscripten_bind_ExpertEncoder_SetSpeedOptions_2 = (Module[
-    '_emscripten_bind_ExpertEncoder_SetSpeedOptions_2'
-  ] = asm['_emscripten_bind_ExpertEncoder_SetSpeedOptions_2']);
-  var _emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1 = (Module[
-    '_emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1'
-  ] = asm['_emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1']);
-  var _emscripten_bind_ExpertEncoder___destroy___0 = (Module[
-    '_emscripten_bind_ExpertEncoder___destroy___0'
-  ] = asm['_emscripten_bind_ExpertEncoder___destroy___0']);
-  var _emscripten_bind_GeometryAttribute_GeometryAttribute_0 = (Module[
-    '_emscripten_bind_GeometryAttribute_GeometryAttribute_0'
-  ] = asm['_emscripten_bind_GeometryAttribute_GeometryAttribute_0']);
-  var _emscripten_bind_GeometryAttribute___destroy___0 = (Module[
-    '_emscripten_bind_GeometryAttribute___destroy___0'
-  ] = asm['_emscripten_bind_GeometryAttribute___destroy___0']);
-  var _emscripten_bind_MeshBuilder_AddFacesToMesh_3 = (Module[
-    '_emscripten_bind_MeshBuilder_AddFacesToMesh_3'
-  ] = asm['_emscripten_bind_MeshBuilder_AddFacesToMesh_3']);
-  var _emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5']);
-  var _emscripten_bind_MeshBuilder_AddFloatAttribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddFloatAttribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddFloatAttribute_5']);
-  var _emscripten_bind_MeshBuilder_AddInt16Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddInt16Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddInt16Attribute_5']);
-  var _emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5']);
-  var _emscripten_bind_MeshBuilder_AddInt32Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddInt32Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddInt32Attribute_5']);
-  var _emscripten_bind_MeshBuilder_AddInt8Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddInt8Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddInt8Attribute_5']);
-  var _emscripten_bind_MeshBuilder_AddMetadataToMesh_2 = (Module[
-    '_emscripten_bind_MeshBuilder_AddMetadataToMesh_2'
-  ] = asm['_emscripten_bind_MeshBuilder_AddMetadataToMesh_2']);
-  var _emscripten_bind_MeshBuilder_AddMetadata_2 = (Module[
-    '_emscripten_bind_MeshBuilder_AddMetadata_2'
-  ] = asm['_emscripten_bind_MeshBuilder_AddMetadata_2']);
-  var _emscripten_bind_MeshBuilder_AddUInt16Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddUInt16Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddUInt16Attribute_5']);
-  var _emscripten_bind_MeshBuilder_AddUInt32Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddUInt32Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddUInt32Attribute_5']);
-  var _emscripten_bind_MeshBuilder_AddUInt8Attribute_5 = (Module[
-    '_emscripten_bind_MeshBuilder_AddUInt8Attribute_5'
-  ] = asm['_emscripten_bind_MeshBuilder_AddUInt8Attribute_5']);
-  var _emscripten_bind_MeshBuilder_MeshBuilder_0 = (Module[
-    '_emscripten_bind_MeshBuilder_MeshBuilder_0'
-  ] = asm['_emscripten_bind_MeshBuilder_MeshBuilder_0']);
-  var _emscripten_bind_MeshBuilder_SetMetadataForAttribute_3 = (Module[
-    '_emscripten_bind_MeshBuilder_SetMetadataForAttribute_3'
-  ] = asm['_emscripten_bind_MeshBuilder_SetMetadataForAttribute_3']);
-  var _emscripten_bind_MeshBuilder___destroy___0 = (Module[
-    '_emscripten_bind_MeshBuilder___destroy___0'
-  ] = asm['_emscripten_bind_MeshBuilder___destroy___0']);
-  var _emscripten_bind_Mesh_Mesh_0 = (Module['_emscripten_bind_Mesh_Mesh_0'] =
-    asm['_emscripten_bind_Mesh_Mesh_0']);
-  var _emscripten_bind_Mesh___destroy___0 = (Module[
-    '_emscripten_bind_Mesh___destroy___0'
-  ] = asm['_emscripten_bind_Mesh___destroy___0']);
-  var _emscripten_bind_Mesh_num_attributes_0 = (Module[
-    '_emscripten_bind_Mesh_num_attributes_0'
-  ] = asm['_emscripten_bind_Mesh_num_attributes_0']);
-  var _emscripten_bind_Mesh_num_faces_0 = (Module[
-    '_emscripten_bind_Mesh_num_faces_0'
-  ] = asm['_emscripten_bind_Mesh_num_faces_0']);
-  var _emscripten_bind_Mesh_num_points_0 = (Module[
-    '_emscripten_bind_Mesh_num_points_0'
-  ] = asm['_emscripten_bind_Mesh_num_points_0']);
-  var _emscripten_bind_Mesh_set_num_points_1 = (Module[
-    '_emscripten_bind_Mesh_set_num_points_1'
-  ] = asm['_emscripten_bind_Mesh_set_num_points_1']);
-  var _emscripten_bind_MetadataBuilder_AddDoubleEntry_3 = (Module[
-    '_emscripten_bind_MetadataBuilder_AddDoubleEntry_3'
-  ] = asm['_emscripten_bind_MetadataBuilder_AddDoubleEntry_3']);
-  var _emscripten_bind_MetadataBuilder_AddIntEntry_3 = (Module[
-    '_emscripten_bind_MetadataBuilder_AddIntEntry_3'
-  ] = asm['_emscripten_bind_MetadataBuilder_AddIntEntry_3']);
-  var _emscripten_bind_MetadataBuilder_AddStringEntry_3 = (Module[
-    '_emscripten_bind_MetadataBuilder_AddStringEntry_3'
-  ] = asm['_emscripten_bind_MetadataBuilder_AddStringEntry_3']);
-  var _emscripten_bind_MetadataBuilder_MetadataBuilder_0 = (Module[
-    '_emscripten_bind_MetadataBuilder_MetadataBuilder_0'
-  ] = asm['_emscripten_bind_MetadataBuilder_MetadataBuilder_0']);
-  var _emscripten_bind_MetadataBuilder___destroy___0 = (Module[
-    '_emscripten_bind_MetadataBuilder___destroy___0'
-  ] = asm['_emscripten_bind_MetadataBuilder___destroy___0']);
-  var _emscripten_bind_Metadata_Metadata_0 = (Module[
-    '_emscripten_bind_Metadata_Metadata_0'
-  ] = asm['_emscripten_bind_Metadata_Metadata_0']);
-  var _emscripten_bind_Metadata___destroy___0 = (Module[
-    '_emscripten_bind_Metadata___destroy___0'
-  ] = asm['_emscripten_bind_Metadata___destroy___0']);
-  var _emscripten_bind_PointAttribute_PointAttribute_0 = (Module[
-    '_emscripten_bind_PointAttribute_PointAttribute_0'
-  ] = asm['_emscripten_bind_PointAttribute_PointAttribute_0']);
-  var _emscripten_bind_PointAttribute___destroy___0 = (Module[
-    '_emscripten_bind_PointAttribute___destroy___0'
-  ] = asm['_emscripten_bind_PointAttribute___destroy___0']);
-  var _emscripten_bind_PointAttribute_attribute_type_0 = (Module[
-    '_emscripten_bind_PointAttribute_attribute_type_0'
-  ] = asm['_emscripten_bind_PointAttribute_attribute_type_0']);
-  var _emscripten_bind_PointAttribute_byte_offset_0 = (Module[
-    '_emscripten_bind_PointAttribute_byte_offset_0'
-  ] = asm['_emscripten_bind_PointAttribute_byte_offset_0']);
-  var _emscripten_bind_PointAttribute_byte_stride_0 = (Module[
-    '_emscripten_bind_PointAttribute_byte_stride_0'
-  ] = asm['_emscripten_bind_PointAttribute_byte_stride_0']);
-  var _emscripten_bind_PointAttribute_data_type_0 = (Module[
-    '_emscripten_bind_PointAttribute_data_type_0'
-  ] = asm['_emscripten_bind_PointAttribute_data_type_0']);
-  var _emscripten_bind_PointAttribute_normalized_0 = (Module[
-    '_emscripten_bind_PointAttribute_normalized_0'
-  ] = asm['_emscripten_bind_PointAttribute_normalized_0']);
-  var _emscripten_bind_PointAttribute_num_components_0 = (Module[
-    '_emscripten_bind_PointAttribute_num_components_0'
-  ] = asm['_emscripten_bind_PointAttribute_num_components_0']);
-  var _emscripten_bind_PointAttribute_size_0 = (Module[
-    '_emscripten_bind_PointAttribute_size_0'
-  ] = asm['_emscripten_bind_PointAttribute_size_0']);
-  var _emscripten_bind_PointAttribute_unique_id_0 = (Module[
-    '_emscripten_bind_PointAttribute_unique_id_0'
-  ] = asm['_emscripten_bind_PointAttribute_unique_id_0']);
-  var _emscripten_bind_PointCloudBuilder_AddFloatAttribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddFloatAttribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddFloatAttribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddInt16Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddInt16Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddInt16Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddInt32Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddInt32Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddInt32Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddInt8Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddInt8Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddInt8Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddMetadata_2 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddMetadata_2'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddMetadata_2']);
-  var _emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5 = (Module[
-    '_emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5'
-  ] = asm['_emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5']);
-  var _emscripten_bind_PointCloudBuilder_PointCloudBuilder_0 = (Module[
-    '_emscripten_bind_PointCloudBuilder_PointCloudBuilder_0'
-  ] = asm['_emscripten_bind_PointCloudBuilder_PointCloudBuilder_0']);
-  var _emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3 = (Module[
-    '_emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3'
-  ] = asm['_emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3']);
-  var _emscripten_bind_PointCloudBuilder___destroy___0 = (Module[
-    '_emscripten_bind_PointCloudBuilder___destroy___0'
-  ] = asm['_emscripten_bind_PointCloudBuilder___destroy___0']);
-  var _emscripten_bind_PointCloud_PointCloud_0 = (Module[
-    '_emscripten_bind_PointCloud_PointCloud_0'
-  ] = asm['_emscripten_bind_PointCloud_PointCloud_0']);
-  var _emscripten_bind_PointCloud___destroy___0 = (Module[
-    '_emscripten_bind_PointCloud___destroy___0'
-  ] = asm['_emscripten_bind_PointCloud___destroy___0']);
-  var _emscripten_bind_PointCloud_num_attributes_0 = (Module[
-    '_emscripten_bind_PointCloud_num_attributes_0'
-  ] = asm['_emscripten_bind_PointCloud_num_attributes_0']);
-  var _emscripten_bind_PointCloud_num_points_0 = (Module[
-    '_emscripten_bind_PointCloud_num_points_0'
-  ] = asm['_emscripten_bind_PointCloud_num_points_0']);
-  var _emscripten_bind_VoidPtr___destroy___0 = (Module[
-    '_emscripten_bind_VoidPtr___destroy___0'
-  ] = asm['_emscripten_bind_VoidPtr___destroy___0']);
-  var _emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE =
-    (Module[
-      '_emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE'
-    ] =
-      asm['_emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE']);
-  var _emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD = (Module[
-    '_emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD'
-  ] = asm['_emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD']);
-  var _emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH = (Module[
-    '_emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH'
-  ] = asm['_emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_COLOR = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_COLOR'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_COLOR']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_GENERIC = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_GENERIC'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_GENERIC']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_INVALID = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_INVALID'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_INVALID']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_NORMAL = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_NORMAL'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_NORMAL']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_POSITION = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_POSITION'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_POSITION']);
-  var _emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD = (Module[
-    '_emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD'
-  ] = asm['_emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD']);
-  var _emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING =
-    (Module[
-      '_emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING'
-    ] =
-      asm[
-        '_emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING'
-      ]);
-  var _emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING =
-    (Module[
-      '_emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING'
-    ] =
-      asm['_emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING']);
-  var _emscripten_replace_memory = (Module['_emscripten_replace_memory'] =
-    asm['_emscripten_replace_memory']);
-  var _free = (Module['_free'] = asm['_free']);
-  var _i64Add = (Module['_i64Add'] = asm['_i64Add']);
-  var _i64Subtract = (Module['_i64Subtract'] = asm['_i64Subtract']);
-  var _llvm_bswap_i32 = (Module['_llvm_bswap_i32'] = asm['_llvm_bswap_i32']);
-  var _malloc = (Module['_malloc'] = asm['_malloc']);
-  var _memcpy = (Module['_memcpy'] = asm['_memcpy']);
-  var _memmove = (Module['_memmove'] = asm['_memmove']);
-  var _memset = (Module['_memset'] = asm['_memset']);
-  var _sbrk = (Module['_sbrk'] = asm['_sbrk']);
-  var establishStackSpace = (Module['establishStackSpace'] =
-    asm['establishStackSpace']);
-  var getTempRet0 = (Module['getTempRet0'] = asm['getTempRet0']);
-  var runPostSets = (Module['runPostSets'] = asm['runPostSets']);
-  var setTempRet0 = (Module['setTempRet0'] = asm['setTempRet0']);
-  var setThrew = (Module['setThrew'] = asm['setThrew']);
-  var stackAlloc = (Module['stackAlloc'] = asm['stackAlloc']);
-  var stackRestore = (Module['stackRestore'] = asm['stackRestore']);
-  var stackSave = (Module['stackSave'] = asm['stackSave']);
-  var dynCall_ii = (Module['dynCall_ii'] = asm['dynCall_ii']);
-  var dynCall_iii = (Module['dynCall_iii'] = asm['dynCall_iii']);
-  var dynCall_iiii = (Module['dynCall_iiii'] = asm['dynCall_iiii']);
-  var dynCall_iiiiiii = (Module['dynCall_iiiiiii'] = asm['dynCall_iiiiiii']);
-  var dynCall_v = (Module['dynCall_v'] = asm['dynCall_v']);
-  var dynCall_vi = (Module['dynCall_vi'] = asm['dynCall_vi']);
-  var dynCall_vii = (Module['dynCall_vii'] = asm['dynCall_vii']);
-  var dynCall_viii = (Module['dynCall_viii'] = asm['dynCall_viii']);
-  var dynCall_viiii = (Module['dynCall_viiii'] = asm['dynCall_viiii']);
-  var dynCall_viiiii = (Module['dynCall_viiiii'] = asm['dynCall_viiiii']);
-  var dynCall_viiiiii = (Module['dynCall_viiiiii'] = asm['dynCall_viiiiii']);
-  Module['asm'] = asm;
+  let ___cxa_can_catch = (Module.___cxa_can_catch = asm.___cxa_can_catch);
+  let ___cxa_is_pointer_type = (Module.___cxa_is_pointer_type =
+    asm.___cxa_is_pointer_type);
+  let ___divdi3 = (Module.___divdi3 = asm.___divdi3);
+  let ___muldi3 = (Module.___muldi3 = asm.___muldi3);
+  let ___udivdi3 = (Module.___udivdi3 = asm.___udivdi3);
+  let ___uremdi3 = (Module.___uremdi3 = asm.___uremdi3);
+  let _bitshift64Lshr = (Module._bitshift64Lshr = asm._bitshift64Lshr);
+  let _bitshift64Shl = (Module._bitshift64Shl = asm._bitshift64Shl);
+  let _emscripten_bind_DracoInt8Array_DracoInt8Array_0 = (Module._emscripten_bind_DracoInt8Array_DracoInt8Array_0 = asm._emscripten_bind_DracoInt8Array_DracoInt8Array_0);
+  let _emscripten_bind_DracoInt8Array_GetValue_1 = (Module._emscripten_bind_DracoInt8Array_GetValue_1 = asm._emscripten_bind_DracoInt8Array_GetValue_1);
+  let _emscripten_bind_DracoInt8Array___destroy___0 = (Module._emscripten_bind_DracoInt8Array___destroy___0 = asm._emscripten_bind_DracoInt8Array___destroy___0);
+  let _emscripten_bind_DracoInt8Array_size_0 = (Module._emscripten_bind_DracoInt8Array_size_0 = asm._emscripten_bind_DracoInt8Array_size_0);
+  let _emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2 = (Module._emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2 = asm._emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2);
+  let _emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3 = (Module._emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3 = asm._emscripten_bind_Encoder_EncodePointCloudToDracoBuffer_3);
+  let _emscripten_bind_Encoder_Encoder_0 = (Module._emscripten_bind_Encoder_Encoder_0 = asm._emscripten_bind_Encoder_Encoder_0);
+  let _emscripten_bind_Encoder_GetNumberOfEncodedFaces_0 = (Module._emscripten_bind_Encoder_GetNumberOfEncodedFaces_0 = asm._emscripten_bind_Encoder_GetNumberOfEncodedFaces_0);
+  let _emscripten_bind_Encoder_GetNumberOfEncodedPoints_0 = (Module._emscripten_bind_Encoder_GetNumberOfEncodedPoints_0 = asm._emscripten_bind_Encoder_GetNumberOfEncodedPoints_0);
+  let _emscripten_bind_Encoder_SetAttributeExplicitQuantization_5 = (Module._emscripten_bind_Encoder_SetAttributeExplicitQuantization_5 = asm._emscripten_bind_Encoder_SetAttributeExplicitQuantization_5);
+  let _emscripten_bind_Encoder_SetAttributeQuantization_2 = (Module._emscripten_bind_Encoder_SetAttributeQuantization_2 = asm._emscripten_bind_Encoder_SetAttributeQuantization_2);
+  let _emscripten_bind_Encoder_SetEncodingMethod_1 = (Module._emscripten_bind_Encoder_SetEncodingMethod_1 = asm._emscripten_bind_Encoder_SetEncodingMethod_1);
+  let _emscripten_bind_Encoder_SetSpeedOptions_2 = (Module._emscripten_bind_Encoder_SetSpeedOptions_2 = asm._emscripten_bind_Encoder_SetSpeedOptions_2);
+  let _emscripten_bind_Encoder_SetTrackEncodedProperties_1 = (Module._emscripten_bind_Encoder_SetTrackEncodedProperties_1 = asm._emscripten_bind_Encoder_SetTrackEncodedProperties_1);
+  let _emscripten_bind_Encoder___destroy___0 = (Module._emscripten_bind_Encoder___destroy___0 = asm._emscripten_bind_Encoder___destroy___0);
+  let _emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2 = (Module._emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2 = asm._emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2);
+  let _emscripten_bind_ExpertEncoder_ExpertEncoder_1 = (Module._emscripten_bind_ExpertEncoder_ExpertEncoder_1 = asm._emscripten_bind_ExpertEncoder_ExpertEncoder_1);
+  let _emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0 = (Module._emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0 = asm._emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0);
+  let _emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0 = (Module._emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0 = asm._emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0);
+  let _emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5 =
+    (Module._emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5 =
+      asm._emscripten_bind_ExpertEncoder_SetAttributeExplicitQuantization_5);
+  let _emscripten_bind_ExpertEncoder_SetAttributeQuantization_2 = (Module._emscripten_bind_ExpertEncoder_SetAttributeQuantization_2 = asm._emscripten_bind_ExpertEncoder_SetAttributeQuantization_2);
+  let _emscripten_bind_ExpertEncoder_SetEncodingMethod_1 = (Module._emscripten_bind_ExpertEncoder_SetEncodingMethod_1 = asm._emscripten_bind_ExpertEncoder_SetEncodingMethod_1);
+  let _emscripten_bind_ExpertEncoder_SetSpeedOptions_2 = (Module._emscripten_bind_ExpertEncoder_SetSpeedOptions_2 = asm._emscripten_bind_ExpertEncoder_SetSpeedOptions_2);
+  let _emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1 = (Module._emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1 = asm._emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1);
+  let _emscripten_bind_ExpertEncoder___destroy___0 = (Module._emscripten_bind_ExpertEncoder___destroy___0 = asm._emscripten_bind_ExpertEncoder___destroy___0);
+  let _emscripten_bind_GeometryAttribute_GeometryAttribute_0 = (Module._emscripten_bind_GeometryAttribute_GeometryAttribute_0 = asm._emscripten_bind_GeometryAttribute_GeometryAttribute_0);
+  let _emscripten_bind_GeometryAttribute___destroy___0 = (Module._emscripten_bind_GeometryAttribute___destroy___0 = asm._emscripten_bind_GeometryAttribute___destroy___0);
+  let _emscripten_bind_MeshBuilder_AddFacesToMesh_3 = (Module._emscripten_bind_MeshBuilder_AddFacesToMesh_3 = asm._emscripten_bind_MeshBuilder_AddFacesToMesh_3);
+  let _emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5 = (Module._emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5 = asm._emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5);
+  let _emscripten_bind_MeshBuilder_AddFloatAttribute_5 = (Module._emscripten_bind_MeshBuilder_AddFloatAttribute_5 = asm._emscripten_bind_MeshBuilder_AddFloatAttribute_5);
+  let _emscripten_bind_MeshBuilder_AddInt16Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddInt16Attribute_5 = asm._emscripten_bind_MeshBuilder_AddInt16Attribute_5);
+  let _emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5 = (Module._emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5 = asm._emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5);
+  let _emscripten_bind_MeshBuilder_AddInt32Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddInt32Attribute_5 = asm._emscripten_bind_MeshBuilder_AddInt32Attribute_5);
+  let _emscripten_bind_MeshBuilder_AddInt8Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddInt8Attribute_5 = asm._emscripten_bind_MeshBuilder_AddInt8Attribute_5);
+  let _emscripten_bind_MeshBuilder_AddMetadataToMesh_2 = (Module._emscripten_bind_MeshBuilder_AddMetadataToMesh_2 = asm._emscripten_bind_MeshBuilder_AddMetadataToMesh_2);
+  let _emscripten_bind_MeshBuilder_AddMetadata_2 = (Module._emscripten_bind_MeshBuilder_AddMetadata_2 = asm._emscripten_bind_MeshBuilder_AddMetadata_2);
+  let _emscripten_bind_MeshBuilder_AddUInt16Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddUInt16Attribute_5 = asm._emscripten_bind_MeshBuilder_AddUInt16Attribute_5);
+  let _emscripten_bind_MeshBuilder_AddUInt32Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddUInt32Attribute_5 = asm._emscripten_bind_MeshBuilder_AddUInt32Attribute_5);
+  let _emscripten_bind_MeshBuilder_AddUInt8Attribute_5 = (Module._emscripten_bind_MeshBuilder_AddUInt8Attribute_5 = asm._emscripten_bind_MeshBuilder_AddUInt8Attribute_5);
+  let _emscripten_bind_MeshBuilder_MeshBuilder_0 = (Module._emscripten_bind_MeshBuilder_MeshBuilder_0 = asm._emscripten_bind_MeshBuilder_MeshBuilder_0);
+  let _emscripten_bind_MeshBuilder_SetMetadataForAttribute_3 = (Module._emscripten_bind_MeshBuilder_SetMetadataForAttribute_3 = asm._emscripten_bind_MeshBuilder_SetMetadataForAttribute_3);
+  let _emscripten_bind_MeshBuilder___destroy___0 = (Module._emscripten_bind_MeshBuilder___destroy___0 = asm._emscripten_bind_MeshBuilder___destroy___0);
+  let _emscripten_bind_Mesh_Mesh_0 = (Module._emscripten_bind_Mesh_Mesh_0 =
+    asm._emscripten_bind_Mesh_Mesh_0);
+  let _emscripten_bind_Mesh___destroy___0 = (Module._emscripten_bind_Mesh___destroy___0 = asm._emscripten_bind_Mesh___destroy___0);
+  let _emscripten_bind_Mesh_num_attributes_0 = (Module._emscripten_bind_Mesh_num_attributes_0 = asm._emscripten_bind_Mesh_num_attributes_0);
+  let _emscripten_bind_Mesh_num_faces_0 = (Module._emscripten_bind_Mesh_num_faces_0 = asm._emscripten_bind_Mesh_num_faces_0);
+  let _emscripten_bind_Mesh_num_points_0 = (Module._emscripten_bind_Mesh_num_points_0 = asm._emscripten_bind_Mesh_num_points_0);
+  let _emscripten_bind_Mesh_set_num_points_1 = (Module._emscripten_bind_Mesh_set_num_points_1 = asm._emscripten_bind_Mesh_set_num_points_1);
+  let _emscripten_bind_MetadataBuilder_AddDoubleEntry_3 = (Module._emscripten_bind_MetadataBuilder_AddDoubleEntry_3 = asm._emscripten_bind_MetadataBuilder_AddDoubleEntry_3);
+  let _emscripten_bind_MetadataBuilder_AddIntEntry_3 = (Module._emscripten_bind_MetadataBuilder_AddIntEntry_3 = asm._emscripten_bind_MetadataBuilder_AddIntEntry_3);
+  let _emscripten_bind_MetadataBuilder_AddStringEntry_3 = (Module._emscripten_bind_MetadataBuilder_AddStringEntry_3 = asm._emscripten_bind_MetadataBuilder_AddStringEntry_3);
+  let _emscripten_bind_MetadataBuilder_MetadataBuilder_0 = (Module._emscripten_bind_MetadataBuilder_MetadataBuilder_0 = asm._emscripten_bind_MetadataBuilder_MetadataBuilder_0);
+  let _emscripten_bind_MetadataBuilder___destroy___0 = (Module._emscripten_bind_MetadataBuilder___destroy___0 = asm._emscripten_bind_MetadataBuilder___destroy___0);
+  let _emscripten_bind_Metadata_Metadata_0 = (Module._emscripten_bind_Metadata_Metadata_0 = asm._emscripten_bind_Metadata_Metadata_0);
+  let _emscripten_bind_Metadata___destroy___0 = (Module._emscripten_bind_Metadata___destroy___0 = asm._emscripten_bind_Metadata___destroy___0);
+  let _emscripten_bind_PointAttribute_PointAttribute_0 = (Module._emscripten_bind_PointAttribute_PointAttribute_0 = asm._emscripten_bind_PointAttribute_PointAttribute_0);
+  let _emscripten_bind_PointAttribute___destroy___0 = (Module._emscripten_bind_PointAttribute___destroy___0 = asm._emscripten_bind_PointAttribute___destroy___0);
+  let _emscripten_bind_PointAttribute_attribute_type_0 = (Module._emscripten_bind_PointAttribute_attribute_type_0 = asm._emscripten_bind_PointAttribute_attribute_type_0);
+  let _emscripten_bind_PointAttribute_byte_offset_0 = (Module._emscripten_bind_PointAttribute_byte_offset_0 = asm._emscripten_bind_PointAttribute_byte_offset_0);
+  let _emscripten_bind_PointAttribute_byte_stride_0 = (Module._emscripten_bind_PointAttribute_byte_stride_0 = asm._emscripten_bind_PointAttribute_byte_stride_0);
+  let _emscripten_bind_PointAttribute_data_type_0 = (Module._emscripten_bind_PointAttribute_data_type_0 = asm._emscripten_bind_PointAttribute_data_type_0);
+  let _emscripten_bind_PointAttribute_normalized_0 = (Module._emscripten_bind_PointAttribute_normalized_0 = asm._emscripten_bind_PointAttribute_normalized_0);
+  let _emscripten_bind_PointAttribute_num_components_0 = (Module._emscripten_bind_PointAttribute_num_components_0 = asm._emscripten_bind_PointAttribute_num_components_0);
+  let _emscripten_bind_PointAttribute_size_0 = (Module._emscripten_bind_PointAttribute_size_0 = asm._emscripten_bind_PointAttribute_size_0);
+  let _emscripten_bind_PointAttribute_unique_id_0 = (Module._emscripten_bind_PointAttribute_unique_id_0 = asm._emscripten_bind_PointAttribute_unique_id_0);
+  let _emscripten_bind_PointCloudBuilder_AddFloatAttribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddFloatAttribute_5 = asm._emscripten_bind_PointCloudBuilder_AddFloatAttribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddInt16Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddInt16Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddInt16Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddInt32Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddInt32Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddInt32Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddInt8Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddInt8Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddInt8Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddMetadata_2 = (Module._emscripten_bind_PointCloudBuilder_AddMetadata_2 = asm._emscripten_bind_PointCloudBuilder_AddMetadata_2);
+  let _emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5 = (Module._emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5 = asm._emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5);
+  let _emscripten_bind_PointCloudBuilder_PointCloudBuilder_0 = (Module._emscripten_bind_PointCloudBuilder_PointCloudBuilder_0 = asm._emscripten_bind_PointCloudBuilder_PointCloudBuilder_0);
+  let _emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3 = (Module._emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3 = asm._emscripten_bind_PointCloudBuilder_SetMetadataForAttribute_3);
+  let _emscripten_bind_PointCloudBuilder___destroy___0 = (Module._emscripten_bind_PointCloudBuilder___destroy___0 = asm._emscripten_bind_PointCloudBuilder___destroy___0);
+  let _emscripten_bind_PointCloud_PointCloud_0 = (Module._emscripten_bind_PointCloud_PointCloud_0 = asm._emscripten_bind_PointCloud_PointCloud_0);
+  let _emscripten_bind_PointCloud___destroy___0 = (Module._emscripten_bind_PointCloud___destroy___0 = asm._emscripten_bind_PointCloud___destroy___0);
+  let _emscripten_bind_PointCloud_num_attributes_0 = (Module._emscripten_bind_PointCloud_num_attributes_0 = asm._emscripten_bind_PointCloud_num_attributes_0);
+  let _emscripten_bind_PointCloud_num_points_0 = (Module._emscripten_bind_PointCloud_num_points_0 = asm._emscripten_bind_PointCloud_num_points_0);
+  let _emscripten_bind_VoidPtr___destroy___0 = (Module._emscripten_bind_VoidPtr___destroy___0 = asm._emscripten_bind_VoidPtr___destroy___0);
+  let _emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE =
+    (Module._emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE =
+      asm._emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE);
+  let _emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD = (Module._emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD = asm._emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD);
+  let _emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH = (Module._emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH = asm._emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH);
+  let _emscripten_enum_draco_GeometryAttribute_Type_COLOR = (Module._emscripten_enum_draco_GeometryAttribute_Type_COLOR = asm._emscripten_enum_draco_GeometryAttribute_Type_COLOR);
+  let _emscripten_enum_draco_GeometryAttribute_Type_GENERIC = (Module._emscripten_enum_draco_GeometryAttribute_Type_GENERIC = asm._emscripten_enum_draco_GeometryAttribute_Type_GENERIC);
+  let _emscripten_enum_draco_GeometryAttribute_Type_INVALID = (Module._emscripten_enum_draco_GeometryAttribute_Type_INVALID = asm._emscripten_enum_draco_GeometryAttribute_Type_INVALID);
+  let _emscripten_enum_draco_GeometryAttribute_Type_NORMAL = (Module._emscripten_enum_draco_GeometryAttribute_Type_NORMAL = asm._emscripten_enum_draco_GeometryAttribute_Type_NORMAL);
+  let _emscripten_enum_draco_GeometryAttribute_Type_POSITION = (Module._emscripten_enum_draco_GeometryAttribute_Type_POSITION = asm._emscripten_enum_draco_GeometryAttribute_Type_POSITION);
+  let _emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD = (Module._emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD = asm._emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD);
+  let _emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING =
+    (Module._emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING =
+      asm._emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING);
+  let _emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING =
+    (Module._emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING =
+      asm._emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING);
+  var _emscripten_replace_memory = (Module._emscripten_replace_memory =
+    asm._emscripten_replace_memory);
+  let _free = (Module._free = asm._free);
+  let _i64Add = (Module._i64Add = asm._i64Add);
+  let _i64Subtract = (Module._i64Subtract = asm._i64Subtract);
+  let _llvm_bswap_i32 = (Module._llvm_bswap_i32 = asm._llvm_bswap_i32);
+  var _malloc = (Module._malloc = asm._malloc);
+  let _memcpy = (Module._memcpy = asm._memcpy);
+  let _memmove = (Module._memmove = asm._memmove);
+  let _memset = (Module._memset = asm._memset);
+  let _sbrk = (Module._sbrk = asm._sbrk);
+  let establishStackSpace = (Module.establishStackSpace =
+    asm.establishStackSpace);
+  let getTempRet0 = (Module.getTempRet0 = asm.getTempRet0);
+  let runPostSets = (Module.runPostSets = asm.runPostSets);
+  var setTempRet0 = (Module.setTempRet0 = asm.setTempRet0);
+  let setThrew = (Module.setThrew = asm.setThrew);
+  var stackAlloc = (Module.stackAlloc = asm.stackAlloc);
+  var stackRestore = (Module.stackRestore = asm.stackRestore);
+  var stackSave = (Module.stackSave = asm.stackSave);
+  let dynCall_ii = (Module.dynCall_ii = asm.dynCall_ii);
+  let dynCall_iii = (Module.dynCall_iii = asm.dynCall_iii);
+  let dynCall_iiii = (Module.dynCall_iiii = asm.dynCall_iiii);
+  let dynCall_iiiiiii = (Module.dynCall_iiiiiii = asm.dynCall_iiiiiii);
+  let dynCall_v = (Module.dynCall_v = asm.dynCall_v);
+  let dynCall_vi = (Module.dynCall_vi = asm.dynCall_vi);
+  let dynCall_vii = (Module.dynCall_vii = asm.dynCall_vii);
+  let dynCall_viii = (Module.dynCall_viii = asm.dynCall_viii);
+  let dynCall_viiii = (Module.dynCall_viiii = asm.dynCall_viiii);
+  let dynCall_viiiii = (Module.dynCall_viiiii = asm.dynCall_viiiii);
+  let dynCall_viiiiii = (Module.dynCall_viiiiii = asm.dynCall_viiiiii);
+  Module.asm = asm;
   if (memoryInitializer) {
     if (!isDataURI(memoryInitializer)) {
-      if (typeof Module['locateFile'] === 'function') {
-        memoryInitializer = Module['locateFile'](memoryInitializer);
-      } else if (Module['memoryInitializerPrefixURL']) {
+      if (typeof Module.locateFile === 'function') {
+        memoryInitializer = Module.locateFile(memoryInitializer);
+      } else if (Module.memoryInitializerPrefixURL) {
         memoryInitializer =
-          Module['memoryInitializerPrefixURL'] + memoryInitializer;
+          Module.memoryInitializerPrefixURL + memoryInitializer;
       }
     }
     if (ENVIRONMENT_IS_NODE || ENVIRONMENT_IS_SHELL) {
-      var data = Module['readBinary'](memoryInitializer);
+      let data = Module.readBinary(memoryInitializer);
       HEAPU8.set(data, GLOBAL_BASE);
     } else {
       addRunDependency('memory initializer');
-      var applyMemoryInitializer = function (data) {
+      let applyMemoryInitializer = function (data) {
         if (data.byteLength) data = new Uint8Array(data);
         HEAPU8.set(data, GLOBAL_BASE);
-        if (Module['memoryInitializerRequest'])
-          delete Module['memoryInitializerRequest'].response;
+        if (Module.memoryInitializerRequest)
+          delete Module.memoryInitializerRequest.response;
         removeRunDependency('memory initializer');
       };
       function doBrowserLoad() {
-        Module['readAsync'](
+        Module.readAsync(
           memoryInitializer,
           applyMemoryInitializer,
           function () {
-            throw 'could not load memory initializer ' + memoryInitializer;
+            throw `could not load memory initializer ${  memoryInitializer}`;
           }
         );
       }
-      var memoryInitializerBytes = tryParseAsDataURI(memoryInitializer);
+      let memoryInitializerBytes = tryParseAsDataURI(memoryInitializer);
       if (memoryInitializerBytes) {
         applyMemoryInitializer(memoryInitializerBytes.buffer);
-      } else if (Module['memoryInitializerRequest']) {
+      } else if (Module.memoryInitializerRequest) {
         function useRequest() {
-          var request = Module['memoryInitializerRequest'];
-          var response = request.response;
+          let request = Module.memoryInitializerRequest;
+          let {response} = request;
           if (request.status !== 200 && request.status !== 0) {
-            var data = tryParseAsDataURI(Module['memoryInitializerRequestURL']);
+            let data = tryParseAsDataURI(Module.memoryInitializerRequestURL);
             if (data) {
               response = data.buffer;
             } else {
               console.warn(
-                'a problem seems to have happened with Module.memoryInitializerRequest, status: ' +
-                  request.status +
-                  ', retrying ' +
-                  memoryInitializer
+                `a problem seems to have happened with Module.memoryInitializerRequest, status: ${ 
+                  request.status 
+                  }, retrying ${ 
+                  memoryInitializer}`
               );
               doBrowserLoad();
               return;
@@ -90125,10 +89941,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           }
           applyMemoryInitializer(response);
         }
-        if (Module['memoryInitializerRequest'].response) {
+        if (Module.memoryInitializerRequest.response) {
           setTimeout(useRequest, 0);
         } else {
-          Module['memoryInitializerRequest'].addEventListener(
+          Module.memoryInitializerRequest.addEventListener(
             'load',
             useRequest
           );
@@ -90138,12 +89954,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
     }
   }
-  Module['then'] = function (func) {
-    if (Module['calledRun']) {
+  Module.then = function (func) {
+    if (Module.calledRun) {
       func(Module);
     } else {
-      var old = Module['onRuntimeInitialized'];
-      Module['onRuntimeInitialized'] = function () {
+      let old = Module.onRuntimeInitialized;
+      Module.onRuntimeInitialized = function () {
         if (old) old();
         func(Module);
       };
@@ -90152,38 +89968,38 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   };
   function ExitStatus(status) {
     this.name = 'ExitStatus';
-    this.message = 'Program terminated with exit(' + status + ')';
+    this.message = `Program terminated with exit(${  status  })`;
     this.status = status;
   }
   ExitStatus.prototype = new Error();
   ExitStatus.prototype.constructor = ExitStatus;
-  var initialStackTop;
+  let initialStackTop;
   dependenciesFulfilled = function runCaller() {
-    if (!Module['calledRun']) run();
-    if (!Module['calledRun']) dependenciesFulfilled = runCaller;
+    if (!Module.calledRun) run();
+    if (!Module.calledRun) dependenciesFulfilled = runCaller;
   };
   function run(args) {
-    args = args || Module['arguments'];
+    args = args || Module.arguments;
     if (runDependencies > 0) {
       return;
     }
     preRun();
     if (runDependencies > 0) return;
-    if (Module['calledRun']) return;
+    if (Module.calledRun) return;
     function doRun() {
-      if (Module['calledRun']) return;
-      Module['calledRun'] = true;
+      if (Module.calledRun) return;
+      Module.calledRun = true;
       if (ABORT) return;
       ensureInitRuntime();
       preMain();
-      if (Module['onRuntimeInitialized']) Module['onRuntimeInitialized']();
+      if (Module.onRuntimeInitialized) Module.onRuntimeInitialized();
       postRun();
     }
-    if (Module['setStatus']) {
-      Module['setStatus']('Running...');
+    if (Module.setStatus) {
+      Module.setStatus('Running...');
       setTimeout(function () {
         setTimeout(function () {
-          Module['setStatus']('');
+          Module.setStatus('');
         }, 1);
         doRun();
       }, 1);
@@ -90191,28 +90007,28 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       doRun();
     }
   }
-  Module['run'] = run;
+  Module.run = run;
   function exit(status, implicit) {
-    if (implicit && Module['noExitRuntime'] && status === 0) {
+    if (implicit && Module.noExitRuntime && status === 0) {
       return;
     }
-    if (Module['noExitRuntime']) {
+    if (Module.noExitRuntime) {
     } else {
       ABORT = true;
       EXITSTATUS = status;
       STACKTOP = initialStackTop;
       exitRuntime();
-      if (Module['onExit']) Module['onExit'](status);
+      if (Module.onExit) Module.onExit(status);
     }
     if (ENVIRONMENT_IS_NODE) {
-      process['exit'](status);
+      process.exit(status);
     }
-    Module['quit'](status, new ExitStatus(status));
+    Module.quit(status, new ExitStatus(status));
   }
-  Module['exit'] = exit;
+  Module.exit = exit;
   function abort(what) {
-    if (Module['onAbort']) {
-      Module['onAbort'](what);
+    if (Module.onAbort) {
+      Module.onAbort(what);
     }
     if (what !== undefined) {
       Module.print(what);
@@ -90223,95 +90039,95 @@ var DracoEncoderModule = function (DracoEncoderModule) {
     }
     ABORT = true;
     EXITSTATUS = 1;
-    throw 'abort(' + what + '). Build with -s ASSERTIONS=1 for more info.';
+    throw `abort(${  what  }). Build with -s ASSERTIONS=1 for more info.`;
   }
-  Module['abort'] = abort;
-  if (Module['preInit']) {
-    if (typeof Module['preInit'] == 'function')
-      Module['preInit'] = [Module['preInit']];
-    while (Module['preInit'].length > 0) {
-      Module['preInit'].pop()();
+  Module.abort = abort;
+  if (Module.preInit) {
+    if (typeof Module.preInit === 'function')
+      Module.preInit = [Module.preInit];
+    while (Module.preInit.length > 0) {
+      Module.preInit.pop()();
     }
   }
-  Module['noExitRuntime'] = true;
+  Module.noExitRuntime = true;
   run();
   function WrapperObject() {}
   WrapperObject.prototype = Object.create(WrapperObject.prototype);
   WrapperObject.prototype.constructor = WrapperObject;
   WrapperObject.prototype.__class__ = WrapperObject;
   WrapperObject.__cache__ = {};
-  Module['WrapperObject'] = WrapperObject;
+  Module.WrapperObject = WrapperObject;
   function getCache(__class__) {
     return (__class__ || WrapperObject).__cache__;
   }
-  Module['getCache'] = getCache;
+  Module.getCache = getCache;
   function wrapPointer(ptr, __class__) {
-    var cache = getCache(__class__);
-    var ret = cache[ptr];
+    let cache = getCache(__class__);
+    let ret = cache[ptr];
     if (ret) return ret;
     ret = Object.create((__class__ || WrapperObject).prototype);
     ret.ptr = ptr;
     return (cache[ptr] = ret);
   }
-  Module['wrapPointer'] = wrapPointer;
+  Module.wrapPointer = wrapPointer;
   function castObject(obj, __class__) {
     return wrapPointer(obj.ptr, __class__);
   }
-  Module['castObject'] = castObject;
-  Module['NULL'] = wrapPointer(0);
+  Module.castObject = castObject;
+  Module.NULL = wrapPointer(0);
   function destroy(obj) {
-    if (!obj['__destroy__'])
+    if (!obj.__destroy__)
       throw 'Error: Cannot destroy object. (Did you create it yourself?)';
-    obj['__destroy__']();
+    obj.__destroy__();
     delete getCache(obj.__class__)[obj.ptr];
   }
-  Module['destroy'] = destroy;
+  Module.destroy = destroy;
   function compare(obj1, obj2) {
     return obj1.ptr === obj2.ptr;
   }
-  Module['compare'] = compare;
+  Module.compare = compare;
   function getPointer(obj) {
     return obj.ptr;
   }
-  Module['getPointer'] = getPointer;
+  Module.getPointer = getPointer;
   function getClass(obj) {
     return obj.__class__;
   }
-  Module['getClass'] = getClass;
+  Module.getClass = getClass;
   var ensureCache = {
     buffer: 0,
     size: 0,
     pos: 0,
     temps: [],
     needed: 0,
-    prepare: function () {
+    prepare () {
       if (ensureCache.needed) {
-        for (var i = 0; i < ensureCache.temps.length; i++) {
-          Module['_free'](ensureCache.temps[i]);
+        for (let i = 0; i < ensureCache.temps.length; i++) {
+          Module._free(ensureCache.temps[i]);
         }
         ensureCache.temps.length = 0;
-        Module['_free'](ensureCache.buffer);
+        Module._free(ensureCache.buffer);
         ensureCache.buffer = 0;
         ensureCache.size += ensureCache.needed;
         ensureCache.needed = 0;
       }
       if (!ensureCache.buffer) {
         ensureCache.size += 128;
-        ensureCache.buffer = Module['_malloc'](ensureCache.size);
+        ensureCache.buffer = Module._malloc(ensureCache.size);
         assert(ensureCache.buffer);
       }
       ensureCache.pos = 0;
     },
-    alloc: function (array, view) {
+    alloc (array, view) {
       assert(ensureCache.buffer);
-      var bytes = view.BYTES_PER_ELEMENT;
-      var len = array.length * bytes;
+      let bytes = view.BYTES_PER_ELEMENT;
+      let len = array.length * bytes;
       len = (len + 7) & -8;
-      var ret;
+      let ret;
       if (ensureCache.pos + len >= ensureCache.size) {
         assert(len > 0);
         ensureCache.needed += len;
-        ret = Module['_malloc'](len);
+        ret = Module._malloc(len);
         ensureCache.temps.push(ret);
       } else {
         ret = ensureCache.buffer + ensureCache.pos;
@@ -90319,9 +90135,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       }
       return ret;
     },
-    copy: function (array, view, offset) {
-      var offsetShifted = offset;
-      var bytes = view.BYTES_PER_ELEMENT;
+    copy (array, view, offset) {
+      let offsetShifted = offset;
+      let bytes = view.BYTES_PER_ELEMENT;
       switch (bytes) {
         case 2:
           offsetShifted >>= 1;
@@ -90333,15 +90149,15 @@ var DracoEncoderModule = function (DracoEncoderModule) {
           offsetShifted >>= 3;
           break;
       }
-      for (var i = 0; i < array.length; i++) {
+      for (let i = 0; i < array.length; i++) {
         view[offsetShifted + i] = array[i];
       }
     },
   };
   function ensureString(value) {
     if (typeof value === 'string') {
-      var intArray = intArrayFromString(value);
-      var offset = ensureCache.alloc(intArray, HEAP8);
+      let intArray = intArrayFromString(value);
+      let offset = ensureCache.alloc(intArray, HEAP8);
       ensureCache.copy(intArray, HEAP8, offset);
       return offset;
     }
@@ -90349,7 +90165,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function ensureInt8(value) {
     if (typeof value === 'object') {
-      var offset = ensureCache.alloc(value, HEAP8);
+      let offset = ensureCache.alloc(value, HEAP8);
       ensureCache.copy(value, HEAP8, offset);
       return offset;
     }
@@ -90357,7 +90173,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function ensureInt16(value) {
     if (typeof value === 'object') {
-      var offset = ensureCache.alloc(value, HEAP16);
+      let offset = ensureCache.alloc(value, HEAP16);
       ensureCache.copy(value, HEAP16, offset);
       return offset;
     }
@@ -90365,7 +90181,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function ensureInt32(value) {
     if (typeof value === 'object') {
-      var offset = ensureCache.alloc(value, HEAP32);
+      let offset = ensureCache.alloc(value, HEAP32);
       ensureCache.copy(value, HEAP32, offset);
       return offset;
     }
@@ -90373,7 +90189,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   }
   function ensureFloat32(value) {
     if (typeof value === 'object') {
-      var offset = ensureCache.alloc(value, HEAPF32);
+      let offset = ensureCache.alloc(value, HEAPF32);
       ensureCache.copy(value, HEAPF32, offset);
       return offset;
     }
@@ -90387,20 +90203,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   PointCloud.prototype.constructor = PointCloud;
   PointCloud.prototype.__class__ = PointCloud;
   PointCloud.__cache__ = {};
-  Module['PointCloud'] = PointCloud;
-  PointCloud.prototype['num_attributes'] = PointCloud.prototype.num_attributes =
+  Module.PointCloud = PointCloud;
+  PointCloud.prototype.num_attributes = PointCloud.prototype.num_attributes =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointCloud_num_attributes_0(self);
     };
-  PointCloud.prototype['num_points'] = PointCloud.prototype.num_points =
+  PointCloud.prototype.num_points = PointCloud.prototype.num_points =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointCloud_num_points_0(self);
     };
-  PointCloud.prototype['__destroy__'] = PointCloud.prototype.__destroy__ =
+  PointCloud.prototype.__destroy__ = PointCloud.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_PointCloud___destroy___0(self);
     };
   function ExpertEncoder(arg0) {
@@ -90412,16 +90228,16 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   ExpertEncoder.prototype.constructor = ExpertEncoder;
   ExpertEncoder.prototype.__class__ = ExpertEncoder;
   ExpertEncoder.__cache__ = {};
-  Module['ExpertEncoder'] = ExpertEncoder;
-  ExpertEncoder.prototype['SetEncodingMethod'] =
+  Module.ExpertEncoder = ExpertEncoder;
+  ExpertEncoder.prototype.SetEncodingMethod =
     ExpertEncoder.prototype.SetEncodingMethod = function (arg0) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       _emscripten_bind_ExpertEncoder_SetEncodingMethod_1(self, arg0);
     };
-  ExpertEncoder.prototype['SetAttributeQuantization'] =
+  ExpertEncoder.prototype.SetAttributeQuantization =
     ExpertEncoder.prototype.SetAttributeQuantization = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       _emscripten_bind_ExpertEncoder_SetAttributeQuantization_2(
@@ -90430,7 +90246,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg1
       );
     };
-  ExpertEncoder.prototype['SetAttributeExplicitQuantization'] =
+  ExpertEncoder.prototype.SetAttributeExplicitQuantization =
     ExpertEncoder.prototype.SetAttributeExplicitQuantization = function (
       arg0,
       arg1,
@@ -90438,12 +90254,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
-      if (typeof arg3 == 'object') {
+      if (typeof arg3 === 'object') {
         arg3 = ensureFloat32(arg3);
       }
       if (arg4 && typeof arg4 === 'object') arg4 = arg4.ptr;
@@ -90456,22 +90272,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  ExpertEncoder.prototype['SetSpeedOptions'] =
+  ExpertEncoder.prototype.SetSpeedOptions =
     ExpertEncoder.prototype.SetSpeedOptions = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       _emscripten_bind_ExpertEncoder_SetSpeedOptions_2(self, arg0, arg1);
     };
-  ExpertEncoder.prototype['SetTrackEncodedProperties'] =
+  ExpertEncoder.prototype.SetTrackEncodedProperties =
     ExpertEncoder.prototype.SetTrackEncodedProperties = function (arg0) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       _emscripten_bind_ExpertEncoder_SetTrackEncodedProperties_1(self, arg0);
     };
-  ExpertEncoder.prototype['EncodeToDracoBuffer'] =
+  ExpertEncoder.prototype.EncodeToDracoBuffer =
     ExpertEncoder.prototype.EncodeToDracoBuffer = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       return _emscripten_bind_ExpertEncoder_EncodeToDracoBuffer_2(
@@ -90480,19 +90296,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg1
       );
     };
-  ExpertEncoder.prototype['GetNumberOfEncodedPoints'] =
+  ExpertEncoder.prototype.GetNumberOfEncodedPoints =
     ExpertEncoder.prototype.GetNumberOfEncodedPoints = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_ExpertEncoder_GetNumberOfEncodedPoints_0(self);
     };
-  ExpertEncoder.prototype['GetNumberOfEncodedFaces'] =
+  ExpertEncoder.prototype.GetNumberOfEncodedFaces =
     ExpertEncoder.prototype.GetNumberOfEncodedFaces = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_ExpertEncoder_GetNumberOfEncodedFaces_0(self);
     };
-  ExpertEncoder.prototype['__destroy__'] = ExpertEncoder.prototype.__destroy__ =
+  ExpertEncoder.prototype.__destroy__ = ExpertEncoder.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_ExpertEncoder___destroy___0(self);
     };
   function PointAttribute() {
@@ -90503,50 +90319,50 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   PointAttribute.prototype.constructor = PointAttribute;
   PointAttribute.prototype.__class__ = PointAttribute;
   PointAttribute.__cache__ = {};
-  Module['PointAttribute'] = PointAttribute;
-  PointAttribute.prototype['size'] = PointAttribute.prototype.size =
+  Module.PointAttribute = PointAttribute;
+  PointAttribute.prototype.size = PointAttribute.prototype.size =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_size_0(self);
     };
-  PointAttribute.prototype['attribute_type'] =
+  PointAttribute.prototype.attribute_type =
     PointAttribute.prototype.attribute_type = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_attribute_type_0(self);
     };
-  PointAttribute.prototype['data_type'] = PointAttribute.prototype.data_type =
+  PointAttribute.prototype.data_type = PointAttribute.prototype.data_type =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_data_type_0(self);
     };
-  PointAttribute.prototype['num_components'] =
+  PointAttribute.prototype.num_components =
     PointAttribute.prototype.num_components = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_num_components_0(self);
     };
-  PointAttribute.prototype['normalized'] = PointAttribute.prototype.normalized =
+  PointAttribute.prototype.normalized = PointAttribute.prototype.normalized =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return !!_emscripten_bind_PointAttribute_normalized_0(self);
     };
-  PointAttribute.prototype['byte_stride'] =
+  PointAttribute.prototype.byte_stride =
     PointAttribute.prototype.byte_stride = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_byte_stride_0(self);
     };
-  PointAttribute.prototype['byte_offset'] =
+  PointAttribute.prototype.byte_offset =
     PointAttribute.prototype.byte_offset = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_byte_offset_0(self);
     };
-  PointAttribute.prototype['unique_id'] = PointAttribute.prototype.unique_id =
+  PointAttribute.prototype.unique_id = PointAttribute.prototype.unique_id =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_PointAttribute_unique_id_0(self);
     };
-  PointAttribute.prototype['__destroy__'] =
+  PointAttribute.prototype.__destroy__ =
     PointAttribute.prototype.__destroy__ = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_PointAttribute___destroy___0(self);
     };
   function Encoder() {
@@ -90557,21 +90373,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   Encoder.prototype.constructor = Encoder;
   Encoder.prototype.__class__ = Encoder;
   Encoder.__cache__ = {};
-  Module['Encoder'] = Encoder;
-  Encoder.prototype['SetEncodingMethod'] = Encoder.prototype.SetEncodingMethod =
+  Module.Encoder = Encoder;
+  Encoder.prototype.SetEncodingMethod = Encoder.prototype.SetEncodingMethod =
     function (arg0) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       _emscripten_bind_Encoder_SetEncodingMethod_1(self, arg0);
     };
-  Encoder.prototype['SetAttributeQuantization'] =
+  Encoder.prototype.SetAttributeQuantization =
     Encoder.prototype.SetAttributeQuantization = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       _emscripten_bind_Encoder_SetAttributeQuantization_2(self, arg0, arg1);
     };
-  Encoder.prototype['SetAttributeExplicitQuantization'] =
+  Encoder.prototype.SetAttributeExplicitQuantization =
     Encoder.prototype.SetAttributeExplicitQuantization = function (
       arg0,
       arg1,
@@ -90579,12 +90395,12 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
-      if (typeof arg3 == 'object') {
+      if (typeof arg3 === 'object') {
         arg3 = ensureFloat32(arg3);
       }
       if (arg4 && typeof arg4 === 'object') arg4 = arg4.ptr;
@@ -90597,22 +90413,22 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  Encoder.prototype['SetSpeedOptions'] = Encoder.prototype.SetSpeedOptions =
+  Encoder.prototype.SetSpeedOptions = Encoder.prototype.SetSpeedOptions =
     function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       _emscripten_bind_Encoder_SetSpeedOptions_2(self, arg0, arg1);
     };
-  Encoder.prototype['SetTrackEncodedProperties'] =
+  Encoder.prototype.SetTrackEncodedProperties =
     Encoder.prototype.SetTrackEncodedProperties = function (arg0) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       _emscripten_bind_Encoder_SetTrackEncodedProperties_1(self, arg0);
     };
-  Encoder.prototype['EncodeMeshToDracoBuffer'] =
+  Encoder.prototype.EncodeMeshToDracoBuffer =
     Encoder.prototype.EncodeMeshToDracoBuffer = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       return _emscripten_bind_Encoder_EncodeMeshToDracoBuffer_2(
@@ -90621,13 +90437,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg1
       );
     };
-  Encoder.prototype['EncodePointCloudToDracoBuffer'] =
+  Encoder.prototype.EncodePointCloudToDracoBuffer =
     Encoder.prototype.EncodePointCloudToDracoBuffer = function (
       arg0,
       arg1,
       arg2
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
@@ -90638,19 +90454,19 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  Encoder.prototype['GetNumberOfEncodedPoints'] =
+  Encoder.prototype.GetNumberOfEncodedPoints =
     Encoder.prototype.GetNumberOfEncodedPoints = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_Encoder_GetNumberOfEncodedPoints_0(self);
     };
-  Encoder.prototype['GetNumberOfEncodedFaces'] =
+  Encoder.prototype.GetNumberOfEncodedFaces =
     Encoder.prototype.GetNumberOfEncodedFaces = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_Encoder_GetNumberOfEncodedFaces_0(self);
     };
-  Encoder.prototype['__destroy__'] = Encoder.prototype.__destroy__ =
+  Encoder.prototype.__destroy__ = Encoder.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_Encoder___destroy___0(self);
     };
   function MeshBuilder() {
@@ -90661,14 +90477,14 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   MeshBuilder.prototype.constructor = MeshBuilder;
   MeshBuilder.prototype.__class__ = MeshBuilder;
   MeshBuilder.__cache__ = {};
-  Module['MeshBuilder'] = MeshBuilder;
-  MeshBuilder.prototype['AddFacesToMesh'] =
+  Module.MeshBuilder = MeshBuilder;
+  MeshBuilder.prototype.AddFacesToMesh =
     MeshBuilder.prototype.AddFacesToMesh = function (arg0, arg1, arg2) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
-      if (typeof arg2 == 'object') {
+      if (typeof arg2 === 'object') {
         arg2 = ensureInt32(arg2);
       }
       return !!_emscripten_bind_MeshBuilder_AddFacesToMesh_3(
@@ -90678,7 +90494,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  MeshBuilder.prototype['AddFloatAttributeToMesh'] =
+  MeshBuilder.prototype.AddFloatAttributeToMesh =
     MeshBuilder.prototype.AddFloatAttributeToMesh = function (
       arg0,
       arg1,
@@ -90686,13 +90502,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureFloat32(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddFloatAttributeToMesh_5(
@@ -90704,7 +90520,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddInt32AttributeToMesh'] =
+  MeshBuilder.prototype.AddInt32AttributeToMesh =
     MeshBuilder.prototype.AddInt32AttributeToMesh = function (
       arg0,
       arg1,
@@ -90712,13 +90528,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt32(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddInt32AttributeToMesh_5(
@@ -90730,9 +90546,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddMetadataToMesh'] =
+  MeshBuilder.prototype.AddMetadataToMesh =
     MeshBuilder.prototype.AddMetadataToMesh = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       return !!_emscripten_bind_MeshBuilder_AddMetadataToMesh_2(
@@ -90741,7 +90557,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg1
       );
     };
-  MeshBuilder.prototype['AddFloatAttribute'] =
+  MeshBuilder.prototype.AddFloatAttribute =
     MeshBuilder.prototype.AddFloatAttribute = function (
       arg0,
       arg1,
@@ -90749,13 +90565,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureFloat32(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddFloatAttribute_5(
@@ -90767,7 +90583,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddInt8Attribute'] =
+  MeshBuilder.prototype.AddInt8Attribute =
     MeshBuilder.prototype.AddInt8Attribute = function (
       arg0,
       arg1,
@@ -90775,13 +90591,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt8(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddInt8Attribute_5(
@@ -90793,7 +90609,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddUInt8Attribute'] =
+  MeshBuilder.prototype.AddUInt8Attribute =
     MeshBuilder.prototype.AddUInt8Attribute = function (
       arg0,
       arg1,
@@ -90801,13 +90617,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt8(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddUInt8Attribute_5(
@@ -90819,7 +90635,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddInt16Attribute'] =
+  MeshBuilder.prototype.AddInt16Attribute =
     MeshBuilder.prototype.AddInt16Attribute = function (
       arg0,
       arg1,
@@ -90827,13 +90643,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt16(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddInt16Attribute_5(
@@ -90845,7 +90661,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddUInt16Attribute'] =
+  MeshBuilder.prototype.AddUInt16Attribute =
     MeshBuilder.prototype.AddUInt16Attribute = function (
       arg0,
       arg1,
@@ -90853,13 +90669,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt16(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddUInt16Attribute_5(
@@ -90871,7 +90687,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddInt32Attribute'] =
+  MeshBuilder.prototype.AddInt32Attribute =
     MeshBuilder.prototype.AddInt32Attribute = function (
       arg0,
       arg1,
@@ -90879,13 +90695,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt32(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddInt32Attribute_5(
@@ -90897,7 +90713,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddUInt32Attribute'] =
+  MeshBuilder.prototype.AddUInt32Attribute =
     MeshBuilder.prototype.AddUInt32Attribute = function (
       arg0,
       arg1,
@@ -90905,13 +90721,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt32(arg4);
       }
       return _emscripten_bind_MeshBuilder_AddUInt32Attribute_5(
@@ -90923,20 +90739,20 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  MeshBuilder.prototype['AddMetadata'] = MeshBuilder.prototype.AddMetadata =
+  MeshBuilder.prototype.AddMetadata = MeshBuilder.prototype.AddMetadata =
     function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       return !!_emscripten_bind_MeshBuilder_AddMetadata_2(self, arg0, arg1);
     };
-  MeshBuilder.prototype['SetMetadataForAttribute'] =
+  MeshBuilder.prototype.SetMetadataForAttribute =
     MeshBuilder.prototype.SetMetadataForAttribute = function (
       arg0,
       arg1,
       arg2
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
@@ -90947,9 +90763,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  MeshBuilder.prototype['__destroy__'] = MeshBuilder.prototype.__destroy__ =
+  MeshBuilder.prototype.__destroy__ = MeshBuilder.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_MeshBuilder___destroy___0(self);
     };
   function DracoInt8Array() {
@@ -90960,21 +90776,21 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   DracoInt8Array.prototype.constructor = DracoInt8Array;
   DracoInt8Array.prototype.__class__ = DracoInt8Array;
   DracoInt8Array.__cache__ = {};
-  Module['DracoInt8Array'] = DracoInt8Array;
-  DracoInt8Array.prototype['GetValue'] = DracoInt8Array.prototype.GetValue =
+  Module.DracoInt8Array = DracoInt8Array;
+  DracoInt8Array.prototype.GetValue = DracoInt8Array.prototype.GetValue =
     function (arg0) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       return _emscripten_bind_DracoInt8Array_GetValue_1(self, arg0);
     };
-  DracoInt8Array.prototype['size'] = DracoInt8Array.prototype.size =
+  DracoInt8Array.prototype.size = DracoInt8Array.prototype.size =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_DracoInt8Array_size_0(self);
     };
-  DracoInt8Array.prototype['__destroy__'] =
+  DracoInt8Array.prototype.__destroy__ =
     DracoInt8Array.prototype.__destroy__ = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_DracoInt8Array___destroy___0(self);
     };
   function MetadataBuilder() {
@@ -90985,10 +90801,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   MetadataBuilder.prototype.constructor = MetadataBuilder;
   MetadataBuilder.prototype.__class__ = MetadataBuilder;
   MetadataBuilder.__cache__ = {};
-  Module['MetadataBuilder'] = MetadataBuilder;
-  MetadataBuilder.prototype['AddStringEntry'] =
+  Module.MetadataBuilder = MetadataBuilder;
+  MetadataBuilder.prototype.AddStringEntry =
     MetadataBuilder.prototype.AddStringEntry = function (arg0, arg1, arg2) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
@@ -91002,9 +90818,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  MetadataBuilder.prototype['AddIntEntry'] =
+  MetadataBuilder.prototype.AddIntEntry =
     MetadataBuilder.prototype.AddIntEntry = function (arg0, arg1, arg2) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
@@ -91017,9 +90833,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  MetadataBuilder.prototype['AddDoubleEntry'] =
+  MetadataBuilder.prototype.AddDoubleEntry =
     MetadataBuilder.prototype.AddDoubleEntry = function (arg0, arg1, arg2) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
@@ -91032,9 +90848,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  MetadataBuilder.prototype['__destroy__'] =
+  MetadataBuilder.prototype.__destroy__ =
     MetadataBuilder.prototype.__destroy__ = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_MetadataBuilder___destroy___0(self);
     };
   function GeometryAttribute() {
@@ -91045,10 +90861,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   GeometryAttribute.prototype.constructor = GeometryAttribute;
   GeometryAttribute.prototype.__class__ = GeometryAttribute;
   GeometryAttribute.__cache__ = {};
-  Module['GeometryAttribute'] = GeometryAttribute;
-  GeometryAttribute.prototype['__destroy__'] =
+  Module.GeometryAttribute = GeometryAttribute;
+  GeometryAttribute.prototype.__destroy__ =
     GeometryAttribute.prototype.__destroy__ = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_GeometryAttribute___destroy___0(self);
     };
   function Mesh() {
@@ -91059,29 +90875,29 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   Mesh.prototype.constructor = Mesh;
   Mesh.prototype.__class__ = Mesh;
   Mesh.__cache__ = {};
-  Module['Mesh'] = Mesh;
-  Mesh.prototype['num_faces'] = Mesh.prototype.num_faces = function () {
-    var self = this.ptr;
+  Module.Mesh = Mesh;
+  Mesh.prototype.num_faces = Mesh.prototype.num_faces = function () {
+    let self = this.ptr;
     return _emscripten_bind_Mesh_num_faces_0(self);
   };
-  Mesh.prototype['num_attributes'] = Mesh.prototype.num_attributes =
+  Mesh.prototype.num_attributes = Mesh.prototype.num_attributes =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       return _emscripten_bind_Mesh_num_attributes_0(self);
     };
-  Mesh.prototype['num_points'] = Mesh.prototype.num_points = function () {
-    var self = this.ptr;
+  Mesh.prototype.num_points = Mesh.prototype.num_points = function () {
+    let self = this.ptr;
     return _emscripten_bind_Mesh_num_points_0(self);
   };
-  Mesh.prototype['set_num_points'] = Mesh.prototype.set_num_points = function (
+  Mesh.prototype.set_num_points = Mesh.prototype.set_num_points = function (
     arg0
   ) {
-    var self = this.ptr;
+    let self = this.ptr;
     if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
     _emscripten_bind_Mesh_set_num_points_1(self, arg0);
   };
-  Mesh.prototype['__destroy__'] = Mesh.prototype.__destroy__ = function () {
-    var self = this.ptr;
+  Mesh.prototype.__destroy__ = Mesh.prototype.__destroy__ = function () {
+    let self = this.ptr;
     _emscripten_bind_Mesh___destroy___0(self);
   };
   function PointCloudBuilder() {
@@ -91092,8 +90908,8 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   PointCloudBuilder.prototype.constructor = PointCloudBuilder;
   PointCloudBuilder.prototype.__class__ = PointCloudBuilder;
   PointCloudBuilder.__cache__ = {};
-  Module['PointCloudBuilder'] = PointCloudBuilder;
-  PointCloudBuilder.prototype['AddFloatAttribute'] =
+  Module.PointCloudBuilder = PointCloudBuilder;
+  PointCloudBuilder.prototype.AddFloatAttribute =
     PointCloudBuilder.prototype.AddFloatAttribute = function (
       arg0,
       arg1,
@@ -91101,13 +90917,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureFloat32(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddFloatAttribute_5(
@@ -91119,7 +90935,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddInt8Attribute'] =
+  PointCloudBuilder.prototype.AddInt8Attribute =
     PointCloudBuilder.prototype.AddInt8Attribute = function (
       arg0,
       arg1,
@@ -91127,13 +90943,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt8(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddInt8Attribute_5(
@@ -91145,7 +90961,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddUInt8Attribute'] =
+  PointCloudBuilder.prototype.AddUInt8Attribute =
     PointCloudBuilder.prototype.AddUInt8Attribute = function (
       arg0,
       arg1,
@@ -91153,13 +90969,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt8(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddUInt8Attribute_5(
@@ -91171,7 +90987,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddInt16Attribute'] =
+  PointCloudBuilder.prototype.AddInt16Attribute =
     PointCloudBuilder.prototype.AddInt16Attribute = function (
       arg0,
       arg1,
@@ -91179,13 +90995,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt16(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddInt16Attribute_5(
@@ -91197,7 +91013,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddUInt16Attribute'] =
+  PointCloudBuilder.prototype.AddUInt16Attribute =
     PointCloudBuilder.prototype.AddUInt16Attribute = function (
       arg0,
       arg1,
@@ -91205,13 +91021,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt16(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddUInt16Attribute_5(
@@ -91223,7 +91039,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddInt32Attribute'] =
+  PointCloudBuilder.prototype.AddInt32Attribute =
     PointCloudBuilder.prototype.AddInt32Attribute = function (
       arg0,
       arg1,
@@ -91231,13 +91047,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt32(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddInt32Attribute_5(
@@ -91249,7 +91065,7 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddUInt32Attribute'] =
+  PointCloudBuilder.prototype.AddUInt32Attribute =
     PointCloudBuilder.prototype.AddUInt32Attribute = function (
       arg0,
       arg1,
@@ -91257,13 +91073,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
       arg3,
       arg4
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       ensureCache.prepare();
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
       if (arg3 && typeof arg3 === 'object') arg3 = arg3.ptr;
-      if (typeof arg4 == 'object') {
+      if (typeof arg4 === 'object') {
         arg4 = ensureInt32(arg4);
       }
       return _emscripten_bind_PointCloudBuilder_AddUInt32Attribute_5(
@@ -91275,9 +91091,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg4
       );
     };
-  PointCloudBuilder.prototype['AddMetadata'] =
+  PointCloudBuilder.prototype.AddMetadata =
     PointCloudBuilder.prototype.AddMetadata = function (arg0, arg1) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       return !!_emscripten_bind_PointCloudBuilder_AddMetadata_2(
@@ -91286,13 +91102,13 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg1
       );
     };
-  PointCloudBuilder.prototype['SetMetadataForAttribute'] =
+  PointCloudBuilder.prototype.SetMetadataForAttribute =
     PointCloudBuilder.prototype.SetMetadataForAttribute = function (
       arg0,
       arg1,
       arg2
     ) {
-      var self = this.ptr;
+      let self = this.ptr;
       if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
       if (arg1 && typeof arg1 === 'object') arg1 = arg1.ptr;
       if (arg2 && typeof arg2 === 'object') arg2 = arg2.ptr;
@@ -91303,9 +91119,9 @@ var DracoEncoderModule = function (DracoEncoderModule) {
         arg2
       );
     };
-  PointCloudBuilder.prototype['__destroy__'] =
+  PointCloudBuilder.prototype.__destroy__ =
     PointCloudBuilder.prototype.__destroy__ = function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_PointCloudBuilder___destroy___0(self);
     };
   function VoidPtr() {
@@ -91315,10 +91131,10 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   VoidPtr.prototype.constructor = VoidPtr;
   VoidPtr.prototype.__class__ = VoidPtr;
   VoidPtr.__cache__ = {};
-  Module['VoidPtr'] = VoidPtr;
-  VoidPtr.prototype['__destroy__'] = VoidPtr.prototype.__destroy__ =
+  Module.VoidPtr = VoidPtr;
+  VoidPtr.prototype.__destroy__ = VoidPtr.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_VoidPtr___destroy___0(self);
     };
   function Metadata() {
@@ -91329,49 +91145,49 @@ var DracoEncoderModule = function (DracoEncoderModule) {
   Metadata.prototype.constructor = Metadata;
   Metadata.prototype.__class__ = Metadata;
   Metadata.__cache__ = {};
-  Module['Metadata'] = Metadata;
-  Metadata.prototype['__destroy__'] = Metadata.prototype.__destroy__ =
+  Module.Metadata = Metadata;
+  Metadata.prototype.__destroy__ = Metadata.prototype.__destroy__ =
     function () {
-      var self = this.ptr;
+      let self = this.ptr;
       _emscripten_bind_Metadata___destroy___0(self);
     };
   (function () {
     function setupEnums() {
-      Module['MESH_SEQUENTIAL_ENCODING'] =
+      Module.MESH_SEQUENTIAL_ENCODING =
         _emscripten_enum_draco_MeshEncoderMethod_MESH_SEQUENTIAL_ENCODING();
-      Module['MESH_EDGEBREAKER_ENCODING'] =
+      Module.MESH_EDGEBREAKER_ENCODING =
         _emscripten_enum_draco_MeshEncoderMethod_MESH_EDGEBREAKER_ENCODING();
-      Module['INVALID_GEOMETRY_TYPE'] =
+      Module.INVALID_GEOMETRY_TYPE =
         _emscripten_enum_draco_EncodedGeometryType_INVALID_GEOMETRY_TYPE();
-      Module['POINT_CLOUD'] =
+      Module.POINT_CLOUD =
         _emscripten_enum_draco_EncodedGeometryType_POINT_CLOUD();
-      Module['TRIANGULAR_MESH'] =
+      Module.TRIANGULAR_MESH =
         _emscripten_enum_draco_EncodedGeometryType_TRIANGULAR_MESH();
-      Module['INVALID'] =
+      Module.INVALID =
         _emscripten_enum_draco_GeometryAttribute_Type_INVALID();
-      Module['POSITION'] =
+      Module.POSITION =
         _emscripten_enum_draco_GeometryAttribute_Type_POSITION();
-      Module['NORMAL'] = _emscripten_enum_draco_GeometryAttribute_Type_NORMAL();
-      Module['COLOR'] = _emscripten_enum_draco_GeometryAttribute_Type_COLOR();
-      Module['TEX_COORD'] =
+      Module.NORMAL = _emscripten_enum_draco_GeometryAttribute_Type_NORMAL();
+      Module.COLOR = _emscripten_enum_draco_GeometryAttribute_Type_COLOR();
+      Module.TEX_COORD =
         _emscripten_enum_draco_GeometryAttribute_Type_TEX_COORD();
-      Module['GENERIC'] =
+      Module.GENERIC =
         _emscripten_enum_draco_GeometryAttribute_Type_GENERIC();
     }
-    if (Module['calledRun']) setupEnums();
+    if (Module.calledRun) setupEnums();
     else addOnPreMain(setupEnums);
   })();
-  if (typeof Module['onModuleParsed'] === 'function') {
-    Module['onModuleParsed']();
+  if (typeof Module.onModuleParsed === 'function') {
+    Module.onModuleParsed();
   }
 
   return DracoEncoderModule;
 };
 if (typeof exports === 'object' && typeof module === 'object')
   module.exports = DracoEncoderModule;
-else if (typeof define === 'function' && define['amd'])
+else if (typeof define === 'function' && define.amd)
   define([], function () {
     return DracoEncoderModule;
   });
 else if (typeof exports === 'object')
-  exports['DracoEncoderModule'] = DracoEncoderModule;
+  exports.DracoEncoderModule = DracoEncoderModule;
