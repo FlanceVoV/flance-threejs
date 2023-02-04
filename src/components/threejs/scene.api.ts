@@ -1,7 +1,5 @@
 import { THREE } from '@/components/threejs/three';
 import { Scene } from './scene';
-import { Material } from 'three/src/materials/Material';
-import { BufferGeometry } from 'three/src/core/BufferGeometry';
 
 /**
  * three scene 操作 api
@@ -42,6 +40,20 @@ export class SceneApi {
         this.scene.render();
       }
     }
+  }
+
+  initDefaultSceneView(scene: Scene, objects: Array<any>) {
+    // 画网格
+    scene.drawGridHelper();
+
+    // 中心
+    scene.drawCenter();
+
+    // 添加地面
+    objects.push(scene.plane);
+
+    // 逐帧绘制
+    scene.renderer.setAnimationLoop(() => scene.render());
   }
 
   /**
@@ -143,8 +155,8 @@ export class SceneApi {
       this.scene.mouseMesh.material
     );
     mesh.name = 'myCube';
-    mesh.position.copy( intersect.point ).add( intersect.face.normal );
-    mesh.position.divideScalar( 25 ).floor().multiplyScalar( 25 ).addScalar( 12.5 );
+    mesh.position.copy(intersect.point).add(intersect.face.normal);
+    mesh.position.divideScalar(25).floor().multiplyScalar(25).addScalar(12.5);
     this.scene.scene.add(mesh);
     this.scene.render();
     return mesh;
@@ -278,13 +290,18 @@ export class SceneApi {
    * @param container
    * @param event
    */
-  getWebGlCoordinate(container: HTMLElement, event: any): { x: number; y: number } {
+  getWebGlCoordinate(
+    container: HTMLElement,
+    event: any
+  ): { x: number; y: number } {
     // 可能有屏幕有侧边栏，位置偏移问题
     let getBoundingClientRect = container.getBoundingClientRect();
 
     // 获取屏幕坐标即鼠标的坐标以左上角为原点在第四象限(减去画布左侧菜单和顶部菜单)
-    let eventX = event.clientX - getBoundingClientRect.left - document.body.scrollLeft;
-    let eventY = event.clientY - getBoundingClientRect.top - document.body.scrollTop;
+    let eventX =
+      event.clientX - getBoundingClientRect.left - document.body.scrollLeft;
+    let eventY =
+      event.clientY - getBoundingClientRect.top - document.body.scrollTop;
 
     /*
       转换为标指设备坐标以中心为原点

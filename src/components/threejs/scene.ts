@@ -36,7 +36,12 @@ export class Scene {
 
   divisions = 400;
 
-  constructor(selector: string) {
+  hasScene: boolean = false;
+
+  constructor(selector: string);
+  constructor(selector: string, creatorScene: THREE.Scene);
+
+  constructor(selector: string, creatorScene?: THREE.Scene) {
     let selectorDom = document.querySelector(selector);
     // 构建dom元素
     if (selectorDom) {
@@ -46,12 +51,23 @@ export class Scene {
     }
 
     // 构造场景
-    this.scene = new THREE.Scene();
+    if (!creatorScene) {
+      this.scene = new THREE.Scene();
+    } else {
+      this.scene = creatorScene;
+      this.hasScene = true;
+    }
 
     // 构建渲染器
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
     // 构建相机
+    /*
+      fov 摄像机视锥体垂直视野角度。
+      aspect 摄像机视锥体长宽比。
+      near 摄像机视锥体近端面。
+      far 摄像机视锥体远端面。
+     */
     this.camera = new THREE.PerspectiveCamera(
       50,
       this.container.clientWidth / this.container.clientHeight,
@@ -105,13 +121,15 @@ export class Scene {
 
   init() {
     console.log('开始初始化...');
+    if (!this.hasScene) {
+      this.initPlane();
+      this.initAxesHelper();
+      this.initLight();
+    }
+    this.initCamera();
     this.initScene();
     this.initRenderer();
-    this.initCamera();
-    this.initLight();
     this.cameraControls();
-    this.initPlane();
-    this.initAxesHelper();
   }
 
   // 初始化场景
@@ -217,8 +235,8 @@ export class Scene {
     this.gltfLoader.setDRACOLoader(dracoLoader);
     this.gltfLoader.load(gltfFilePath, (gltf) => {
       let root = gltf.scene;
-      root.position.set(0, 200, 0);
-      root.scale.set(1, 1, 1);
+      root.position.set(0, 100, 0);
+      root.scale.set(20, 20, 20);
       root.rotation.y = Math.PI;
       this.scene.add(root);
     });

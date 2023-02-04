@@ -4,7 +4,7 @@
       <a-page-header>
         <template #extra>
           <div>
-            {{testName}}
+            {{ testName }}
           </div>
           <button @click="parse3d"> 3d鼠标 </button>
 
@@ -38,7 +38,7 @@
 
           <button> 保存为素材 </button>
 
-          <button> 打开新视图 </button>
+          <button @click="newScene"> 打开新视图 </button>
 
           <button @click="clearChoose"> 清除选中 </button>
 
@@ -50,13 +50,15 @@
       id="content"
       style="
         position: absolute;
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
+        width: calc(100% - 230px);
+        height: calc(100% - 230px);
       "
       @contextmenu="void 0"
     >
     </div>
   </div>
+  <!-- 打开新视图 -->
+  <new-scene-window></new-scene-window>
 </template>
 
 <script lang="ts">
@@ -70,6 +72,7 @@
   } from '@/components/threejs/three';
   import glb from '@/static/LittlestTokyo.glb';
   import gltf from '@/static/scene.gltf';
+  import NewSceneWindow from '@/components/threejs/scene.window.vue';
 
   let scene: Scene;
 
@@ -102,10 +105,11 @@
   const side: any = [];
 
   export default {
+    components: { NewSceneWindow },
     data() {
       return {
-        testName : "测试名称"
-      }
+        testName: '测试名称',
+      };
     },
     mounted() {
       // this as any typescript 根据词法作用域检测methods，直接this.xxx编辑器会提示错误，但并不影响编译运行。此处使用this as any来避免编辑器提示
@@ -127,19 +131,22 @@
       // shift up
       document.addEventListener('keyup', that.onDocumentKeyUp);
 
-      // 画网格
-      scene.drawGridHelper();
+      // 生成基础界面
+      sceneApi.initDefaultSceneView(scene, objects);
 
-      // 中心
-      scene.drawCenter();
-
-      // 添加地面
-      objects.push(scene.plane);
-
-      // scene.addSubScene('footer');
-
-      // 逐帧绘制 回调
-      that.animate();
+      // // 画网格
+      // scene.drawGridHelper();
+      //
+      // // 中心
+      // scene.drawCenter();
+      //
+      // // 添加地面
+      // objects.push(scene.plane);
+      //
+      // // scene.addSubScene('footer');
+      //
+      // // 逐帧绘制 回调
+      // that.animate();
     },
 
     methods: {
@@ -348,6 +355,10 @@
             scene.scene.remove(allChildren[i]);
           }
         }
+      },
+
+      newScene() {
+        NewSceneWindow.methods?.init(scene.scene, objects, '视图');
       },
 
       animate() {
