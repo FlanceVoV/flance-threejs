@@ -56,7 +56,7 @@ export class Scene {
       50,
       this.container.clientWidth / this.container.clientHeight,
       1,
-      5000
+      50000
     );
 
     // 相机控制器
@@ -164,7 +164,7 @@ export class Scene {
   // 初始化二维平面（让射线可以选取）
   initPlane() {
     this.plane.name = 'Plane';
-    this.plane.position.y = 1;
+    this.plane.position.y = 0;
     this.plane.receiveShadow = true;
     this.scene.add(this.plane);
   }

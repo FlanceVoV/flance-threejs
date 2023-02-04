@@ -3,9 +3,9 @@
     <div id="header">
       <a-page-header>
         <template #extra>
-          <ChildComponent v-model:name="selectedName">
-            {{ name }}
-          </ChildComponent>
+          <div>
+            {{testName}}
+          </div>
           <button @click="parse3d"> 3d鼠标 </button>
 
           <button @click="parse2d"> 2d鼠标 </button>
@@ -101,9 +101,12 @@
 
   const side: any = [];
 
-  let selectedName = '未选择';
-
   export default {
+    data() {
+      return {
+        testName : "测试名称"
+      }
+    },
     mounted() {
       // this as any typescript 根据词法作用域检测methods，直接this.xxx编辑器会提示错误，但并不影响编译运行。此处使用this as any来避免编辑器提示
       let that = this as any;
@@ -238,7 +241,7 @@
         }
       },
 
-      createMouse() {
+      createMouse(event: any) {
         // 2d
         let raycaster = sceneApi.create2dRay(event, container);
         const intersects = raycaster.intersectObjects(objects);
@@ -250,6 +253,7 @@
 
       // 选择模型
       chooseModel(event: any) {
+        let that = this as any;
         let hasSelect = sceneApi.chooseOneModel(
           event,
           container,
@@ -257,6 +261,7 @@
         );
         if (hasSelect) {
           currentSelect = hasSelect;
+          that.testName = currentSelect.name;
         }
       },
 

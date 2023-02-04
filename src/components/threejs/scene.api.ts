@@ -26,9 +26,8 @@ export class SceneApi {
     this.scene.pointer.set(webGlCoordinate.x, webGlCoordinate.y);
 
     let raycaster = this.create2dRay(event, container);
-    this.scene.renderer.setPixelRatio(window.devicePixelRatio);
     raycaster.setFromCamera(this.scene.pointer, this.scene.camera);
-    const intersects = raycaster.intersectObjects(objects, true);
+    const intersects = raycaster.intersectObjects(objects, false);
     if (intersects.length > 0) {
       const intersect: any = intersects[0];
       if (intersect) {
@@ -127,14 +126,8 @@ export class SceneApi {
       new THREE.MeshBasicMaterial({ color: 0xff0000 })
     );
     cube.name = 'myCube';
-    console.log(this.scene.mouseMesh);
-    cube.position.set(
-      this.scene.mouseMesh.position.x,
-      this.scene.mouseMesh.position.y +
-        50 -
-        this.scene.mouseMesh.geometry.parameters.height / 2,
-      this.scene.mouseMesh.position.z
-    );
+    cube.position.copy(intersect.point).add(intersect.face.normal);
+    cube.position.divideScalar(25).floor().multiplyScalar(25).addScalar(12.5);
     this.scene.scene.add(cube);
     this.scene.render();
     return cube;
@@ -150,13 +143,8 @@ export class SceneApi {
       this.scene.mouseMesh.material
     );
     mesh.name = 'myCube';
-    mesh.position.set(
-      this.scene.mouseMesh.position.x,
-      this.scene.mouseMesh.position.y +
-        50 -
-        this.scene.mouseMesh.geometry.parameters.height / 2,
-      this.scene.mouseMesh.position.z
-    );
+    mesh.position.copy( intersect.point ).add( intersect.face.normal );
+    mesh.position.divideScalar( 25 ).floor().multiplyScalar( 25 ).addScalar( 12.5 );
     this.scene.scene.add(mesh);
     this.scene.render();
     return mesh;
@@ -290,20 +278,42 @@ export class SceneApi {
    * @param container
    * @param event
    */
-  getWebGlCoordinate(
-    container: HTMLElement,
-    event: any
-  ): { x: number; y: number } {
+  getWebGlCoordinate(container: HTMLElement, event: any): { x: number; y: number } {
     // 可能有屏幕有侧边栏，位置偏移问题
     let getBoundingClientRect = container.getBoundingClientRect();
-    let xNum =
-      ((event.clientX - getBoundingClientRect.left) / container.offsetWidth) *
-        2 -
-      1;
-    let yNum =
-      -((event.clientY - getBoundingClientRect.top) / container.offsetHeight) *
-        2 +
-      1;
+
+    // 获取屏幕坐标即鼠标的坐标以左上角为原点在第四象限(减去画布左侧菜单和顶部菜单)
+    let eventX = event.clientX - getBoundingClientRect.left - document.body.scrollLeft;
+    let eventY = event.clientY - getBoundingClientRect.top - document.body.scrollTop;
+
+    /*
+      转换为标指设备坐标以中心为原点
+      注意：屏幕坐标y轴是反过来的
+      把整个画布当成一个矩形，屏幕坐标转为标指坐标，相当于把原点移到矩形的中心
+      也就是说，x轴向右，y轴向下（右正 下负）
+      原坐标压缩，x -> w/2 ,y -> -h/2  （w矩形宽度  y矩形高度）
+      转换公式：
+      X = (x/w) * 2 - 1
+      Y = - (y/h) * 2 + 1
+
+      推导：
+      1. 新原点 = (w/2, h/2)
+      即 cx = w/2 cy = h/2 = > (cx, cy)
+
+      2. 新的坐标(x', y') 到 (cx, cy)
+      x' = x - cx
+      y' = -(y - cy)
+
+      3. 将(x', y')标准化到[-1, 1]，即同时除以 cx, cy
+      x'/cx ,y'/cy
+      [(x - c/x) / cx] = [x/cx - 1] = [x/(w/2) - 1] = [x/w * 2 - 1]
+      [-(y - c/y) / cy] = [-y/cy + 1] = [-y/(h/2) + 1] = [-y/h * 2 + 1]
+
+
+     */
+    let xNum = (eventX / container.offsetWidth) * 2 - 1;
+    let yNum = -(eventY / container.offsetHeight) * 2 + 1;
+
     return { x: xNum, y: yNum };
   }
 
@@ -338,6 +348,7 @@ export class SceneApi {
     this.scene.pointer.set(coordinate.x, coordinate.y);
     let raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(this.scene.pointer, this.scene.camera);
+    this.scene.renderer.setPixelRatio(window.devicePixelRatio);
     return raycaster;
   }
 
