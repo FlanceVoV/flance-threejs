@@ -71,7 +71,8 @@
     GLTFLoader,
   } from '@/components/threejs/three';
   import glb from '@/static/LittlestTokyo.glb';
-  import gltf from '@/static/scene.gltf';
+  // import gltf from '@/static/scene.gltf';
+  import gltf from '@/static/test.glb';
   import NewSceneWindow from '@/components/threejs/scene.window.vue';
 
   let scene: Scene;
