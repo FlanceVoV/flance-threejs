@@ -5,7 +5,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
 
 export default defineConfig({
-  assetsInclude: ['**/*.glb', '**/*.gltf'],
+  assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.glsl'],
   publicDir: '../src/static',
   plugins: [vue(), vueJsx(), svgLoader({ svgoConfig: {} })],
   resolve: {

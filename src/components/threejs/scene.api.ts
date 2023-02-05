@@ -60,7 +60,9 @@ export class SceneApi {
    * 移动选中的所有模型
    * @param selectedObjects   选中的模型
    */
-  moveObjectWithMouse(selectedObjects: Array<any>) {
+  moveObjectWithMouse(
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
+  ) {
     if (
       selectedObjects &&
       selectedObjects.length &&
@@ -344,6 +346,74 @@ export class SceneApi {
   }
 
   /**
+   * 扫描的模型描边
+   * @param selectedObjects
+   */
+  outline(
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
+  ) {
+    if (selectedObjects && selectedObjects.length > 0) {
+      selectedObjects.forEach((obj) => {
+        let intersect = obj.intersect;
+        let outlineMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          side: THREE.BackSide,
+        });
+        let outlineMesh = new THREE.Mesh(
+          intersect.object.geometry,
+          outlineMaterial
+        );
+        outlineMesh.name = 'outlineMesh';
+        outlineMesh.position.set(
+          intersect.object.position.x,
+          intersect.object.position.y,
+          intersect.object.position.z
+        );
+        outlineMesh.scale.set(1.2, 1.2, 1.2);
+        this.scene.scene.add(outlineMesh);
+      });
+    }
+  }
+
+  /**
+   * 扫描的模型变色
+   * @param selectedObjects
+   */
+  outColor(
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
+  ) {
+    if (selectedObjects && selectedObjects.length > 0) {
+      selectedObjects.forEach((obj) => {
+        let intersect = obj.intersect;
+        let outlineMaterial = new THREE.MeshBasicMaterial({
+          color: 'red',
+          side: THREE.BackSide,
+        });
+        // intersect.object.material = outlineMaterial;
+        outlineMaterial.name = 'selectedOutColor';
+        intersect.object.originMaterial = intersect.object.material;
+        intersect.object.material = outlineMaterial;
+      });
+    }
+  }
+
+  /**
+   * 扫描的取消模型变色
+   * @param selectedObjects
+   */
+  clearOutColor(
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
+  ) {
+    if (selectedObjects && selectedObjects.length > 0) {
+      selectedObjects.forEach((obj) => {
+        let intersect = obj.intersect;
+        intersect.object.material = intersect.object.originMaterial;
+        this.clearModelWithName([], ['selectedOutColor']);
+      });
+    }
+  }
+
+  /**
    * 创建三维射线
    * @param event
    * @param container
@@ -378,7 +448,7 @@ export class SceneApi {
   chooseOneModel(
     event: any,
     container: HTMLElement,
-    selectedObjects: Array<any>
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
   ): any {
     // 获取三维射线
     let rayCaster = this.create2dRay(event, container);
@@ -437,7 +507,9 @@ export class SceneApi {
    * 清除选择
    * @param selectedObjects   已选中的模型
    */
-  clearChooseModels(selectedObjects: Array<any>) {
+  clearChooseModels(
+    selectedObjects: Array<{ key: string; helper: any; intersect: any }>
+  ) {
     if (selectedObjects.length > 0) {
       for (let i = selectedObjects.length - 1; i >= 0; i -= 1) {
         this.scene.scene.remove(selectedObjects[i].helper);

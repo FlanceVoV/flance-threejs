@@ -235,7 +235,7 @@ export class Scene {
     this.gltfLoader.setDRACOLoader(dracoLoader);
     this.gltfLoader.load(gltfFilePath, (gltf) => {
       let root = gltf.scene;
-      root.position.set(0, 100, 0);
+      root.position.set(0, 0, 0);
       root.scale.set(1, 1, 1);
       root.rotation.y = Math.PI;
       this.scene.add(root);

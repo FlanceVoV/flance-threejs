@@ -16,6 +16,10 @@
 
           <button @click="createMouse"> 生成鼠标模型 </button>
 
+          <button @click="outline"> 选择变色 </button>
+
+          <button @click="clearOutline"> 取消变色 </button>
+
           <button> 背景 </button>
 
           <button> 材质 </button>
@@ -276,6 +280,14 @@
       // 清空选择
       clearChoose() {
         sceneApi.clearChooseModels(selectedObjects);
+      },
+
+      outline() {
+        sceneApi.outColor(selectedObjects);
+      },
+
+      clearOutline() {
+        sceneApi.clearOutColor(selectedObjects);
       },
 
       onPointerClick(event: any) {
