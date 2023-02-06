@@ -29,14 +29,9 @@ export class SceneApi {
     if (intersects.length > 0) {
       const intersect: any = intersects[0];
       if (intersect) {
-        this.scene.mouseMesh.position
-          .copy(intersect.point)
-          .add(intersect.face.normal);
-        this.scene.mouseMesh.position
-          .divideScalar(25)
-          .floor()
-          .multiplyScalar(25)
-          .addScalar(12.5);
+        console.log(intersect);
+        this.scene.mouseMesh.position.copy(intersect.point).add(intersect.face.normal);
+        this.scene.mouseMesh.position.divideScalar(25).floor().multiplyScalar(25).addScalar(12.5);
         this.scene.render();
       }
     }
@@ -516,6 +511,15 @@ export class SceneApi {
       }
       selectedObjects.splice(0);
     }
+  }
+
+  /**
+   * 摄像头照射向物体
+   * @param intersect
+   */
+  viewToModel(intersect: any) {
+    this.scene.camera.position.set(intersect.position.x + 100, intersect.position.y + 100, intersect.position.z + 100);
+    this.scene.camera.lookAt(intersect.position);
   }
 
   createMaterial(intersect: any) {}

@@ -182,7 +182,6 @@ export class Scene {
   // 初始化二维平面（让射线可以选取）
   initPlane() {
     this.plane.name = 'Plane';
-    this.plane.position.y = 0;
     this.plane.receiveShadow = true;
     this.scene.add(this.plane);
   }

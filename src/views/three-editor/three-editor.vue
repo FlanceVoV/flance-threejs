@@ -28,7 +28,9 @@
 
           <button> 光照 </button>
 
-          <button> 摄像头 </button>
+          <br/>
+
+          <button @click="viewToModel"> 摄像头 </button>
 
           <button @click="undo"> 撤回 </button>
 
@@ -106,6 +108,8 @@
   const selectedObjects: any = [];
 
   let currentSelect: any;
+
+  let currentSelectHelper: any;
 
   const side: any = [];
 
@@ -277,6 +281,10 @@
         }
       },
 
+      viewToModel(event: any) {
+        sceneApi.viewToModel(currentSelect);
+      },
+
       // 清空选择
       clearChoose() {
         sceneApi.clearChooseModels(selectedObjects);
@@ -371,7 +379,7 @@
       },
 
       newScene() {
-        NewSceneWindow.methods?.init(scene.scene, objects, '视图');
+        NewSceneWindow.methods?.init(scene, objects, '视图');
       },
 
       animate() {

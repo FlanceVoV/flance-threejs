@@ -1,7 +1,7 @@
 <template>
   <div
     id="newScene"
-    style="position: fixed; display: none; width: 220px; height: 220px"
+    style="position: fixed; display: none; width: 500px; height: 500px"
   >
     <div style="width: 220px">
       {{ name }}{{ type }}
@@ -61,7 +61,7 @@
       }
     },
     methods: {
-      init(creatorScene: THREE.Scene, objs: Array<any>, name: string) {
+      init(creatorScene: Scene, objs: Array<any>, name: string) {
         let newWindow = document.getElementById('newScene');
         if (newWindow) {
           newWindow.style.display = 'inline-block';
@@ -70,7 +70,7 @@
         objects = objs;
 
         if (creatorScene) {
-          scene = new Scene('#newScene', creatorScene);
+          scene = new Scene('#newScene', creatorScene.scene);
           scene.renderer.setAnimationLoop(() => scene.render());
           isMain = true;
         } else {
