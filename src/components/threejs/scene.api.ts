@@ -29,9 +29,17 @@ export class SceneApi {
     if (intersects.length > 0) {
       const intersect: any = intersects[0];
       if (intersect) {
-        console.log(intersect);
-        this.scene.mouseMesh.position.copy(intersect.point).add(intersect.face.normal);
-        this.scene.mouseMesh.position.divideScalar(25).floor().multiplyScalar(25).addScalar(12.5);
+        this.scene.mouseMesh.position
+          .copy(intersect.point)
+          .add(intersect.face.normal);
+        this.scene.mouseMesh.position
+          .divideScalar(25)
+          .floor()
+          .multiplyScalar(25)
+          .addScalar(12.5);
+        if (this.scene.mouseMesh.geometry.type === 'PlaneGeometry') {
+          this.scene.mouseMesh.position.y = 0;
+        }
         this.scene.render();
       }
     }
@@ -132,7 +140,7 @@ export class SceneApi {
   mouseClickCreateCube(intersect: any): THREE.Mesh {
     let cube = new THREE.Mesh(
       new THREE.BoxGeometry(25, 100, 25),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
     cube.name = 'myCube';
     cube.position.copy(intersect.point).add(intersect.face.normal);
@@ -220,14 +228,13 @@ export class SceneApi {
         if (whiteList.indexOf(child.name, 0) !== -1) {
           continue;
         }
-        console.log(child.name);
         this.dispose(this.scene.scene, child);
       }
     }
 
     // 重置相机位置
-    this.scene.camera.position.set(0, 1100, 0);
-    this.scene.camera.lookAt(0, 0, 0);
+    // this.scene.camera.position.set(0, 1100, 0);
+    // this.scene.camera.lookAt(0, 0, 0);
 
     // 鼠标回中
     this.scene.mouseMesh.position.x = 0;
@@ -518,7 +525,11 @@ export class SceneApi {
    * @param intersect
    */
   viewToModel(intersect: any) {
-    this.scene.camera.position.set(intersect.position.x + 100, intersect.position.y + 100, intersect.position.z + 100);
+    this.scene.camera.position.set(
+      intersect.position.x + 100,
+      intersect.position.y + 100,
+      intersect.position.z + 100
+    );
     this.scene.camera.lookAt(intersect.position);
   }
 

@@ -20,6 +20,8 @@
 
           <button @click="clearOutline"> 取消变色 </button>
 
+          <button @click="initTransformControl"> 拖拽 </button>
+
           <button> 背景 </button>
 
           <button> 材质 </button>
@@ -28,7 +30,7 @@
 
           <button> 光照 </button>
 
-          <br/>
+          <br />
 
           <button @click="viewToModel"> 摄像头 </button>
 
@@ -80,6 +82,7 @@
   // import gltf from '@/static/scene.gltf';
   import gltf from '@/static/test.glb';
   import NewSceneWindow from '@/components/threejs/scene.window.vue';
+  import { DragControls } from 'three/examples/jsm/controls/DragControls';
 
   let scene: Scene;
 
@@ -88,6 +91,8 @@
   let renders: any;
 
   let transformControls: any;
+
+  let dragControls: any;
 
   let container: any;
 
@@ -240,6 +245,7 @@
       },
 
       onLineClick() {
+        this.transformControlsRemove();
         if (!isEditor) {
           scene.container.addEventListener(
             'pointermove',
@@ -304,7 +310,6 @@
         const intersects = raycaster.intersectObjects(objects);
 
         // 移除模型控制
-        this.transformControlsRemove();
         if (intersects.length > 0) {
           const intersect: any = intersects[0];
           /*
@@ -357,17 +362,65 @@
       },
 
       initTransformControl() {
+        scene.container.removeEventListener(
+          'click',
+          this.onPointerClick,
+          false
+        );
         transformControls = new TransformControls(
           scene.camera,
           scene.renderer.domElement
         );
         transformControls.name = 'transformControls';
+
+        // 初始化拖拽控件
+        let dragControls = new DragControls(
+          objects,
+          scene.camera,
+          scene.renderer.domElement
+        );
+
+        // 鼠标略过事件
+        dragControls.addEventListener('hoveron', function (event) {
+          if (event.name === 'mouseCtrl') {
+            return;
+          }
+          console.log(event);
+          // 让变换控件对象和选中的对象绑定
+          transformControls.attach(event.object);
+          sceneApi.outColor([
+            { key: event.object.uuid, helper: null, intersect: event },
+          ]);
+        });
+
+        // 鼠标移除事件
+        dragControls.addEventListener('hoveroff', function (event) {
+          sceneApi.clearOutColor([
+            { key: event.object.uuid, helper: null, intersect: event },
+          ]);
+        });
+        // 开始拖拽
+        dragControls.addEventListener('dragstart', function (event) {
+          if (event.name === 'mouseCtrl') {
+            return;
+          }
+          console.log('c');
+        });
+        // 拖拽结束
+        dragControls.addEventListener('dragend', function (event) {
+          console.log('e');
+        });
+
         scene.scene.add(transformControls);
       },
 
       transformControlsRemove() {
         if (transformControls) {
           transformControls.detach();
+        }
+        if (dragControls) {
+          dragControls.remove();
+          dragControls.dipose();
         }
         transformControls = null;
         let allChildren = scene.scene.children;
