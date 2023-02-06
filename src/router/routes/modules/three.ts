@@ -9,7 +9,7 @@ const THREE: AppRouteRecordRaw = {
     locale: 'menu.three',
     icon: 'icon-list',
     requiresAuth: true,
-    order: 1,
+    order: -1
   },
   children: [
     {
@@ -19,8 +19,17 @@ const THREE: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.three.editor',
         requiresAuth: true,
-        roles: ['*'],
-        keepAlive: false,
+        roles: ['*']
+      },
+    },
+    {
+      path: 'list', // The midline path complies with SEO specifications
+      name: 'List',
+      component: () => import('@/views/three-editor/three-list.vue'),
+      meta: {
+        locale: 'menu.three.list',
+        requiresAuth: true,
+        roles: ['*']
       },
     },
   ],
