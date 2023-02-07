@@ -80,7 +80,7 @@
         }
 
         // 禁止控制摄像头
-        scene.controls.enabled = false;
+        // scene.controls.enabled = false;
 
         this.switchCamera('top');
 
@@ -143,7 +143,7 @@
           case 'top':
             // 顶部视角
             scene.camera.lookAt(0, 0, 0);
-            scene.camera.position.set(0, 300, 0);
+            scene.camera.position.set(0, 1000, 0);
             break;
           case 'right':
             break;

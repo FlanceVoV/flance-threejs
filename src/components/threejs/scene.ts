@@ -229,12 +229,12 @@ export class Scene {
 
   loadGltf(gltfFilePath: string) {
     const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('/src/static/js/draco/');
-    dracoLoader.setDecoderConfig({ type: 'js' });
+    dracoLoader.setDecoderPath('/src/static/js/draco/gltf/');
+    // dracoLoader.setDecoderConfig({ type: 'js' });
     this.gltfLoader.setDRACOLoader(dracoLoader);
     this.gltfLoader.load(gltfFilePath, (gltf) => {
       let root = gltf.scene;
-      root.position.set(0, 0, 0);
+      root.position.set(0, 200, 0);
       root.scale.set(1, 1, 1);
       root.rotation.y = Math.PI;
       this.scene.add(root);

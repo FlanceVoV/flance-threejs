@@ -388,7 +388,7 @@ export class SceneApi {
       selectedObjects.forEach((obj) => {
         let intersect = obj.intersect;
         let outlineMaterial = new THREE.MeshBasicMaterial({
-          color: 'red',
+          color: 'white',
           side: THREE.BackSide,
         });
         // intersect.object.material = outlineMaterial;
@@ -397,6 +397,33 @@ export class SceneApi {
         intersect.object.material = outlineMaterial;
       });
     }
+  }
+
+  /**
+   * 创建贴图
+   */
+  createTexture(intersect: any) {
+    let textureLoader = new THREE.TextureLoader();
+    intersect.object.material = new THREE.MeshBasicMaterial({
+      map: textureLoader.load("http://localhost:8080/src/assets/logo.svg")
+    })
+  }
+
+  /**
+   * 场景变换
+   */
+  changeScene() {
+    let textureLoader = new THREE.TextureLoader();
+    this.scene.scene.background = textureLoader.load("http://localhost:8080/src/assets/test_scene_back.png");
+    let texture = textureLoader.load("http://localhost:8080/src/assets/test_plane_back.png");
+    texture.magFilter = THREE.NearestFilter;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(13, 10);
+    this.scene.plane.material = new THREE.MeshBasicMaterial({
+      visible: true,
+      map:  texture
+    })
   }
 
   /**

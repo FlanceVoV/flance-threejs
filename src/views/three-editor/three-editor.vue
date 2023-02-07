@@ -23,11 +23,11 @@
 
             <button @click="initTransformControl"> 拖拽</button>
 
-            <button> 背景</button>
+            <button @click="changeScene"> 背景</button>
 
             <button> 材质</button>
 
-            <button> 贴图</button>
+            <button @click="createTexture"> 贴图</button>
 
             <button> 光照</button>
 
@@ -80,9 +80,9 @@ import {
   TransformControls,
   GLTFLoader
 } from "@/components/threejs/three";
-import glb from "@/static/LittlestTokyo.glb";
+import gltf from "@/static/LittlestTokyo.glb";
 // import gltf from '@/static/scene.gltf';
-import gltf from "@/static/test.glb";
+// import gltf from "@/static/test.glb";
 import NewSceneWindow from "@/components/threejs/scene.window.vue";
 import { DragControls } from "three/examples/jsm/controls/DragControls";
 
@@ -443,6 +443,14 @@ export default {
       renders = requestAnimationFrame(this.animate);
       // 执行渲染操作
       scene.renderer.render(scene.scene, scene.camera);
+    },
+
+    createTexture() {
+      sceneApi.createTexture({object: currentSelect});
+    },
+
+    changeScene() {
+      sceneApi.changeScene();
     },
 
     clearModel() {
