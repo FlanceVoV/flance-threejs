@@ -34,18 +34,40 @@
 <script lang="ts">
 
 import { Scene } from "@/components/threejs/objects/scene";
+import { SceneMouse } from "@/components/threejs/objects/scene.mouse";
+import { THREE } from "@/components/threejs/three";
 
-let container;
+let mouse: SceneMouse;
+let scene: Scene;
 
 export default ({
   data() {
     return {};
   },
+
   mounted() {
-    let scene = new Scene("测试场景", ["#content", "#content2"]);
-    console.log(scene);
+    let that = this as any;
+    scene = new Scene("测试场景", ["#content", "#content2"]);
+    mouse = new SceneMouse("测试鼠标", scene,
+      new THREE.BoxGeometry(25, 25, 25),
+      new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      opacity: 0.5,
+      transparent: true,
+    }));
+    scene.getFirstRender().render.renderer.domElement.addEventListener("pointermove", that.onPointerMove, false);
   },
-  methods: {}
+
+  methods: {
+    onPointerMove(event: any) {
+      mouse.move(event);
+    },
+    // new 的所有模型销毁时需要手动销毁，所有自定义的封装类需要提供destroy方法，删除实例释放内存
+    destroy() {
+      scene.destroy();
+      mouse.destroy();
+    }
+  }
 
 });
 </script>

@@ -92,6 +92,12 @@ export class SceneRender {
     this.renderer.render(scene, camera)
   }
 
+  renderFirst() {
+    let scene = this.scene.scene;
+    let camera = this.scene.getFirstCamera().camera.camera;
+    this.renderer.render(scene, camera);
+  }
+
   /**
    * 执行渲染
    * @param sceneCamera 摄像头

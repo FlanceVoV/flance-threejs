@@ -49,10 +49,6 @@ export class SceneCamera {
 
     // 构造控制器
     this.control = new OrbitControls(this.camera, this.container);
-    this.control.name = this.camera.name + ".control";
-
-    console.log(this.control.uuid);
-
     this.init();
   }
 

@@ -197,6 +197,20 @@ export class Scene {
   }
 
   /**
+   * 获取第一个摄像头
+   */
+  getFirstCamera() {
+    return this.cameras[0];
+  }
+
+  /**
+   * 获取第一个渲染器
+   */
+  getFirstRender() {
+    return this.renders[0];
+  }
+
+  /**
    * 创建地面
    * @param geometry    地面几何
    * @param material    地面材质
@@ -280,6 +294,29 @@ export class Scene {
     this.cameras.forEach(camera => {
       camera.camera.destroy();
     });
+    this.objects.forEach(obj => {
+      obj.clear();
+      obj.remove();
+      obj.removeFromParent();
+    })
+    this.objects = [];
+  }
+
+  /**
+   * 场景添加模型
+   * @param obj
+   */
+  addModel(obj: Object3D) {
+    this.scene.add(obj);
+  }
+
+  /**
+   * 添加模型（同时加入可操作数组）
+   * @param obj 3d模型
+   */
+  pushObject(obj: Object3D) {
+    this.addModel(obj);
+    this.objects.push(obj);
   }
 
 }
