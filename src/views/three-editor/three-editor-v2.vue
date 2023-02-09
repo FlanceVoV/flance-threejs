@@ -36,9 +36,13 @@
 import { Scene } from "@/components/threejs/objects/scene";
 import { SceneMouse } from "@/components/threejs/objects/scene.mouse";
 import { THREE } from "@/components/threejs/three";
+import { SceneLoader } from "@/components/threejs/objects/scene.loader";
+import { SceneExporter } from "@/components/threejs/objects/scene.exporter";
 
 let mouse: SceneMouse;
 let scene: Scene;
+let loader: SceneLoader;
+let exporter: SceneExporter;
 
 export default ({
   data() {
@@ -56,6 +60,12 @@ export default ({
       transparent: true,
     }));
     scene.getFirstRender().render.renderer.domElement.addEventListener("pointermove", that.onPointerMove, false);
+    loader = new SceneLoader("测试加载器", scene);
+    loader.loadFont("/src/static/fonts/STKaiti_Regular.json", "测试");
+
+    exporter = new SceneExporter("测试导出器", scene);
+
+    exporter.exportSceneGLTF();
   },
 
   methods: {

@@ -319,4 +319,11 @@ export class Scene {
     this.objects.push(obj);
   }
 
+  /**
+   * 保存场景，导出场景
+   */
+  save() {
+
+  }
+
 }
