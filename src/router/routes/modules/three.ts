@@ -23,6 +23,16 @@ const THREE: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'editor2', // The midline path complies with SEO specifications
+      name: 'Editor2',
+      component: () => import('@/views/three-editor/three-editor-v2.vue'),
+      meta: {
+        locale: 'menu.three.editor2',
+        requiresAuth: true,
+        roles: ['*']
+      },
+    },
+    {
       path: 'list', // The midline path complies with SEO specifications
       name: 'List',
       component: () => import('@/views/three-editor/three-list.vue'),

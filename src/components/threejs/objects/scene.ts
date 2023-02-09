@@ -28,12 +28,12 @@ export class Scene {
   /**
    * 地面实例
    */
-  plane: THREE.Mesh | null;
+  plane: THREE.Mesh | undefined;
 
   /**
    * 地面网格实例
    */
-  gridHelper: THREE.GridHelper | null;
+  gridHelper: THREE.GridHelper | undefined;
 
   /**
    * 场景大小
@@ -75,13 +75,14 @@ export class Scene {
   cameras: Array<{
     id: string,
     name: string,
-    container: Element,
+    render: SceneRender,
+    container: HTMLElement,
     camera: SceneCamera
   }> = [];
 
   constructor(name: string, selectors: Array<string>);
-  constructor(id: string, name: string, selectors: Array<string>);
-  constructor(id?: string, name: string, selectors: Array<string>) {
+  constructor(name: string, selectors: Array<string>, id: string);
+  constructor(name: string, selectors: Array<string>, id?: string) {
 
     this.name = name;
 
@@ -93,6 +94,7 @@ export class Scene {
 
     // 创建场景
     this.scene = new THREE.Scene();
+    this.scene.name = this.name + ".scene";
 
     // 绑定渲染dom
     this.selectors = selectors;
@@ -105,6 +107,7 @@ export class Scene {
    * 场景初始化
    */
   init() {
+    this.scene.background = new THREE.Color(0xffffff);
     this.createContainer(this.selectors);
     this.createRender();
     this.createPlane();
@@ -115,7 +118,7 @@ export class Scene {
    * 初始化渲染容器
    * @param selectors
    */
-  createContainer(selectors: string) {
+  createContainer(selectors: Array<string>) {
     this.selectors = selectors;
     this.containers = [];
     this.selectors.forEach(selector => {
@@ -141,7 +144,7 @@ export class Scene {
    * @param container   dom
    */
   addRenderByContainer(container: Element): string {
-    let sceneRender = new SceneRender(this.scene.name + ".render." + this.renders.length, this.scene, container);
+    let sceneRender = new SceneRender(this.name + ".render." + this.renders.length, this, container);
     this.renders.push({ id: sceneRender.id, name: sceneRender.name, render: sceneRender });
     return sceneRender.id;
   }
@@ -152,22 +155,31 @@ export class Scene {
    */
   addRender(selector: string): string {
     let container = document.querySelector(selector);
-    let sceneRender = new SceneRender(this.scene.name + ".render." + this.renders.length, this.scene, container);
+    if (!container) {
+      throw new Error("找不到元素[" + selector + "]");
+    }
+    let sceneRender = new SceneRender(this.name + ".render." + this.renders.length, this, container);
     this.renders.push({ id: sceneRender.id, name: sceneRender.name, render: sceneRender });
     return sceneRender.id;
   }
 
   /**
    * 添加摄像机
-   * @param container   容器
+   * @param render      渲染器
    * @param name        相机名称
    * @param fov         摄像机视锥体垂直视野角度
    * @param near        摄像机视锥体近端面
    * @param far         摄像机视锥体远端面
    */
-  addCamera(container: Element, name: string, fov: number, near: number, far: number): string {
-    let sceneCamera = new SceneCamera(name, fov, near, far, container);
-    this.cameras.push({id: sceneCamera.id, name: sceneCamera.name, container: sceneCamera.container, camera: sceneCamera});
+  addCamera(render: SceneRender, name: string, fov: number, near: number, far: number): string {
+    let sceneCamera = new SceneCamera(name, fov, near, far, render);
+    this.cameras.push({
+      id: sceneCamera.id,
+      name: sceneCamera.name,
+      render: render,
+      container: render.renderer.domElement,
+      camera: sceneCamera
+    });
     return sceneCamera.id;
   }
 
@@ -176,9 +188,9 @@ export class Scene {
    */
   createCamera() {
     this.clearCameras();
-    this.containers.forEach((container, index) => {
-      let name = this.scene.name + ".camera." + index;
-      this.addCamera(container, name, 50, 1, 50000);
+    this.renders.forEach((render, index) => {
+      let name = this.name + ".camera." + index;
+      this.addCamera(render.render, name, 50, 1, 50000);
     });
   }
 
@@ -206,9 +218,9 @@ export class Scene {
     this.plane.receiveShadow = true;
 
     if (!gridHelper) {
-      gridHelper = new THREE.GridHelper(this.size, this.divisions);
-      gridHelper.name = this.name + ".gridHelper";
-      this.scene.add(gridHelper);
+      this.gridHelper = new THREE.GridHelper(this.size, this.divisions);
+      this.gridHelper.name = this.name + ".gridHelper";
+      this.scene.add(this.gridHelper);
     }
 
     this.scene.add(this.plane);
@@ -231,10 +243,10 @@ export class Scene {
    * 清空摄像机
    */
   clearCameras() {
-    if(this.cameras.length > 0) {
+    if (this.cameras.length > 0) {
       this.cameras.forEach((camera, index) => {
         camera.camera.destroy();
-      })
+      });
     }
     this.cameras = [];
   }
@@ -264,9 +276,9 @@ export class Scene {
       if (this.containers.length === 0) {
         throw new Error("找不到容器");
       }
-      this.addCamera(this.containers[0], this.name + ".camera.0", 50, 1, 50000)
+      this.addCamera(this.containers[0], this.name + ".camera.0", 50, 1, 50000);
     }
-    return this.cameras[0].camera;
+    return this.cameras[0].camera.camera;
   }
 
   /**
