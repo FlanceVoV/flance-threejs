@@ -1,6 +1,7 @@
 import { THREE } from "@/components/threejs/three";
 import { Scene } from "@/components/threejs/objects/scene";
 import { generateUUID } from "three/src/math/MathUtils";
+import { SceneCamera } from "@/components/threejs/objects/scene.camera";
 
 /**
  * 渲染器封装
@@ -36,7 +37,6 @@ export class SceneRender {
 
   init () {
     this.setDefaultRender();
-    this.initRenderLoop();
   }
 
   setDefaultRender() {
@@ -64,8 +64,15 @@ export class SceneRender {
   /**
    * 初始化默认摄像头渲染
    */
-  initRenderLoop() {
-    this.renderer.setAnimationLoop(() => this.defaultRender());
+  initRenderLoop(cameraId: string) {
+    this.renderer.setAnimationLoop(() => this.render(cameraId));
+  }
+
+  /**
+   * 初始化默认摄像头渲染
+   */
+  initRenderLoopBySceneCamera(sceneCamera: SceneCamera) {
+    this.renderer.setAnimationLoop(() => this.renderBySceneCamera(sceneCamera));
   }
 
   /**
@@ -76,21 +83,22 @@ export class SceneRender {
   }
 
   /**
-   * 执行默认渲染
-   */
-  defaultRender() {
-    let scene = this.scene.scene;
-    let camera = this.scene.getDefaultCamera();
-    this.renderer.render(scene, camera)
-  }
-
-  /**
    * 执行渲染
    * @param cameraId 摄像头id
    */
   render(cameraId: string) {
     let scene = this.scene.scene;
     let camera = this.scene.getCameraById(cameraId);
+    this.renderer.render(scene, camera)
+  }
+
+  /**
+   * 执行渲染
+   * @param sceneCamera 摄像头
+   */
+  renderBySceneCamera(sceneCamera: SceneCamera) {
+    let scene = this.scene.scene;
+    let camera = sceneCamera.camera;
     this.renderer.render(scene, camera)
   }
 

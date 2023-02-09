@@ -1,16 +1,27 @@
 <template>
   <div>
-    <div class="container" style="width: 100%; height: 100%">
+    <div class="container" style="width: 100%; height: 100%; ">
       <div>header</div>
       <div
         id="content"
         style="
         position: absolute;
-        width: calc(100% - 230px);
-        height: calc(100% - 230px);
+        width: 300px;
+        height: 300px;
       "
         @contextmenu="void 0"
       >
+      </div>
+      <div style="height: 320px"></div>
+
+      <div id="content2"
+           style="
+        position: absolute;
+        width: 300px;
+        height: 300px;
+      "
+           @contextmenu="void 0">
+
       </div>
       <div>
         footer
@@ -31,9 +42,7 @@ export default ({
     return {};
   },
   mounted() {
-    let that = this as any;
-    container = document.getElementById("content");
-    let scene = new Scene("测试场景", ["#content"]);
+    let scene = new Scene("测试场景", ["#content", "#content2"]);
     console.log(scene);
   },
   methods: {}

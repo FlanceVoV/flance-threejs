@@ -173,6 +173,8 @@ export class Scene {
    */
   addCamera(render: SceneRender, name: string, fov: number, near: number, far: number): string {
     let sceneCamera = new SceneCamera(name, fov, near, far, render);
+    // 创建摄像机后调用渲染器的逐帧渲染
+    render.initRenderLoopBySceneCamera(sceneCamera);
     this.cameras.push({
       id: sceneCamera.id,
       name: sceneCamera.name,
@@ -265,20 +267,6 @@ export class Scene {
       }
     });
     throw new Error("找不到摄像头[" + cameraId + "]");
-  }
-
-  /**
-   * 获取默认的摄像机，第0个
-   */
-  getDefaultCamera(): THREE.PerspectiveCamera {
-    if (this.cameras.length === 0) {
-      // 初始化摄像头
-      if (this.containers.length === 0) {
-        throw new Error("找不到容器");
-      }
-      this.addCamera(this.containers[0], this.name + ".camera.0", 50, 1, 50000);
-    }
-    return this.cameras[0].camera.camera;
   }
 
   /**
