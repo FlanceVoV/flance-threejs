@@ -61,7 +61,7 @@ export class SceneMouse {
     this.addMouse();
   }
 
-  move(event: any) {
+  move(event: any, addScalar: number) {
     // 获取二维坐标
     let xy = SceneUtil.getWebGlCoordinate(this.scene.getFirstRender().render.renderer.domElement, event);
     // 创建射线
@@ -72,20 +72,18 @@ export class SceneMouse {
     const intersects = raycaster.intersectObjects(this.scene.objects, false);
     if (intersects && intersects.length > 0) {
       const intersect: any = intersects[0];
+      this.mouseMesh.position.copy(intersect.point).add(intersect.face.normal);
       this.mouseMesh.position
-        .copy(intersect.point)
-        .add(intersect.face.normal);
-      this.mouseMesh.position
-        .divideScalar(25)
+        .divideScalar(this.scene.size / this.scene.divisions)
         .floor()
-        .multiplyScalar(25)
-        .addScalar(12.5);
+        .multiplyScalar(this.scene.size / this.scene.divisions)
+        .addScalar(addScalar);
       this.scene.getFirstRender().render.renderFirst();
     }
   }
 
   addMouse() {
-    this.scene.addModel(this.mouseMesh);
+    this.scene.addObject(this.mouseMesh);
   }
 
   setMouse(mouse: THREE.Mesh) {

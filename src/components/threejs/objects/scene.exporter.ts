@@ -45,6 +45,9 @@ export class SceneExporter {
           this.save(new Blob([output], { type: "text/plain" }), "scene.gltf");
         }
       },
+      (error) => {
+
+      },
       {
         // 如果设置为false，则禁用对几何体的平移、旋转和缩放。
         trs: false,
@@ -57,7 +60,7 @@ export class SceneExporter {
         // 如果设置为true，则强制使用索引。
         forceIndices: false,
         // 如果设置为true，则强制使用2的幂次方纹理贴图。
-        forcePowerOfTwoTextures: false
+        // forcePowerOfTwoTextures: false
       });
   }
 
@@ -65,7 +68,7 @@ export class SceneExporter {
 
   }
 
-  save(blob, filename) {
+  save(blob: any, filename: string) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';

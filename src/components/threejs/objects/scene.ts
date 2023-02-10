@@ -3,6 +3,9 @@ import { generateUUID } from "three/src/math/MathUtils";
 import { SceneRender } from "@/components/threejs/objects/scene.render";
 import { SceneCamera } from "@/components/threejs/objects/scene.camera";
 import { Object3D } from "three";
+import { SceneModel } from "@/components/threejs/objects/scene.model";
+import { SceneMouse } from "@/components/threejs/objects/scene.mouse";
+import { SceneUtil } from "@/components/threejs/objects/scene.util";
 
 /**
  * 场景模型封装
@@ -65,9 +68,19 @@ export class Scene {
   }> = [];
 
   /**
+   * 模型封装
+   */
+  models: Array<SceneModel> = [];
+
+  /**
    * 场景中的所有模型实例
    */
   objects: Array<Object3D> = [];
+
+  /**
+   * 不可被扫描到的模型
+   */
+  noScanObjects: Array<Object3D> = [];
 
   /**
    * 场景摄像机
@@ -217,16 +230,17 @@ export class Scene {
    * @param gridHelper  网格
    */
   createPlane(geometry?: THREE.PlaneGeometry, material?: THREE.MeshBasicMaterial, gridHelper?: THREE.GridHelper) {
-
     let planeGeometry = geometry;
     if (!planeGeometry) {
       planeGeometry = new THREE.PlaneGeometry(this.size, this.size);
+      planeGeometry.name = this.name + ".plane.geometry";
       planeGeometry.rotateX(-Math.PI / 2);
     }
 
     let planeMaterial = material;
     if (!planeMaterial) {
       planeMaterial = new THREE.MeshBasicMaterial({ visible: false });
+      planeMaterial.name = this.name + ".plane.material";
     }
 
     this.plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -236,11 +250,10 @@ export class Scene {
     if (!gridHelper) {
       this.gridHelper = new THREE.GridHelper(this.size, this.divisions);
       this.gridHelper.name = this.name + ".gridHelper";
-      this.scene.add(this.gridHelper);
+      this.addObject(this.gridHelper);
     }
 
-    this.scene.add(this.plane);
-    this.objects.push(this.plane);
+    this.pushObject(this.plane);
   }
 
   /**
@@ -299,25 +312,83 @@ export class Scene {
       obj.remove();
       obj.removeFromParent();
     })
+    this.noScanObjects.forEach(obj => {
+      obj.clear();
+      obj.remove();
+      obj.removeFromParent();
+    })
+    this.models.forEach(model => {
+      model.destroy();
+    })
     this.objects = [];
+    this.noScanObjects = [];
+    this.models = [];
   }
 
   /**
    * 场景添加模型
    * @param obj
    */
-  addModel(obj: Object3D) {
+  addObject(obj: Object3D) {
     this.scene.add(obj);
+    this.noScanObjects.push(obj);
   }
 
   /**
-   * 添加模型（同时加入可操作数组）
+   * 添加模型（同时加入可被扫描的数组）
    * @param obj 3d模型
    */
   pushObject(obj: Object3D) {
-    this.addModel(obj);
+    this.scene.add(obj);
     this.objects.push(obj);
   }
+
+  /**
+   * 删除模型
+   * @param obj
+   */
+  removeObject(obj: Object3D) {
+    this.scene.remove(obj);
+    this.objects.forEach(obj => {
+      if (obj.uuid === obj.uuid) {
+        obj.removeFromParent();
+        obj.remove();
+      }
+    });
+  }
+
+  /**
+   * 删除模型
+   * @param obj
+   */
+  removeNoScanObject(obj: Object3D) {
+    this.scene.remove(obj);
+    this.noScanObjects.forEach(obj => {
+      if (obj.uuid === obj.uuid) {
+        obj.removeFromParent();
+        obj.remove();
+      }
+    });
+  }
+
+  /**
+   * 添加模型封装
+   * @param model 模型封装对象
+   */
+  pushModel(model: SceneModel) {
+    this.models.push(model);
+    this.pushObject(model.object);
+  }
+
+  /**
+   * 添加模型封装（不可被扫描）
+   * @param model 模型封装对象
+   */
+  addModel(model: SceneModel) {
+    this.models.push(model);
+    this.addObject(model.object);
+  }
+
 
   /**
    * 保存场景，导出场景
