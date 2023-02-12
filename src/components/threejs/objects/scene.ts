@@ -387,5 +387,7 @@ export class Scene {
   /**
    * 保存场景，导出场景
    */
-  save() {}
+  save() {
+    this.scene.toJSON();
+  }
 }
