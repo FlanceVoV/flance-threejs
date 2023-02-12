@@ -1,14 +1,13 @@
-import { generateUUID } from "three/src/math/MathUtils";
-import { THREE } from "@/components/threejs/three";
-import { Scene } from "@/components/threejs/objects/scene";
-import { SceneUtil } from "@/components/threejs/objects/scene.util";
+import { generateUUID } from 'three/src/math/MathUtils';
+import { THREE } from '@/components/threejs/three';
+import { Scene } from '@/components/threejs/objects/scene';
+import { SceneUtil } from '@/components/threejs/objects/scene.util';
 
 /**
  * 鼠标模型
  * @author jhf
  */
 export class SceneMouse {
-
   id: string;
 
   name: string;
@@ -28,18 +27,33 @@ export class SceneMouse {
   /**
    * 鼠标材质
    */
-  material: THREE.Material | THREE.Material[] ;
+  material: THREE.Material | THREE.Material[];
 
   /**
    * 鼠标模型
    */
   mouseMesh: THREE.Mesh;
 
-
-  constructor(name: string, scene: Scene, geometry: THREE.BufferGeometry, material: THREE.Material);
-  constructor(name: string, scene: Scene, geometry: THREE.BufferGeometry, material: THREE.Material, id: string);
-  constructor(name: string, scene: Scene, geometry: THREE.BufferGeometry, material: THREE.Material, id?: string) {
-
+  constructor(
+    name: string,
+    scene: Scene,
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material
+  );
+  constructor(
+    name: string,
+    scene: Scene,
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material,
+    id: string
+  );
+  constructor(
+    name: string,
+    scene: Scene,
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material,
+    id?: string
+  ) {
     if (id) {
       this.id = id;
     } else {
@@ -51,23 +65,29 @@ export class SceneMouse {
     this.material = material;
     this.geometry = geometry;
     this.mouseMesh = new THREE.Mesh(geometry, material);
-    this.mouseMesh.name = this.name + ".mouseMesh";
+    this.mouseMesh.name = this.name + '.mouseMesh';
     this.pointer = new THREE.Vector2();
 
     this.init();
   }
 
-  init () {
+  init() {
     this.addMouse();
   }
 
   move(event: any, addScalar: number) {
     // 获取二维坐标
-    let xy = SceneUtil.getWebGlCoordinate(this.scene.getFirstRender().render.renderer.domElement, event);
+    let xy = SceneUtil.getWebGlCoordinate(
+      this.scene.getFirstRender().render.renderer.domElement,
+      event
+    );
     // 创建射线
     let raycaster = SceneUtil.create2dRayWithMainWindow(this.scene, event);
     this.pointer.set(xy.x, xy.y);
-    raycaster.setFromCamera(this.pointer, this.scene.getFirstCamera().camera.camera);
+    raycaster.setFromCamera(
+      this.pointer,
+      this.scene.getFirstCamera().camera.camera
+    );
     // 射线照射到的模型
     const intersects = raycaster.intersectObjects(this.scene.objects, false);
     if (intersects && intersects.length > 0) {
@@ -78,7 +98,9 @@ export class SceneMouse {
         .floor()
         .multiplyScalar(this.scene.size / this.scene.divisions)
         .addScalar(addScalar);
-      this.scene.getFirstRender().render.renderFirst();
+      this.scene
+        .getFirstRender()
+        .render.renderBySceneCamera(this.scene.getFirstCamera().camera);
     }
   }
 
@@ -107,9 +129,9 @@ export class SceneMouse {
 
   clearModel() {
     if (this.material instanceof Array) {
-      this.material.forEach(m => {
+      this.material.forEach((m) => {
         m.dispose();
-      })
+      });
     } else {
       this.material.dispose();
     }
@@ -120,5 +142,4 @@ export class SceneMouse {
     this.clearModel();
     this.clearMouse();
   }
-
 }

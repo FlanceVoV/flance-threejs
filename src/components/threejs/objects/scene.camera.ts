@@ -1,14 +1,13 @@
-import { OrbitControls, THREE } from "@/components/threejs/three";
-import { generateUUID } from "three/src/math/MathUtils";
-import { MOUSE } from "three/src/Three";
-import { SceneRender } from "@/components/threejs/objects/scene.render";
+import { OrbitControls, THREE } from '@/components/threejs/three';
+import { generateUUID } from 'three/src/math/MathUtils';
+import { MOUSE } from 'three/src/Three';
+import { SceneRender } from '@/components/threejs/objects/scene.render';
 
 /**
  * 相机封装
  * @author jfh
  */
 export class SceneCamera {
-
   id: string;
 
   name: string;
@@ -23,14 +22,31 @@ export class SceneCamera {
 
   camera: THREE.PerspectiveCamera;
 
-  render: SceneRender;
-
   control: OrbitControls;
 
-  constructor(name: string, fov: number, near: number, far: number, render: SceneRender);
-  constructor(name: string, fov: number, near: number, far: number, render: SceneRender, id: string);
-  constructor(name: string, fov: number, near: number, far: number, render: SceneRender, id?: string) {
-
+  constructor(
+    name: string,
+    fov: number,
+    near: number,
+    far: number,
+    render: SceneRender
+  );
+  constructor(
+    name: string,
+    fov: number,
+    near: number,
+    far: number,
+    render: SceneRender,
+    id: string
+  );
+  constructor(
+    name: string,
+    fov: number,
+    near: number,
+    far: number,
+    render: SceneRender,
+    id?: string
+  ) {
     if (id) {
       this.id = id;
     } else {
@@ -41,11 +57,10 @@ export class SceneCamera {
     this.far = far;
     this.near = near;
     this.container = render.renderer.domElement;
-    this.render = render;
     // 摄像机视锥体长宽比
     let aspect = this.container.clientWidth / this.container.clientHeight;
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this.camera.name = this.name + ".camera.default";
+    this.camera.name = this.name + '.camera.default';
 
     // 构造控制器
     this.control = new OrbitControls(this.camera, this.container);
@@ -58,20 +73,27 @@ export class SceneCamera {
     this.setLookAt();
   }
 
-  move() {
+  move() {}
 
-  }
-
-  setCamera(camera: THREE.PerspectiveCamera, name: string, fov: number, aspect: number, near: number, far: number) {
+  setCamera(
+    camera: THREE.PerspectiveCamera,
+    name: string,
+    fov: number,
+    aspect: number,
+    near: number,
+    far: number
+  ) {
     this.destroy();
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     this.camera = camera;
-    this.camera.name = this.name + ".camera." + name;
+    this.camera.name = this.name + '.camera.' + name;
   }
 
-  setControl(name: string,
-             mouseButtons: Partial<{ LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE }>,
-             keys: { LEFT: string; UP: string; RIGHT: string; BOTTOM: string }) {
+  setControl(
+    name: string,
+    mouseButtons: Partial<{ LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE }>,
+    keys: { LEFT: string; UP: string; RIGHT: string; BOTTOM: string }
+  ) {
     this.clearControl();
     this.control = new OrbitControls(this.camera, this.container);
     this.control.mouseButtons = mouseButtons;
@@ -91,15 +113,15 @@ export class SceneCamera {
     this.control.mouseButtons = {
       LEFT: THREE.MOUSE.PAN,
       MIDDLE: THREE.MOUSE.DOLLY,
-      RIGHT: THREE.MOUSE.ROTATE
+      RIGHT: THREE.MOUSE.ROTATE,
     };
 
     this.control.keys = {
-      LEFT: "KeyA",
-      RIGHT: "KeyD",
-      UP: "Space",
-      BOTTOM: "ControlLeft"
-    }
+      LEFT: 'KeyA',
+      RIGHT: 'KeyD',
+      UP: 'Space',
+      BOTTOM: 'ControlLeft',
+    };
   }
 
   clearCamera() {
@@ -116,8 +138,5 @@ export class SceneCamera {
     this.clearControl();
   }
 
-  keyEvent() {
-
-  }
-
+  keyEvent() {}
 }

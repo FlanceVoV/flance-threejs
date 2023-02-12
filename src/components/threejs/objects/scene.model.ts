@@ -1,17 +1,16 @@
-import { generateUUID } from "three/src/math/MathUtils";
-import { BoxHelper, Object3D } from "three";
-import { Scene } from "@/components/threejs/objects/scene";
-import { THREE } from "@/components/threejs/three";
-import { Material } from "three/src/materials/Material";
-import { SceneUtil } from "@/components/threejs/objects/scene.util";
-import { SceneMouse } from "@/components/threejs/objects/scene.mouse";
+import { generateUUID } from 'three/src/math/MathUtils';
+import { BoxHelper, Object3D } from 'three';
+import { Scene } from '@/components/threejs/objects/scene';
+import { THREE } from '@/components/threejs/three';
+import { Material } from 'three/src/materials/Material';
+import { SceneUtil } from '@/components/threejs/objects/scene.util';
+import { SceneMouse } from '@/components/threejs/objects/scene.mouse';
 
 /**
  * 业务模型封装
  * @author jhf
  */
 export class SceneModel {
-
   id: string;
 
   name: string;
@@ -27,9 +26,20 @@ export class SceneModel {
   addModel: boolean = false;
 
   constructor(name: string, object: Object3D, scene: Scene);
-  constructor(name: string, object: Object3D, scene: Scene, addModel: boolean, id?: string);
-  constructor(name: string, object: Object3D, scene: Scene, addModel?: boolean, id?: string) {
-
+  constructor(
+    name: string,
+    object: Object3D,
+    scene: Scene,
+    addModel: boolean,
+    id?: string
+  );
+  constructor(
+    name: string,
+    object: Object3D,
+    scene: Scene,
+    addModel?: boolean,
+    id?: string
+  ) {
     if (id) {
       this.id = id;
     } else {
@@ -40,33 +50,26 @@ export class SceneModel {
     }
     this.name = name;
     this.object = object;
-    this.object.name = this.name + ".object";
+    this.object.name = this.name + '.object';
     this.scene = scene;
     if (this.addModel) {
-      this.scene.addModel(this);
+      this.scene.addObject(this.object);
     } else {
-      this.scene.pushModel(this);
+      this.scene.pushObject(this.object);
     }
   }
 
-  init() {
-
-  }
-
+  init() {}
 
   /**
    * 设置透明
    */
-  setTransparent() {
-
-  }
+  setTransparent() {}
 
   /**
    * 跟随鼠标移动
    */
-  moveByMouse(event: any) {
-
-  }
+  moveByMouse(event: any) {}
 
   /**
    * 鼠标移入
@@ -79,8 +82,8 @@ export class SceneModel {
       color: color,
       side: THREE.BackSide,
     });
-    this.highLight.name = this.name + ".highLight";
-    let obj = (this.object as any);
+    this.highLight.name = this.name + '.highLight';
+    let obj = this.object as any;
     obj.originMaterial = obj.material;
     obj.setMaterial(this.highLight, true);
   }
@@ -89,7 +92,7 @@ export class SceneModel {
    * 鼠标移出
    */
   mouseMoveOut() {
-    let obj = (this.object as any);
+    let obj = this.object as any;
     obj.setMaterial(obj.originMaterial, true);
     obj.originMaterial = null;
   }
@@ -102,7 +105,7 @@ export class SceneModel {
       return;
     }
     this.boxHelper = new BoxHelper(this.object, color);
-    this.boxHelper.name = this.name + ".boxHelper";
+    this.boxHelper.name = this.name + '.boxHelper';
     this.scene.addObject(this.boxHelper);
   }
 

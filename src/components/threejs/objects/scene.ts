@@ -1,18 +1,14 @@
-import { THREE } from "@/components/threejs/three";
-import { generateUUID } from "three/src/math/MathUtils";
-import { SceneRender } from "@/components/threejs/objects/scene.render";
-import { SceneCamera } from "@/components/threejs/objects/scene.camera";
-import { Object3D } from "three";
-import { SceneModel } from "@/components/threejs/objects/scene.model";
-import { SceneMouse } from "@/components/threejs/objects/scene.mouse";
-import { SceneUtil } from "@/components/threejs/objects/scene.util";
+import { THREE } from '@/components/threejs/three';
+import { generateUUID } from 'three/src/math/MathUtils';
+import { SceneRender } from '@/components/threejs/objects/scene.render';
+import { SceneCamera } from '@/components/threejs/objects/scene.camera';
+import { Object3D } from 'three';
 
 /**
  * 场景模型封装
  * @author jhf
  */
 export class Scene {
-
   /**
    * 场景id
    */
@@ -62,15 +58,10 @@ export class Scene {
    * 场景渲染器
    */
   renders: Array<{
-    id: string,
-    name: string,
-    render: SceneRender
+    id: string;
+    name: string;
+    render: SceneRender;
   }> = [];
-
-  /**
-   * 模型封装
-   */
-  models: Array<SceneModel> = [];
 
   /**
    * 场景中的所有模型实例
@@ -86,17 +77,16 @@ export class Scene {
    * 场景摄像机
    */
   cameras: Array<{
-    id: string,
-    name: string,
-    render: SceneRender,
-    container: HTMLElement,
-    camera: SceneCamera
+    id: string;
+    name: string;
+    render: SceneRender;
+    container: HTMLElement;
+    camera: SceneCamera;
   }> = [];
 
   constructor(name: string, selectors: Array<string>);
   constructor(name: string, selectors: Array<string>, id: string);
   constructor(name: string, selectors: Array<string>, id?: string) {
-
     this.name = name;
 
     if (id) {
@@ -107,7 +97,7 @@ export class Scene {
 
     // 创建场景
     this.scene = new THREE.Scene();
-    this.scene.name = this.name + ".scene";
+    this.scene.name = this.name + '.scene';
 
     // 绑定渲染dom
     this.selectors = selectors;
@@ -134,7 +124,7 @@ export class Scene {
   createContainer(selectors: Array<string>) {
     this.selectors = selectors;
     this.containers = [];
-    this.selectors.forEach(selector => {
+    this.selectors.forEach((selector) => {
       let container = document.querySelector(selector);
       if (container) {
         this.containers.push(container);
@@ -157,8 +147,16 @@ export class Scene {
    * @param container   dom
    */
   addRenderByContainer(container: Element): string {
-    let sceneRender = new SceneRender(this.name + ".render." + this.renders.length, this, container);
-    this.renders.push({ id: sceneRender.id, name: sceneRender.name, render: sceneRender });
+    let sceneRender = new SceneRender(
+      this.name + '.render.' + this.renders.length,
+      this.scene,
+      container
+    );
+    this.renders.push({
+      id: sceneRender.id,
+      name: sceneRender.name,
+      render: sceneRender,
+    });
     return sceneRender.id;
   }
 
@@ -169,10 +167,18 @@ export class Scene {
   addRender(selector: string): string {
     let container = document.querySelector(selector);
     if (!container) {
-      throw new Error("找不到元素[" + selector + "]");
+      throw new Error('找不到元素[' + selector + ']');
     }
-    let sceneRender = new SceneRender(this.name + ".render." + this.renders.length, this, container);
-    this.renders.push({ id: sceneRender.id, name: sceneRender.name, render: sceneRender });
+    let sceneRender = new SceneRender(
+      this.name + '.render.' + this.renders.length,
+      this.scene,
+      container
+    );
+    this.renders.push({
+      id: sceneRender.id,
+      name: sceneRender.name,
+      render: sceneRender,
+    });
     return sceneRender.id;
   }
 
@@ -184,7 +190,13 @@ export class Scene {
    * @param near        摄像机视锥体近端面
    * @param far         摄像机视锥体远端面
    */
-  addCamera(render: SceneRender, name: string, fov: number, near: number, far: number): string {
+  addCamera(
+    render: SceneRender,
+    name: string,
+    fov: number,
+    near: number,
+    far: number
+  ): string {
     let sceneCamera = new SceneCamera(name, fov, near, far, render);
     // 创建摄像机后调用渲染器的逐帧渲染
     render.initRenderLoopBySceneCamera(sceneCamera);
@@ -193,7 +205,7 @@ export class Scene {
       name: sceneCamera.name,
       render: render,
       container: render.renderer.domElement,
-      camera: sceneCamera
+      camera: sceneCamera,
     });
     return sceneCamera.id;
   }
@@ -204,7 +216,7 @@ export class Scene {
   createCamera() {
     this.clearCameras();
     this.renders.forEach((render, index) => {
-      let name = this.name + ".camera." + index;
+      let name = this.name + '.camera.' + index;
       this.addCamera(render.render, name, 50, 1, 50000);
     });
   }
@@ -229,27 +241,31 @@ export class Scene {
    * @param material    地面材质
    * @param gridHelper  网格
    */
-  createPlane(geometry?: THREE.PlaneGeometry, material?: THREE.MeshBasicMaterial, gridHelper?: THREE.GridHelper) {
+  createPlane(
+    geometry?: THREE.PlaneGeometry,
+    material?: THREE.MeshBasicMaterial,
+    gridHelper?: THREE.GridHelper
+  ) {
     let planeGeometry = geometry;
     if (!planeGeometry) {
       planeGeometry = new THREE.PlaneGeometry(this.size, this.size);
-      planeGeometry.name = this.name + ".plane.geometry";
+      planeGeometry.name = this.name + '.plane.geometry';
       planeGeometry.rotateX(-Math.PI / 2);
     }
 
     let planeMaterial = material;
     if (!planeMaterial) {
       planeMaterial = new THREE.MeshBasicMaterial({ visible: false });
-      planeMaterial.name = this.name + ".plane.material";
+      planeMaterial.name = this.name + '.plane.material';
     }
 
     this.plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    this.plane.name = this.name + ".plane";
+    this.plane.name = this.name + '.plane';
     this.plane.receiveShadow = true;
 
     if (!gridHelper) {
       this.gridHelper = new THREE.GridHelper(this.size, this.divisions);
-      this.gridHelper.name = this.name + ".gridHelper";
+      this.gridHelper.name = this.name + '.gridHelper';
       this.addObject(this.gridHelper);
     }
 
@@ -261,7 +277,7 @@ export class Scene {
    */
   clearRenders() {
     if (this.renders.length > 0) {
-      this.renders.forEach(render => {
+      this.renders.forEach((render) => {
         render.render.destroy();
       });
       this.renders = [];
@@ -286,14 +302,14 @@ export class Scene {
    */
   getCameraById(cameraId: string): THREE.PerspectiveCamera {
     if (this.cameras.length == 0) {
-      throw new Error("摄像头未初始化");
+      throw new Error('摄像头未初始化');
     }
     this.cameras.forEach((camera, index) => {
       if (camera.id === cameraId) {
         return camera.camera;
       }
     });
-    throw new Error("找不到摄像头[" + cameraId + "]");
+    throw new Error('找不到摄像头[' + cameraId + ']');
   }
 
   /**
@@ -301,28 +317,25 @@ export class Scene {
    */
   destroy() {
     this.scene.clear();
-    this.renders.forEach(render => {
+    this.renders.forEach((render) => {
       render.render.destroy();
     });
-    this.cameras.forEach(camera => {
+    this.cameras.forEach((camera) => {
       camera.camera.destroy();
     });
-    this.objects.forEach(obj => {
+    this.objects.forEach((obj) => {
       obj.clear();
       obj.remove();
       obj.removeFromParent();
-    })
-    this.noScanObjects.forEach(obj => {
+    });
+    this.noScanObjects.forEach((obj) => {
       obj.clear();
       obj.remove();
       obj.removeFromParent();
-    })
-    this.models.forEach(model => {
-      model.destroy();
-    })
+    });
+
     this.objects = [];
     this.noScanObjects = [];
-    this.models = [];
   }
 
   /**
@@ -349,7 +362,7 @@ export class Scene {
    */
   removeObject(obj: Object3D) {
     this.scene.remove(obj);
-    this.objects.forEach(obj => {
+    this.objects.forEach((obj) => {
       if (obj.uuid === obj.uuid) {
         obj.removeFromParent();
         obj.remove();
@@ -363,7 +376,7 @@ export class Scene {
    */
   removeNoScanObject(obj: Object3D) {
     this.scene.remove(obj);
-    this.noScanObjects.forEach(obj => {
+    this.noScanObjects.forEach((obj) => {
       if (obj.uuid === obj.uuid) {
         obj.removeFromParent();
         obj.remove();
@@ -372,29 +385,7 @@ export class Scene {
   }
 
   /**
-   * 添加模型封装
-   * @param model 模型封装对象
-   */
-  pushModel(model: SceneModel) {
-    this.models.push(model);
-    this.pushObject(model.object);
-  }
-
-  /**
-   * 添加模型封装（不可被扫描）
-   * @param model 模型封装对象
-   */
-  addModel(model: SceneModel) {
-    this.models.push(model);
-    this.addObject(model.object);
-  }
-
-
-  /**
    * 保存场景，导出场景
    */
-  save() {
-
-  }
-
+  save() {}
 }
